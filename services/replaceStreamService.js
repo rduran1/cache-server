@@ -1,5 +1,4 @@
 const { Transform } = require('stream');
-const { callbackify } = require('util');
 
 class ReplaceStream extends Transform {
   constructor(searchString, replaceString, prefixString) {

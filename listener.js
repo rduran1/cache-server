@@ -3,42 +3,22 @@ const zlib = require('zlib');
 const { promisify } = require('util');
 const { pipeline } = require('stream');
 const { createServer } = require('https');
+const config = require('./app.config').listener;
+const toolboxService = require('./services/toolboxService');
+const loggingService = require('./services/loggingService');
 const replaceStream = require('./services/replaceStreamService');
 const collectionService = require('./services/collectionService');
 
+const logger = loggingService(__filename);
 const pipelineAsync = promisify(pipeline);
-
-function logit(strMsg) { console.log(`${Date()}: ${strMsg}`); }
-
-const truncateFile = (strFileName, len, strAppend) => new Promise(async (resolve, reject) => {
-	let stats;
-	try {
-		stats = fs.statSync(strFileName);
-	} catch(e) {
-		return reject(new Error(`Error getting file size of ${strFileName}: ${e.message}`));
-	}
-	const trim = stats.size - len;
-	if (trim < 1) return resolve();
-	fs.truncate(strFileName, trim, (e) => {
-		if (e) return reject(new Error(`Error truncating ${strFileName} by ${len} characters: ${e.message}`));
-		if (strAppend) {
-			fs.appendFile(strFileName, strAppend, (err) => {
-				if (err) return reject(new Error(`Error appending "${strAppend}" to ${strFileName}: ${e.message}`));
-				return resolve();
-			});
-		} else {
-			return resolve();
-		}
-	});
-});
 
 async function connectionHandler(req, res) {
 	const { remoteAddress, remotePort } = req.connection;
 	if (!config.allowedIps.includes(remoteAddress)) {
-		logit(`Client connection attempt from ${remoteAddress} denied, IP is not in the allowed IP addresses list`);
+		logger.warn(`Client connection attempt from ${remoteAddress} denied, IP is not in the allowed IP addresses list`);
 		return req.destroy();
 	} else {
-		logit(`Client connected from IP ${remoteAddress}:${remotePort}`);
+		logger.info(`Client connected from IP ${remoteAddress}:${remotePort}`);
 	}
 	const datasetName = req.headers['x-dataset-name'];
 	if (typeof datasetName != 'string') {
@@ -52,7 +32,7 @@ async function connectionHandler(req, res) {
 	}
 	logit(`${remoteAddress} is requesting to upload dataset "${datasetName}" size: ${datasetSize} bytes`);
 	logit(`Searching collector store for "${datasetName}" configuration`);
-	const collector = await collectorStore.getByName(datasetName);
+	const collector = await collectionService.getByName(datasetName);
 	if (typeof collector.name !== 'string') {  
         logit(`${remoteAddress} attempted to upload unknown dataset "${datasetName}"`);
         return req.destroy(); 
@@ -79,7 +59,7 @@ async function connectionHandler(req, res) {
 		const tFile = `${collector.cacheFile}.receiving`;
 		const writeStream = fs.createWriteStream(tFile);
 		await pipelineAsync(req, zlib.Gunzip(), ...transforms, writeStream);
-		await truncateFile(tFile, 5, '"]]');
+		await toolboxService.truncateFile(tFile, 5, '"]]');
 		fs.renameSync(tFile, `${collector.cacheFile}_`);
 	} catch (e) {
 		logit(`Pipeline error processing "${datasetName}" from ${remoteAddress}: ${e.message}`);
