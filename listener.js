@@ -1,6 +1,14 @@
+const fs = require('fs');
+const zlib = require('zlib');
+const { promisify } = require('util');
+const { pipeline } = require('stream');
+const { createServer } = require('https');
+const replaceStream = require('./services/replaceStreamService');
+const collectionService = require('./services/collectionService');
+
 const pipelineAsync = promisify(pipeline);
 
-function logit(strMsg) { console.log(`${Date()}: ${strMsg}`) }
+function logit(strMsg) { console.log(`${Date()}: ${strMsg}`); }
 
 const truncateFile = (strFileName, len, strAppend) => new Promise(async (resolve, reject) => {
 	let stats;
