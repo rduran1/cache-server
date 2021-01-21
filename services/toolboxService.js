@@ -1,4 +1,5 @@
 const fs = require('fs');
+const schemaService = require('../services/schemaService');
 
 const toolboxService = {};
 
@@ -29,8 +30,19 @@ toolboxService.clone = (object) => {
 		const clone = JSON.parse(JSON.stringify(object));
 		return clone;
 	} catch (e) {
-		throw new Error(`Failed to clone object: ${e.message}`);
+		throw new Error(`toolboxService.clone: ${e.message}`);
 	}
 };
+
+toolboxService.cloneAndValidate = (config, schemaName) => {
+  const configCopy = toolboxService.clone(config);
+  try {
+		schemaService.validate(configCopy, schemaName);
+		return configCopy;
+  } catch (e) {
+    throw new Error(`schemaService.validate: ${e.message}`);
+  }
+  return configCopy;
+}
 
 module.exports = toolboxService;

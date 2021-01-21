@@ -1,16 +1,5 @@
-const schemaService = require('./services/schemaService');
 const toolboxService = require('./services/toolboxService');
 const httpClientService = require('./services/httpClientService');
-
-function cloneAndValidate(config) {
-  const configCopy = toolboxService.clone(config);
-  try {
-    schemaService.validate(configCopy, schemaName);
-  } catch (e) {
-    throw new Error(`config parameter passed to validate method failed validate: ${e.message}`);
-  }
-  return configCopy;
-}
 
 async function makeHttpRequest(config) {
   try {
@@ -25,7 +14,7 @@ async function makeHttpRequest(config) {
 const bigfixService = {};
 
 bigfixService.authenticate = async(config) => {
-  const configCopy = cloneAndValidate(config, 'bigfixAuthentication');
+  const configCopy = toolboxService.cloneAndValidate(config, 'bigfixAuthentication');
   configCopy.path = '/api/login';
   configCopy.method = 'GET';
   const response = await makeHttpRequest(configCopy);
@@ -33,7 +22,7 @@ bigfixService.authenticate = async(config) => {
 };
 
 bigfixService.getOperator = async(config) => {
-  const configCopy = cloneAndValidate(config, 'bigfixOperator');
+  const configCopy = toolboxService.cloneAndValidate(config, 'bigfixOperator');
   configCopy.path = `/api/operator/${configCopy.opName}`;
   configCopy.method = 'GET';
   const response = await makeHttpRequest(configCopy);
@@ -41,7 +30,7 @@ bigfixService.getOperator = async(config) => {
 };
 
 bigfixService.deleteOperator = async(config) => {
-  const configCopy = cloneAndValidate(config, 'bigfixOperator');
+  const configCopy = toolboxService.cloneAndValidate(config, 'bigfixOperator');
   configCopy.path = `/api/operator/${configCopy.opName}`;
   configCopy.method = 'DELETE';
   const response = await makeHttpRequest(configCopy);
@@ -49,7 +38,7 @@ bigfixService.deleteOperator = async(config) => {
 };
 
 bigfixService.disableOperator = async(config) => {
-  const configCopy = cloneAndValidate(config, 'bigfixOperator');
+  const configCopy = toolboxService.cloneAndValidate(config, 'bigfixOperator');
   configCopy.path = `/api/operator/${configCopy.opName}`;
   configCopy.method = 'PUT';
   const operatorXml = await bigfixService.getOperator(configCopy);
