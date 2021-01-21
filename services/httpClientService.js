@@ -45,7 +45,7 @@ httpClientService.asyncRequest = options => new Promise((resolve, reject) => {
     if (e.path || e.path === null) eInfo.push(`path: ${e.path}`);
     if (e.host) eInfo.push(`host: ${e.host}`);
     if (e.port) eInfo.push(`port: ${e.port}`);
-    return resolve(`${e.message}: (${eInfo.join(' ')})`);
+    return reject(new Error(`${e.message}: (${eInfo.join(' ')})`));
   });
 
   clientRequest.on('abort', (e) => { console.log(e) });

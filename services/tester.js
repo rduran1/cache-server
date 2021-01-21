@@ -8,7 +8,7 @@ const http = require('./httpClientService');
     port: 4000,
     rejectUnauthorized: false,
     timeout: 10000,
-    useTls: false,
+    useTls: true,
     body: null,
     returnClientRequest: false,
     returnHttpIncomingMessage: false
