@@ -27,13 +27,18 @@ httpClientService.asyncRequest = options => new Promise((resolve, reject) => {
   if (returnClientRequest) return resolve(clientRequest);
 
   clientRequest.on('response', httpIncomingMessage => {
+
     if (returnHttpIncomingMessage) return resolve(httpIncomingMessage);
-    httpIncomingMessage.on('close', (e) => { console.log(e) });
-    httpIncomingMessage.on('aborted', (e) => { console.log(e) });
+
+    httpIncomingMessage.on('aborted', (e) => { 
+      return reject(new Error(`httpIncomingMessage aborted: ${e.message}`));
+    });
+
     let data = '';
     httpIncomingMessage.on('data', (chunk) => {
       data += chunk;
     });
+
     httpIncomingMessage.on('end', () => {
       return resolve({ message: httpIncomingMessage, data: data });
     });
@@ -48,7 +53,9 @@ httpClientService.asyncRequest = options => new Promise((resolve, reject) => {
     return reject(new Error(`${e.message}: (${eInfo.join(' ')})`));
   });
 
-  clientRequest.on('abort', (e) => { console.log(e) });
+  clientRequest.on('abort', (e) => { 
+    return reject(new Error(`clientRequest aborted: ${e.message}`)); 
+  });
 
   clientRequest.on('timeout', (e) => {
     clientRequest.destroy();

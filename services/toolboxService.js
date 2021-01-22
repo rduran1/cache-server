@@ -13,7 +13,8 @@ toolboxService.truncateFile = (strFileName, len, strAppend) => new Promise(async
 	const trim = stats.size - len;
 	if (trim < 1) return resolve();
 	fs.truncate(strFileName, trim, (e) => {
-		if (e) return reject(new Error(`Error truncating ${strFileName} by ${len} characters: ${e.message}`));
+		const s = trim === 1 ? '' : 's'
+		if (e) return reject(new Error(`Error truncating ${strFileName} by ${len} character${s}: ${e.message}`));
 		if (strAppend) {
 			fs.appendFile(strFileName, strAppend, (err) => {
 				if (err) return reject(new Error(`Error appending "${strAppend}" to ${strFileName}: ${e.message}`));
@@ -30,7 +31,7 @@ toolboxService.clone = (object) => {
 		const clone = JSON.parse(JSON.stringify(object));
 		return clone;
 	} catch (e) {
-		throw new Error(`toolboxService.clone: ${e.message}`);
+		throw new Error(`Error cloning object: ${e.message}`);
 	}
 };
 
@@ -40,9 +41,8 @@ toolboxService.cloneAndValidate = (config, schemaName) => {
 		schemaService.validate(configCopy, schemaName);
 		return configCopy;
   } catch (e) {
-    throw new Error(`schemaService.validate: ${e.message}`);
+    throw new Error(`Object validation failed: ${e.message}`);
   }
-  return configCopy;
 }
 
 module.exports = toolboxService;

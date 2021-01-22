@@ -3,7 +3,7 @@ const httpClientService = require('./services/httpClientService');
 
 async function makeHttpRequest(config) {
   try {
-    const response = await httpClientService.request(configCopy);
+    const response = await httpClientService.asyncRequest(configCopy);
     if (response.statusCode === 200) return true;
     return false;
   } catch (e) {
@@ -50,6 +50,15 @@ bigfixService.disableOperator = async(config) => {
   .replace(/\<API\>.+?\<\/API\>/,'<API>false</API>')
   .replace(/\n/g,'')
   .replace(/^\<.+?\?\>/,'');
+  const response = await makeHttpRequest(configCopy); 
+  return response ? true : false;
+};
+
+bigfixService.query = async(config) => {
+  const configCopy = toolboxService.cloneAndValidate(config, 'bigfixOperator');
+  configCopy.path = `/api/operator/${configCopy.opName}`;
+  configCopy.method = 'POST';
   const response = await makeHttpRequest(configCopy);
+  pipeline( response, ...TransformStream, outputFile );
   return response ? true : false;
 };
