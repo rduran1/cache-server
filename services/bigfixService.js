@@ -1,48 +1,52 @@
-const toolboxService = require('./services/toolboxService');
-const httpClientService = require('./services/httpClientService');
+const toolboxService = require('../services/toolboxService');
+const httpClientService = require('../services/httpClientService');
 
-async function makeHttpRequest(config) {
-  try {
-    const response = await httpClientService.asyncRequest(configCopy);
-    if (response.statusCode === 200) return true;
-    return false;
-  } catch (e) {
-    throw new Error(`httpClientService returned an error: ${e.message}`);
-  }
+async function _makeHttpRequest(config) {
+  // Set defaults for httpClient
+  if (typeof config.useTls === 'undefined') config.useTls = true;
+  if (typeof config.rejectUnauthorized === 'undefined') config.rejectUnauthorized = false;
+  if (typeof config.returnClientRequest === 'undefined') config.returnClientRequest = false;
+  if (typeof config.returnHttpIncomingMessage === 'undefined') config.returnHttpIncomingMessage = false;
+  const response = await httpClientService.asyncRequest(config);
+  return response;
 }
 
 const bigfixService = {};
 
 bigfixService.authenticate = async(config) => {
-  const configCopy = toolboxService.cloneAndValidate(config, 'bigfixAuthentication');
+  const configCopy = toolboxService.clone(config);
   configCopy.path = '/api/login';
   configCopy.method = 'GET';
-  const response = await makeHttpRequest(configCopy);
-  return response ? true : false;
+  toolboxService.validate({ username: configCopy.username, password: configCopy.password }, 'bigfixAuthentication');
+  configCopy.auth = `${configCopy.username}:${configCopy.password}`;
+  delete configCopy.username;
+  delete configCopy.password;
+  const { message } = await _makeHttpRequest(configCopy);
+  return message.statusCode;
 };
 
 bigfixService.getOperator = async(config) => {
-  const configCopy = toolboxService.cloneAndValidate(config, 'bigfixOperator');
   configCopy.path = `/api/operator/${configCopy.opName}`;
   configCopy.method = 'GET';
-  const response = await makeHttpRequest(configCopy);
-  return response;
+  const configCopy = toolboxService.cloneAndValidate(config, 'bigfixOperator');
+  const { message, data } = await _makeHttpRequest(configCopy);
+  return { message, data };
 };
 
 bigfixService.deleteOperator = async(config) => {
-  const configCopy = toolboxService.cloneAndValidate(config, 'bigfixOperator');
   configCopy.path = `/api/operator/${configCopy.opName}`;
   configCopy.method = 'DELETE';
-  const response = await makeHttpRequest(configCopy);
-  return response ? true : false;
+  const configCopy = toolboxService.cloneAndValidate(config, 'bigfixOperator');
+  const { message, data } = await _makeHttpRequest(configCopy);
+  return { message, data }
 };
 
 bigfixService.disableOperator = async(config) => {
-  const configCopy = toolboxService.cloneAndValidate(config, 'bigfixOperator');
   configCopy.path = `/api/operator/${configCopy.opName}`;
   configCopy.method = 'PUT';
+  const configCopy = toolboxService.cloneAndValidate(config, 'bigfixOperator');
   const operatorXml = await bigfixService.getOperator(configCopy);
-  configCopy.payload = operatorXml
+  configCopy.body = operatorXml
   .replace(/\<LastLoginTime\>.+?\<\/LastLoginTime\>/,'')
   .replace(/\<LoginPermission\>.+?\<\/LoginPermission\>/,'<LoginPermission>Disabled</LoginPermission>')
   .replace(/\<Console\>.+?\<\/Console\>/,'<Console>false</Console>')
@@ -50,15 +54,17 @@ bigfixService.disableOperator = async(config) => {
   .replace(/\<API\>.+?\<\/API\>/,'<API>false</API>')
   .replace(/\n/g,'')
   .replace(/^\<.+?\?\>/,'');
-  const response = await makeHttpRequest(configCopy); 
-  return response ? true : false;
+  const { message, data } = await _makeHttpRequest(configCopy); 
+  return { message, data };
 };
 
 bigfixService.query = async(config) => {
-  const configCopy = toolboxService.cloneAndValidate(config, 'bigfixOperator');
   configCopy.path = `/api/operator/${configCopy.opName}`;
   configCopy.method = 'POST';
-  const response = await makeHttpRequest(configCopy);
+  const configCopy = toolboxService.cloneAndValidate(config, 'bigfixOperator');
+  const response = await _makeHttpRequest(configCopy);
   pipeline( response, ...TransformStream, outputFile );
   return response ? true : false;
 };
+
+module.exports = bigfixService;

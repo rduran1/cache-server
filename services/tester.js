@@ -1,5 +1,6 @@
 const http = require('./httpClientService');
 const toolboxService = require('./toolboxService');
+const bigfixService = require('./bigfixService');
 const replaceStreamService = require('./replaceStreamService');
 
 const rs = new replaceStreamService('Title', 'KING');
@@ -7,15 +8,18 @@ const rs = new replaceStreamService('Title', 'KING');
 (async () => {
   const options = {
     host: 'onportal.net',
-    path: '/incidents',
-    method: 'get',
     port: 4000,
-    //rejectUnauthorized: false,
-    timeout: 5000,
-    //useTls: false,
-    body: null,
-    returnClientRequest: false,
-    returnHttpIncomingMessage: true
+    username: 'rd',
+    password: 'as',
+    useTls: false,
+    timeout: 100
+  }
+
+  try {
+    const code = await bigfixService.authenticate(options);
+    console.log(code);
+  } catch (e) {
+    console.log(e.message);
   }
 
   /*
@@ -27,7 +31,7 @@ const rs = new replaceStreamService('Title', 'KING');
   } catch (e) {
     console.log(`ERROR: ${e.message}`);
   }
-  */
+  
 
   // with returnHttpIncomingMessage = true;
   const { createWriteStream } = require('fs');
@@ -42,6 +46,6 @@ const rs = new replaceStreamService('Title', 'KING');
   } catch (e) {
     console.log(e.message);
   }
-
+*/
 
 })();

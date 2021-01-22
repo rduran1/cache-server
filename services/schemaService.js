@@ -10,7 +10,7 @@ schemaService.validate = (object, schemaName) => {
   const validationResult = schemas[schemaName].validate(object);
   if (validationResult.error != null) {
     const validateErrorMessage = validationResult.error.message.replace(/.+?\[/,'').replace(/\]$/,'');
-    throw new Error(validateErrorMessage);
+    throw new Error(`Object validation failed: ${validateErrorMessage}`);
   }
 };
 

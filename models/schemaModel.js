@@ -12,8 +12,8 @@ schemas.httpClient = Joi.object().keys({
   timeout: Joi.number(),
   useTls: Joi.boolean().required(),
   body: Joi.string().allow('').allow(null),
-  returnClientRequest: Joi.boolean(),
-  returnHttpIncomingMessage: Joi.boolean(),
+  returnClientRequest: Joi.boolean().required(),
+  returnHttpIncomingMessage: Joi.boolean().required(),
   auth: Joi.string().regex(/.+?:.+?/) // Basic authentication i.e. 'user:password'
 });
 
@@ -22,11 +22,8 @@ schemas.bigfix_restapi = Joi.object().keys({
 });
 
 schemas.bigfixAuthentication = Joi.object().keys({
-  hostname: Joi.string().min(2).required(),
-  userId: Joi.string().min(2).required(),
-  password: Joi.string().required(),
-  rejectUnauthorized: Joi.boolean().required(),
-  port: Joi.number().min(80).max(65534).required()
+  username: Joi.string().min(2).required(),
+  password: Joi.string().min(2).required()
 });
 
 schemas.bigfixOperator = Joi.object().keys({

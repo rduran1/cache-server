@@ -35,14 +35,14 @@ toolboxService.clone = (object) => {
 	}
 };
 
+toolboxService.validate = (object, schemaName) => {
+		schemaService.validate(object, schemaName);
+};
+
 toolboxService.cloneAndValidate = (config, schemaName) => {
   const configCopy = toolboxService.clone(config);
-  try {
-		schemaService.validate(configCopy, schemaName);
-		return configCopy;
-  } catch (e) {
-    throw new Error(`Object validation failed: ${e.message}`);
-  }
+	schemaService.validate(configCopy, schemaName);
+	return configCopy;
 }
 
 module.exports = toolboxService;

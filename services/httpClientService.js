@@ -5,14 +5,18 @@ const toolboxService = require('../services/toolboxService');
 const httpClientService = {};
 
 httpClientService.asyncRequest = options => new Promise((resolve, reject) => {
-  let opts;
+  let opts = {};
 
   // Set defaults for httpClient
   if (!opts.useTls) opts.useTls = true;
   if (!opts.rejectUnauthorized) opts.rejectUnauthorized = false;
+  if (!opts.returnClientRequest) opts.returnClientRequest = false;
+  if (!opts.returnHttpIncomingMessage) opts.returnHttpIncomingMessage = false;
+
+  Object.assign(opts, options);
 
   try {
-    opts = toolboxService.cloneAndValidate(options, 'httpClient');
+    toolboxService.validate(opts, 'httpClient');
   } catch (e) {
     return reject(new Error(`${e.message}`));
   }
@@ -58,12 +62,12 @@ httpClientService.asyncRequest = options => new Promise((resolve, reject) => {
   });
 
   clientRequest.on('abort', (e) => { 
-    return reject(new Error(`clientRequest aborted: ${e.message}`)); 
+    return reject(new Error(`ClientRequest aborted: ${e.message}`)); 
   });
 
   clientRequest.on('timeout', (e) => {
     clientRequest.destroy();
-    return reject(new Error('request timed out waiting for server to respond'));
+    return reject(new Error('Request timed out waiting for server response'));
   });
 
   body ? clientRequest.end(body) : clientRequest.end();
