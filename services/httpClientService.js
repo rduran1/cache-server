@@ -7,6 +7,10 @@ const httpClientService = {};
 httpClientService.asyncRequest = options => new Promise((resolve, reject) => {
   let opts;
 
+  // Set defaults for httpClient
+  if (!opts.useTls) opts.useTls = true;
+  if (!opts.rejectUnauthorized) opts.rejectUnauthorized = false;
+
   try {
     opts = toolboxService.cloneAndValidate(options, 'httpClient');
   } catch (e) {

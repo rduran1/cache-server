@@ -1,5 +1,8 @@
 const http = require('./httpClientService');
 const toolboxService = require('./toolboxService');
+const replaceStreamService = require('./replaceStreamService');
+
+const rs = new replaceStreamService('Title', 'KING');
 
 (async () => {
   const options = {
@@ -7,9 +10,9 @@ const toolboxService = require('./toolboxService');
     path: '/incidents',
     method: 'get',
     port: 4000,
-    rejectUnauthorized: false,
+    //rejectUnauthorized: false,
     timeout: 5000,
-    useTls: false,
+    //useTls: false,
     body: null,
     returnClientRequest: false,
     returnHttpIncomingMessage: true
@@ -32,7 +35,7 @@ const toolboxService = require('./toolboxService');
   try {
     const httpIncomingMessage = await http.asyncRequest(options);
     console.log(httpIncomingMessage.statusCode);
-    httpIncomingMessage.pipe(writeStream);
+    httpIncomingMessage.pipe(rs).pipe(writeStream);
     writeStream.on('close', async() => {
       await toolboxService.truncateFile('./output.txt', 1400, 'TRUNCATED');
     });
