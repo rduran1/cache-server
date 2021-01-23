@@ -6,14 +6,14 @@ const httpClientService = {};
 
 httpClientService.asyncRequest = options => new Promise((resolve, reject) => {
   let opts = {};
+  Object.assign(opts, options);
 
   // Set defaults for httpClient
-  if (!opts.useTls) opts.useTls = true;
-  if (!opts.rejectUnauthorized) opts.rejectUnauthorized = false;
-  if (!opts.returnClientRequest) opts.returnClientRequest = false;
-  if (!opts.returnHttpIncomingMessage) opts.returnHttpIncomingMessage = false;
+  if (typeof opts.useTls === 'undefined') opts.useTls = true;
+  if (typeof opts.rejectUnauthorized === 'undefined') opts.rejectUnauthorized = false;
+  if (typeof opts.returnClientRequest === 'undefined') opts.returnClientRequest = false;
+  if (typeof opts.returnHttpIncomingMessage === 'undefined') opts.returnHttpIncomingMessage = false;
 
-  Object.assign(opts, options);
   toolboxService.validate(opts, 'httpClient');
 
   const httpClient = opts.useTls ? https : http;
