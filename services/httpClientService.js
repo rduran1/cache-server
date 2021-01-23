@@ -14,12 +14,7 @@ httpClientService.asyncRequest = options => new Promise((resolve, reject) => {
   if (!opts.returnHttpIncomingMessage) opts.returnHttpIncomingMessage = false;
 
   Object.assign(opts, options);
-
-  try {
-    toolboxService.validate(opts, 'httpClient');
-  } catch (e) {
-    return reject(new Error(`${e.message}`));
-  }
+  toolboxService.validate(opts, 'httpClient');
 
   const httpClient = opts.useTls ? https : http;
   const body = opts.body || null;
