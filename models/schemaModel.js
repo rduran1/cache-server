@@ -1,4 +1,3 @@
-const { JSONCookie } = require('cookie-parser');
 const Joi = require('joi');
 
 const schemas = {};
