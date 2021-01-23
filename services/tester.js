@@ -1,6 +1,6 @@
-const http = require('./httpClientService');
-const toolboxService = require('./toolboxService');
+//const http = require('./httpClientService');
 const bigfixService = require('./bigfixService');
+const toolboxService = require('./toolboxService');
 const replaceStreamService = require('./replaceStreamService');
 
 const rs = new replaceStreamService('Title', 'KING');
@@ -11,16 +11,19 @@ const rs = new replaceStreamService('Title', 'KING');
     port: 4000,
     username: 'rd',
     password: 'as',
-    useTls: false,
-    timeout: 100
+    relevance: 'lines of file whose (name of it contains "test")',
+    transforms: [rs1,rs2,rs3],
+    outputFile: '/path/to/outputfile'
   }
 
   try {
-    const code = await bigfixService.authenticate(options);
+    const code = await bigfixService.query(options);
     console.log(code);
   } catch (e) {
     console.log(e.message);
   }
+
+
 
   /*
   try {
