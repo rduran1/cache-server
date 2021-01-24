@@ -10,7 +10,7 @@ httpClientService.asyncRequest = options => new Promise((resolve, reject) => {
 
   // Set defaults for httpClient
   if (typeof opts.useTls === 'undefined') opts.useTls = true;
-  if (typeof opts.rejectUnauthorized === 'undefined') opts.rejectUnauthorized = false;
+  if (typeof opts.rejectUnauthorized === 'undefined') opts.rejectUnauthorized = true;
   if (typeof opts.returnClientRequest === 'undefined') opts.returnClientRequest = false;
   if (typeof opts.returnHttpIncomingMessage === 'undefined') opts.returnHttpIncomingMessage = false;
 
@@ -23,6 +23,7 @@ httpClientService.asyncRequest = options => new Promise((resolve, reject) => {
   const returnHttpIncomingMessage = opts.returnHttpIncomingMessage;
   delete opts.body;
   delete opts.returnClientRequest;
+  delete opts.returnHttpIncomingMessage;
 
   const clientRequest = httpClient.request(opts);
   if (timeout) clientRequest.setTimeout(timeout);
