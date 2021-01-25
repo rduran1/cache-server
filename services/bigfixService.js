@@ -43,11 +43,12 @@ async function _makeHttpRequest(config) {
             const response = { message, data };
             return response;
           } catch (e) {
-            return httpIncomingMessage;
+            const message = httpIncomingMessage;
+            return message;
           }
         }
-
-        return httpIncomingMessage;
+        const message = httpIncomingMessage;
+        return message;
       } catch (e) {
         throw new Error(`Pipeline error: ${e.message}`);
       }
