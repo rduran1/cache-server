@@ -39,16 +39,12 @@ async function _makeHttpRequest(config) {
         if (httpIncomingMessage.statusCode !== 200) {
           try {
             const data = readFileSync(outputFile, { encoding:'utf8' });
-            const message = httpIncomingMessage;
-            const response = { message, data };
-            return response;
+            return { message: httpIncomingMessage, data };
           } catch (e) {
-            const message = httpIncomingMessage;
-            return message;
+            return { message: httpIncomingMessage };
           }
         }
-        const message = httpIncomingMessage;
-        return message;
+        return { message: httpIncomingMessage };
       } catch (e) {
         throw new Error(`Pipeline error: ${e.message}`);
       }
