@@ -25,7 +25,7 @@ async function _makeHttpRequest(config) {
     let transforms;
     if (typeof config.transforms === 'object') {
       transforms = config.transforms;
-      delete config.tranforms;
+      delete config.transforms;
     }
     if (typeof config.outputFile === 'string') {
       const writable = createWriteStream(config.outputFile);
@@ -115,19 +115,19 @@ bigfixService.query = async(config) => {
   if (typeof config.relevance !== 'string') throw new Error('Relevance is required and must be of type string');
   if (typeof config.output !== 'undefined') {
     if (typeof config.output !== 'string') throw new Error('output parameter must be of type string');
-    if (config.output.toLowerCase() !== 'json' || config.output.toLowerCase() !== 'xml') {
+    if (config.output.toLowerCase() !== 'json' && config.output.toLowerCase() !== 'xml') {
       throw new Error('Valid options for output parameter are "json" or "xml"');
     }
   }
-  // TODO: if output file is provided then only return statusCode
+  // Cant clone transforms so we copy then to a temp variable then reassign back after cloning
+  const transforms = config.transforms;
   configCopy = _validateUserAndPassProvided(config);
+  configCopy.transforms = transforms;
   configCopy.path = `/api/query`;
   configCopy.method = 'POST';
   const { relevance, output } = configCopy;
   const format = (typeof output === 'string' ? `output=${output}&` : '');
-  configCopy.body = `${format}relevance=${encodedURI(relevance)}`;
-  delete configCopy.relevance;
-  delete configCopy.output;
+  configCopy.body = `${format}relevance=${encodeURI(relevance)}`;
   const response = await _makeHttpRequest(configCopy);
   return response;
 };
