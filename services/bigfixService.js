@@ -113,13 +113,19 @@ bigfixService.disableOperator = async(config) => {
 
 bigfixService.query = async(config) => {
   if (typeof config.relevance !== 'string') throw new Error('Relevance is required and must be of type string');
+  if (typeof config.output !== 'undefined') {
+    if (typeof config.output !== 'string') throw new Error('output parameter must be of type string');
+    if (config.output.toLowerCase() !== 'json' || config.output.toLowerCase() !== 'xml') {
+      throw new Error('Valid options for output parameter are "json" or "xml"');
+    }
+  }
   // TODO: if output file is provided then only return statusCode
   configCopy = _validateUserAndPassProvided(config);
   configCopy.path = `/api/query`;
   configCopy.method = 'POST';
   const { relevance, output } = configCopy;
   const format = (typeof output === 'string' ? `output=${output}&` : '');
-  configCopy.body = `${format}relevance=${relevance}`;
+  configCopy.body = `${format}relevance=${encodedURI(relevance)}`;
   delete configCopy.relevance;
   delete configCopy.output;
   const response = await _makeHttpRequest(configCopy);
