@@ -27,6 +27,7 @@ toolboxService.truncateFile = (strFileName, len, strAppend) => new Promise(async
 });
 
 toolboxService.clone = (object) => {
+	if (typeof object === 'undefined') throw new Error('Error cloning object: Object is undefined');
 	try {
 		const clone = JSON.parse(JSON.stringify(object));
 		return clone;
