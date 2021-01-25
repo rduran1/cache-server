@@ -118,7 +118,10 @@ bigfixService.query = async(config) => {
   configCopy.path = `/api/query`;
   configCopy.method = 'POST';
   const { relevance, output } = configCopy;
-  configCopy.body = `relevance='${relevance}'&output='${output}'`;
+  const format = (typeof output === 'string' ? `output=${output}&` : '');
+  configCopy.body = `${format}relevance=${relevance}`;
+  delete configCopy.relevance;
+  delete configCopy.output;
   const response = await _makeHttpRequest(configCopy);
   return response;
 };
