@@ -51,6 +51,7 @@ async function _makeHttpRequest(config) {
 }
 
 function _validateUserAndPassProvided(config) {
+  if (typeof config === 'undefined') throw new Error('username and password parameters are required');
   const configCopy = toolboxService.clone(config);
   const { username, password } = configCopy;
   toolboxService.validate({ username, password }, 'bigfixAuthentication');
@@ -59,6 +60,7 @@ function _validateUserAndPassProvided(config) {
 }
 
 function _validateUserPassAndOpNameProvided(config) {
+  if (typeof config === 'undefined') throw new Error('username and password parameters are required');
   let configCopy = toolboxService.clone(config);
   configCopy = _validateUserAndPassProvided(configCopy);
   toolboxService.validate({ opName: configCopy.opName }, 'bigfixOperator');
