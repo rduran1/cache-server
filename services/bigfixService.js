@@ -1,7 +1,7 @@
 const { promisify } = require('util'); 
 const { pipeline } = require('stream'); 
 const pipelineAsync = promisify(pipeline);
-const { createWriteStream } = require('fs');
+const { createWriteStream, readFileSync} = require('fs');
 const toolboxService = require('../services/toolboxService');
 const httpClientService = require('../services/httpClientService');
 
@@ -29,11 +29,24 @@ async function _makeHttpRequest(config) {
     }
     if (typeof config.outputFile === 'string') {
       const writable = createWriteStream(config.outputFile);
+      const outputFile = config.outputFile;
       delete config.outputFile;
       const httpIncomingMessage = await httpClientService.asyncRequest(config);
       try {
         if (transforms) await pipelineAsync(httpIncomingMessage, ...transforms, writable);
         if (!transforms) await pipelineAsync(httpIncomingMessage, writable);
+
+        if (httpIncomingMessage.statusCode !== 200) {
+          try {
+            const data = readFileSync(outputFile, { encoding:'utf8' });
+            const message = httpIncomingMessage;
+            const response = { message, data };
+            return response;
+          } catch (e) {
+            return httpIncomingMessage;
+          }
+        }
+
         return httpIncomingMessage;
       } catch (e) {
         throw new Error(`Pipeline error: ${e.message}`);
