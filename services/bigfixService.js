@@ -73,24 +73,24 @@ bigfixService.authenticate = async(config) => {
   configCopy = _validateUserAndPassProvided(config);
   configCopy.path = '/api/login';
   configCopy.method = 'GET';
-  const { message } = await _makeHttpRequest(configCopy);
-  return message.statusCode;
+  const response = await _makeHttpRequest(configCopy);
+  return response;
 };
 
 bigfixService.getOperator = async(config) => {
   const configCopy = _validateUserPassAndOpNameProvided(config);
   configCopy.path = `/api/operator/${configCopy.opName}`;
   configCopy.method = 'GET';
-  const { message, data } = await _makeHttpRequest(configCopy);
-  return { message, data };
+  const response = await _makeHttpRequest(configCopy);
+  return response;
 };
 
 bigfixService.deleteOperator = async(config) => {
   const configCopy = _validateUserPassAndOpNameProvided(config);
   configCopy.path = `/api/operator/${configCopy.opName}`;
   configCopy.method = 'DELETE';
-  const { message, data } = await _makeHttpRequest(configCopy);
-  return { message, data };
+  const response = await _makeHttpRequest(configCopy);
+  return response;
 };
 
 bigfixService.disableOperator = async(config) => {
@@ -107,11 +107,12 @@ bigfixService.disableOperator = async(config) => {
   .replace(/\<API\>.+?\<\/API\>/,'<API>false</API>')
   .replace(/\n/g,'')
   .replace(/^\<.+?\?\>/,'');
-  const { message, data } = await _makeHttpRequest(configCopy); 
-  return { message, data };
+  const response = await _makeHttpRequest(configCopy);
+  return response;
 };
 
 bigfixService.query = async(config) => {
+  if (typeof config.relevance !== 'string') throw new Error('Relevance is required and must be of type string');
   // TODO: if output file is provided then only return statusCode
   configCopy = _validateUserAndPassProvided(config);
   configCopy.path = `/api/query`;
@@ -119,7 +120,7 @@ bigfixService.query = async(config) => {
   const { relevance, output } = configCopy;
   configCopy.body = `relevance='${relevance}'&output='${output}'`;
   const response = await _makeHttpRequest(configCopy);
-  
+  return response;
 };
 
 module.exports = bigfixService;
