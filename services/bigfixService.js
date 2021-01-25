@@ -1,3 +1,7 @@
+const { promisify } = require('util'); 
+const { pipeline } = require('stream'); 
+const pipelineAsync = promisify(pipeline);
+const { createWriteStream } = require('fs');
 const toolboxService = require('../services/toolboxService');
 const httpClientService = require('../services/httpClientService');
 
@@ -11,6 +15,37 @@ async function _makeHttpRequest(config) {
   delete config.opName;
   delete config.username;
   delete config.password;
+
+  if (typeof config.relevance === 'string') {
+    if (typeof config.transforms === 'object' || typeof config.outputFile === 'string') {
+      config.returnHttpIncomingMessage = true;
+    }
+    delete config.relevance;
+    delete config.output;
+    let transforms;
+    if (typeof config.transforms === 'object') {
+      transforms = config.transforms;
+      delete config.tranforms;
+    }
+    if (typeof config.outputFile === 'string') {
+      const writable = createWriteStream(config.outputFile);
+      delete config.outputFile;
+      const httpIncomingMessage = await httpClientService.asyncRequest(config);
+      try {
+        if (transforms) await pipelineAsync(httpIncomingMessage, ...transforms, writable);
+        if (!transforms) await pipelineAsync(httpIncomingMessage, writable);
+        return httpIncomingMessage;
+      } catch (e) {
+        throw new Error(`Pipeline error: ${e.message}`);
+      }
+    } else {
+      if (typeof transforms === 'object') {
+        throw new Error('Output file parameter is required when using transforms');
+      }
+      const response = await httpClientService.asyncRequest(config);
+      return response;
+    }
+  }
   const response = await httpClientService.asyncRequest(config);
   return response;
 }
@@ -79,9 +114,10 @@ bigfixService.query = async(config) => {
   configCopy = _validateUserAndPassProvided(config);
   configCopy.path = `/api/query`;
   configCopy.method = 'POST';
+  const { relevance, output } = configCopy;
+  configCopy.body = `relevance='${relevance}'&output='${output}'`;
   const response = await _makeHttpRequest(configCopy);
-  pipeline( response, ...TransformStream, outputFile );
-  return response ? true : false;
+  
 };
 
 module.exports = bigfixService;

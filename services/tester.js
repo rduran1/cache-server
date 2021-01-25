@@ -3,7 +3,15 @@ const bigfixService = require('./bigfixService');
 const toolboxService = require('./toolboxService');
 const replaceStreamService = require('./replaceStreamService');
 
-const rs = new replaceStreamService('Title', 'KING');
+
+
+
+
+
+
+/*
+const rs1 = new replaceStreamService('Title', 'KING');
+const rs2 = new replaceStreamService('MR', 'MRS');
 
 (async () => {
   const options = {
@@ -11,14 +19,15 @@ const rs = new replaceStreamService('Title', 'KING');
     port: 4000,
     username: 'rd',
     password: 'as',
-    opName: 'rduran'
-    //relevance: 'lines of file whose (name of it contains "test")',
-    //transforms: [rs1,rs2,rs3],
-    //outputFile: '/path/to/outputfile'
+    //opName: 'rduran',
+    relevance: 'lines of file whose (name of it contains "test")',
+    transforms: [rs1,rs2],
+    outputFile: '/path/to/outputfile',
+    output: 'json'
   }
 
   try {
-    const code = await bigfixService.getOperator(options);
+    const code = await bigfixService.query(options);
     console.log(code);
   } catch (e) {
     console.log(e.message);
