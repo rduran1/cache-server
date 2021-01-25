@@ -25,4 +25,8 @@ schemas.bigfixOperator = Joi.object().keys({
   opName: Joi.string().min(2).required()
 });
 
+schemas.hpsmAssignmentGroupName = Joi.object().keys({
+  assignmentGroup: Joi.string().min(2).max(100).required()
+});
+
 module.exports = schemas;

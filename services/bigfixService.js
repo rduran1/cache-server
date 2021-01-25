@@ -1,7 +1,7 @@
 const { promisify } = require('util'); 
 const { pipeline } = require('stream'); 
 const pipelineAsync = promisify(pipeline);
-const { createWriteStream, readFileSync} = require('fs');
+const { createWriteStream, readFileSync, unlinkSync} = require('fs');
 const toolboxService = require('../services/toolboxService');
 const httpClientService = require('../services/httpClientService');
 
@@ -38,7 +38,9 @@ async function _makeHttpRequest(config) {
 
         if (httpIncomingMessage.statusCode !== 200) {
           try {
+            // TODO: Only read file contents if file is under 1KB in size
             const data = readFileSync(outputFile, { encoding:'utf8' });
+            unlinkSync(outputFile);
             return { message: httpIncomingMessage, data };
           } catch (e) {
             return { message: httpIncomingMessage };

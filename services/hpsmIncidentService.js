@@ -1,146 +1,80 @@
-const verboseLogging = true;
-const logJSONObjects = false;
-
-const path		= require('path');
-const appConfig	= require(path.join(__dirname, '..', '..', 'data_store', 'appSettings'));
-const logFile	= path.join(appConfig.logDirectory, 'incidentService.log'); 
-const logger	= require('logger')({ outfile: logFile, verbose: verboseLogging});
-
-const maxIncidentIdLength = 12;  // Protect the HPSM REST API from overflows due to long incident params
-const maxGroupNameLength  = 100; // Protect the HPSM REST API from long URLS by limiting the length of the group name
+const schemaService = require('./schemaService');
+const accountService = require('./accountService');
+const toolboxService = require('./toolboxService');
+const httpClientService = require('./httpClientService');
 
 // Load stores
-const hpsmAATypesStore					= require('../models/hpsmAATypesModel');
-const hpsmContactsStore					= require('../models/hpsmContactsModel');
-const hpsmLocationsStore				= require('../models/hpsmLocationsModel');
-const hpsmIncidentsStore				= require('../models/hpsmIncidentsModel');
-const hpsmComputersStore				= require('../models/hpsmComputersModel');
-const hpsmGlobalListsStore 				= require('../models/hpsmGlobalListsModel');
-const hpsmClosureCodesStore				= require('../models/hpsmClosureCodesModel');
-const hpsmAssignmentsStore				= require('../models/hpsmAssignmentgroupsModel');
-const hpsmIncidentStatusesStore			= require('../models/hpsmIncidentStatusesModel');
-const hpsmCauseCodesStore				= require('../models/hpsmIncidentCauseCodesModel');
-const hpsmAreaCategorySubCategoryStore	= require('../models/hpsmAreaCategorySubCategoryModel');
-const hpsmPrimaryAffectedServicesStore	= require('../models/hpsmPrimaryAffectedServicesModel');
-
-// Load schemas
-const hpsmNewIncidentSchema				= require('../schemas/hpsmNewIncidentSchema');
-const hpsmExistingIncidentSchema		= require('../schemas/hpsmExistingIncidentSchema');
-
-// Load services and utilities
-const accountService					= require('../services/accountService');
-const utils								= require('apis-utils');
+const hpsmAATypesStore = require('../models/hpsmAATypesModel');
+const hpsmContactsStore = require('../models/hpsmContactsModel');
+const hpsmIncidentsStore = require('../models/hpsmIncidentsModel');
+const hpsmComputersStore = require('../models/hpsmComputersModel');
+const hpsmClosureCodesStore = require('../models/hpsmClosureCodesModel');
+const hpsmAssignmentsStore = require('../models/hpsmAssignmentgroupsModel');
+const hpsmCauseCodesStore	= require('../models/hpsmIncidentCauseCodesModel');
+const hpsmIncidentStatusesStore	= require('../models/hpsmIncidentStatusesModel');
+const hpsmAreaCategorySubCategoryStore = require('../models/hpsmAreaCategorySubCategoryModel');
+const hpsmPrimaryAffectedServicesStore = require('../models/hpsmPrimaryAffectedServicesModel');
 
 const incidentService = {};
 
-incidentService.getAllIncidents = async() => {
-	return await _modelCall('getAllIncidents', hpsmIncidentsStore, 'hpsmIncidentsStore', undefined, 'getAll');
-};
+// The following methods return an array of objects
+incidentService.getAllNonClosedIncidents = async () => await hpsmIncidentsStore.getAllNonClosedIncidents();
+//incidentService.getCauseCodes = async() => await hpsmCauseCodesStore.getCauseCodes();
 
-incidentService.getStatuses = async() => {
-	return await _modelCall('getStatuses', hpsmIncidentStatusesStore, 'hpsmIncidentStatusesStore', undefined, 'getAll');
-};
+// The following methods return a single object if found
+incidentService.getContactByOperatorId = async (operatorId) => await hpsmIncidentsStore.getContactByOperatorId(operatorId);
+incidentService.getContactByEmailAddress = async (emailAddress) => await hpsmIncidentsStore.getContactByEmail(emailAddress);
+incidentService.getComputerPropertiesByIRSBarcode = async (IRSBarcode) => await hpsmIncidentsStore.getComputerPropertiesByIRSBarcode(IRSBarcode);
+incidentService.getComputerPropertiesByDisplayName = async (displayName) => await hpsmIncidentsStore.getComputerPropertiesByDisplayName(displayName);
+incidentService.getComputerPropertiesByLogicalName = async (logicalName) => await hpsmIncidentsStore.getComputerPropertiesByLogicalName(logicalName);
 
-incidentService.getCauseCodes = async() => {
-	return await _modelCall('getCauseCodes', hpsmCauseCodesStore, 'hpsmCauseCodesStore', undefined, 'getAll');
-};
+// The following methods return a single string value if found
+incidentService.getIRSRespOrgByComputerDisplayName = async (displayName) => await hpsmIncidentsStore.getIRSRespOrgByComputerDisplayName(displayName);
 
-incidentService.getClosureCodes = async() => {
-	return await _modelCall('getClosureCodes', hpsmClosureCodesStore, 'hpsmClosureCodesStore', undefined, 'getAll');
-};
+// The following methods return a array of strings
+incidentService.getAutoAssignTypes = async () => await hpsmAATypesStore.getAll();
+incidentService.getStatuses = async () => await hpsmIncidentStatusesStore.getAll();
+incidentService.getClosureCodes = async () => await hpsmClosureCodesStore.getAll();
+incidentService.getAssignmentGroups = async () => await hpsmAssignmentsStore.getAll();
 
-incidentService.getAutoAssignTypes = async() => {
-	return await _modelCall('getAutoAssignTypes', hpsmAATypesStore, 'hpsmAATypesStore', undefined, 'getAll');
-};
-
-incidentService.getAssignmentGroups = async() => {
-	return await _modelCall('getAssignmentGroups', hpsmAssignmentsStore, 'hpsmAssignmentsStore', undefined, 'getAll');
-};
+// The following methods return an array of arrays of string types
 
 incidentService.getAreaCategorySubCategory = async() => {
 	return await _modelCall('getAreaCategorySubCategory', hpsmAreaCategorySubCategoryStore, 'hpsmAreaCategorySubCategoryStore', undefined, 'getAll');
 };
-
 incidentService.getPrimaryAffectedServices = async() => {
 	return await _modelCall('getPrimaryAffectedServices', hpsmPrimaryAffectedServicesStore, 'hpsmPrimaryAffectedServicesStore', undefined, 'getAll');
 };
 
-incidentService.getContact = async(requester) => {
-	_validateStringArgProvided(requester, 'getContact', 'requester');
-	return await _modelCall('getContact', hpsmContactsStore, 'hpsmContactsStore', requester);
-};
 
-incidentService.getComputerProperties = async(computer) => {
-	_validateStringArgProvided(computer, 'getComputerProperties', 'computer');
-	return await _modelCall('getComputerProperties', hpsmComputersStore, 'hpsmComputersStore', computer);
-};
+incidentService.getEligibleAssigneesByGroup = async (groupName) => {
+	toolboxService.validate({ assignmentGroupName: groupName }, 'hpsmAssignmentGroupName');
+	const accountInfo = accountService.getCreds(appConfig.HPSMServiceAcctId);
 
-incidentService.getComputerPropertiesJson = async(computer) => {
-	_validateStringArgProvided(computer, 'getComputerProperties', 'computer');
-	return await _modelCall('getComputerPropertiesJson', hpsmComputersStore, 'hpsmComputersStore', computer);
-};
-
-incidentService.getComputerLogicalName = async(computer) => {
-	_validateStringArgProvided(computer, 'getComputerLogicalName', 'computer');
-	return await _modelCall('getComputerLogicalName', hpsmComputersStore, 'hpsmComputersStore', computer);
-};
-
-incidentService.getIRSRespOrgGroupByComputer = async(computer) => {
-	_validateStringArgProvided(computer, 'getIRSRespOrgGroupByComputer', 'computer');
-	return await _modelCall('getIRSRespOrgGroupByComputer', hpsmComputersStore, 'hpsmComputersStore', computer);
-};
-
-incidentService.getEligibleAssigneesByGroup = async(group) => {
-	_validateStringArgProvided(group, 'getEligibleAssigneesByGroup', 'group');
-	
-	if (group.length >= maxGroupNameLength) {
-		const e = new Error(`incidentService.getEligibleAssigneesByGroup argument exceeds maxGroupNameLength of ${maxGroupNameLength} characters`);
-		logger.error(e.message);
-		throw(e);
-	}
-	
-	logger.debug(`Entering incidentService.getEligibleAssigneesByGroup(${group}) service method`);
-	
-	let configForFetch = {};
-	try {
-		configForFetch = await _getServiceAccount(appConfig.HPSMServiceAcctId);
-	} catch(e) {
-		logger.debug(`Exiting incidentService.getEligibleAssigneesByGroup(${group}) service method`);
-		throw(e);
-	}
-	
-	const grp = encodeURIComponent(group);
-	const uri1 = `/SM/9/rest/OperatorAPI/?query=AssignmentGroups=%22${grp}%22`;
+	const uri1 = `/SM/9/rest/OperatorAPI/?query=AssignmentGroups=%22${encodeURI(groupName)}%22`;
 	const uri2 = encodeURI(` and EssOnly="false" and TemplateOperator="false"`);
-	configForFetch.path = `${uri1}${uri2}`;
-	configForFetch.method = 'GET';
-	
-	let result;
-	
+
+	const config = {
+		host: accountInfo.host,
+		port: accountInfo.port,
+		path: `${uri1}${uri2}`,
+		auth: `${accountInfo.username}:${accountInfo.password}`,
+		method: 'GET'
+	};
+
+	const response = await httpClientService.asyncRequest(config);
+	const { message, data } = response;
+	console.log(message, JSON.parse(data));
+	/* if (result.ReturnCode === 0 && result['@totalcount'] === 0) request returned 0 results
 	try {
-		result = await _fetchParseAppErrorCheckAndReturn(configForFetch);
-		if (result.ReturnCode === 0 && result['@totalcount'] === 0) {
-			logger.info('Fetch request returned 0 results');
-			logger.debug(`Exiting incidentService.getEligibleAssigneesByGroup(${group}) service method`);
-			return [];
-		}
-	} catch(e) {
-		logger.error(e.message);
-		logger.debug(`Exiting incidentService.getEligibleAssigneesByGroup(${group}) service method`);
-	}
-	
-	try {
-		logger.debug('Mapping through content.OperatorAPI namespace of fetched results');
-		const operators = result.content.map(e => e.OperatorAPI.Name);
-		logger.debug(`Fetch request returned ${operators.length} operator${operators.length > 1 ? 's' : ''}`);
-		logger.debug(operators);
-		logger.debug(`Exiting incidentService.getEligibleAssigneesByGroup(${group}) service method`);
-		return operators;	
+			const operators = result.content.map(e => e.OperatorAPI.Name);
+			return operators;	
     } catch(e) {
-		logger.error(`Mapping of results returned error: ${e.message}`);
-		logger.debug(`Exiting incidentService.getEligibleAssigneesByGroup(${group}) service method`);
-        throw (e);
-    }
+			logger.error(`Mapping of results returned error: ${e.message}`);
+			logger.debug(`Exiting incidentService.getEligibleAssigneesByGroup(${group}) service method`);
+      throw (e);
+		}
+	*/
 };
 
 incidentService.getIncidentById = async(id) => {
@@ -308,24 +242,6 @@ incidentService.updateIncident = async(incident) => {
 //######################################################################//
 // Top Level Private Functions (Called by methods upstairs)				//
 //######################################################################//
-
-async function _modelCall(serviceName, model, modelName, param, modelMethodName) {
-	// If no modelMethodName is provided then serviceName is assumed to be same as modelMethodName
-	if (typeof modelMethodName === 'undefined') modelMethodName = serviceName;
-	const p = param ? param : '';
-	logger.debug(`Entering incidentService.${serviceName}(${p}) service method`);
-	try {
-		logger.debug(`Calling ${modelName}.${modelMethodName}(${p}) model method`);
-		const retval = await model[modelMethodName](p);
-		logger.debug(`Exiting ${modelName}.${modelMethodName}`);
-		logger.debug(`Returning results from ${modelName}.${modelMethodName}(${p}) to caller`);
-		logger.debug(`Exiting incidentService.${serviceName} service model`);
-		return retval;
-	} catch(e) {
-		logger.error(`${modelName}.${modelMethodName}(${p}) returned error: ${e.message}`);
-		logger.debug(`Exiting incidentService.${serviceName} service method`);
-	}
-}
 
 async function _fetchParseAppErrorCheckAndReturn(configForFetch, store, storeMethod) {
 	let serverResponse;
