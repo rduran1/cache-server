@@ -29,4 +29,12 @@ schemas.hpsmAssignmentGroupName = Joi.object().keys({
   assignmentGroup: Joi.string().min(2).max(100).required()
 });
 
+schemas.hpsmIncidentID = Joi.object().keys({
+  IncidentID: Joi.string().min(2).max(20)
+});
+
+schemas.hpsmNewIncident = Joi.object().keys({
+
+});
+
 module.exports = schemas;

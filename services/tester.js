@@ -2,8 +2,15 @@
 const bigfixService = require('./bigfixService');
 const toolboxService = require('./toolboxService');
 const replaceStreamService = require('./replaceStreamService');
-
-
+const accountService = require('./accountService')(__filename);
+//const config = require('app.config');
+//const as = accountService('tester');
+try {
+  const creds = accountService.getCreds('dev1');
+  console.log(creds);
+} catch (e) {
+ console.log(e.message);
+}
 
 
 

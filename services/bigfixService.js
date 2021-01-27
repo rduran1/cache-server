@@ -144,4 +144,8 @@ bigfixService.query = async(config) => {
   return response;
 };
 
+bigfixService.getActionInformationById = async (config) => {
+
+};
+
 module.exports = bigfixService;
