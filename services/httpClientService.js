@@ -50,10 +50,12 @@ httpClientService.asyncRequest = options => new Promise((resolve, reject) => {
 
   clientRequest.on('error', e => { 
     const eInfo = [];
-    if (e.code) eInfo.push(`code: ${e.code}`);
-    if (e.path || e.path === null) eInfo.push(`path: ${e.path}`);
-    if (e.host) eInfo.push(`host: ${e.host}`);
-    if (e.port) eInfo.push(`port: ${e.port}`);
+    if (typeof e.code !== 'undefined') eInfo.push(`code: ${e.code}`);
+    if (typeof e.errno !== 'undefined') eInfo.push(`errno: ${e.errno}`);
+    if (typeof e.path !== 'undefined') eInfo.push(`path: ${e.path}`);
+    if (typeof e.syscall !== 'undefined') eInfo.push(`syscall: ${e.syscall}`);
+    if (typeof e.host !== 'undefined') eInfo.push(`host: ${e.host}`);
+    if (typeof e.port !== 'undefined') eInfo.push(`port: ${e.port}`);
     return reject(new Error(`${e.message}: (${eInfo.join(' ')})`));
   });
 
