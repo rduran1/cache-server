@@ -91,7 +91,10 @@ incidentService.getIncidentById = async(id) => {
 	try {
 		response = await httpClientService.asyncRequest(config);
 	} catch (e) {
-		throw new Error(`Error encountered while retrieving incident from ${host}: ${e.message}`);
+		if (/routines:ssl3_get_record:wrong version number/.test(e.message)) {
+			throw new Error(`${config.host}:${config.port} does not appear to support HTTPS protocol`);
+		}
+		throw new Error(`Error encountered while retrieving incident from ${config.host}: ${e.message}`);
 	}
 	if (response.message.statusCode === 200) {
 		const data = JSON.parse(response.data);
