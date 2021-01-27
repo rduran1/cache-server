@@ -57,7 +57,8 @@ incidentService.getEligibleAssigneesByGroup = async (groupName) => {
 		port: accountInfo.port,
 		path: `${uri1}${uri2}`,
 		auth: `${accountInfo.username}:${accountInfo.password}`,
-		method: 'GET'
+		method: 'GET',
+		useTls: accountInfo.useTls
 	};
 
 	let response;
@@ -66,8 +67,9 @@ incidentService.getEligibleAssigneesByGroup = async (groupName) => {
 	} catch (e) {
 		throw new Error(`Error encountered while attempting to contact HPSM server: ${e.message}`);
 	}
-	if (response.message.statusCode === 200 && response.data.ReturnCode === 0) {
-		const data = JSON.parse(response.data);
+	if (response.message.statusCode === 200) {
+		response.data = JSON.parse(response.data);
+		if (response.data['@totalcount'] === 0) return [];
 		return data.content.map(e => e.OperatorAPI.Name);
 	} 
 	throw new Error(`HTTP ${response.message.statusCode} ${response.message.statusMessage} ${JSON.stringify(data)}`);
