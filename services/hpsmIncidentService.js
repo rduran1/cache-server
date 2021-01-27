@@ -70,13 +70,13 @@ incidentService.getEligibleAssigneesByGroup = async (groupName) => {
 	if (response.message.statusCode === 200) {
 		response.data = JSON.parse(response.data);
 		if (response.data['@totalcount'] === 0) return [];
-		return data.content.map(e => e.OperatorAPI.Name);
+		return response.data.content.map(e => e.OperatorAPI.Name);
 	} 
-	throw new Error(`HTTP ${response.message.statusCode} ${response.message.statusMessage} ${JSON.stringify(data)}`);
+	throw new Error(`HTTP ${response.message.statusCode} ${response.message.statusMessage} ${JSON.stringify(response.data)}`);
 };
 
 incidentService.getIncidentById = async(id) => {
-	toolboxService.validate({ IncidentID: id }, 'hpsmIncidentId');
+	toolboxService.validate({ IncidentID: id }, 'hpsmIncidentID');
 	const accountInfo = accountService.getCreds();
 
 	const config = {
@@ -93,9 +93,9 @@ incidentService.getIncidentById = async(id) => {
 	} catch (e) {
 		throw new Error(`Error encountered while retrieving incident from ${host}: ${e.message}`);
 	}
-	if (response.message.statusCode === 200 && response.data.ReturnCode === 0) {
+	if (response.message.statusCode === 200) {
 		const data = JSON.parse(response.data);
-		return data.Incident;
+		return data;
 	}
 	throw new Error(`HTTP ${response.message.statusCode} ${response.message.statusMessage} ${JSON.stringify(data)}`);
 }
