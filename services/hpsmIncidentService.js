@@ -84,7 +84,8 @@ incidentService.getIncidentById = async(id) => {
 		port: accountInfo.port,
 		path: `/SM/9/rest/incidents/${id}`,
 		auth: `${accountInfo.username}:${accountInfo.password}`,
-		method: 'GET'
+		method: 'GET',
+		useTls: accountInfo.useTls
 	};
 
 	let response;
@@ -92,7 +93,7 @@ incidentService.getIncidentById = async(id) => {
 		response = await httpClientService.asyncRequest(config);
 	} catch (e) {
 		if (/routines:ssl3_get_record:wrong version number/.test(e.message)) {
-			throw new Error(`${config.host}:${config.port} does not appear to support HTTPS protocol`);
+			throw new Error(`${config.host} does not appear to support HTTPS/TLS protocol`);
 		}
 		throw new Error(`Error encountered while retrieving incident from ${config.host}: ${e.message}`);
 	}
@@ -100,6 +101,12 @@ incidentService.getIncidentById = async(id) => {
 		const data = JSON.parse(response.data);
 		return data;
 	}
+
+	if (response.message.statusCode === 404) {
+		const data = JSON.parse(response.data);
+		throw new Error(`HTTP 404 ReturnCode: ${data.ReturnCode} ${data.Messages.join(' ')}`)
+	}
+
 	throw new Error(`HTTP ${response.message.statusCode} ${response.message.statusMessage} ${JSON.stringify(data)}`);
 }
 
@@ -112,7 +119,8 @@ incidentService.createIncident = async(incident) => {
 		port: accountInfo.port,
 		path: '/SM/9/rest/incidents',
 		auth: `${accountInfo.username}:${accountInfo.password}`,
-		method: 'POST'
+		method: 'POST',
+		useTls: accountInfo.useTls
 	};
 	
 	await _validateFieldValues(newIncident);
@@ -140,7 +148,8 @@ incidentService.updateIncident = async(incident) => {
 		port: accountInfo.port,
 		path: `/SM/9/rest/incidents/${incident.IncidentID}`,
 		auth: `${accountInfo.username}:${accountInfo.password}`,
-		method: 'POST'
+		method: 'POST',
+		useTls: accountInfo.useTls
 	};
 
 	const { Incident: retrievedIncident } = await incidentService.getIncidentById(incident.IncidentID);
