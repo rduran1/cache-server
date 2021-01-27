@@ -67,6 +67,9 @@ incidentService.getEligibleAssigneesByGroup = async (groupName) => {
 	try {
 		response = await httpClientService.asyncRequest(config);
 	} catch (e) {
+		if (/routines:ssl3_get_record:wrong version number/.test(e.message)) {
+			throw new Error(`Error: ${config.host} does not appear to support HTTPS/TLS protocol`);
+		}
 		throw new Error(`${ERROR_CONTACTING_SERVER} ${config.host}: ${e.message}`);
 	}
 	if (response.message.statusCode === 200) {
@@ -103,12 +106,10 @@ incidentService.getIncidentById = async(id) => {
 		const data = JSON.parse(response.data);
 		return data;
 	}
-
 	if (response.message.statusCode === 404) {
 		const data = JSON.parse(response.data);
 		throw new Error(`404 ReturnCode: ${data.ReturnCode} ${data.Messages.join(' ')}`)
 	}
-
 	throw new Error(`${response.message.statusCode} ${response.message.statusMessage} ${JSON.stringify(data)}`);
 }
 
@@ -128,9 +129,21 @@ incidentService.createIncident = async(incident) => {
 	await _validateFieldValues(newIncident);
 	await _duplicateOpenIncidentDetection(newIncident);
 	config.body = jSON.stringify({ Incident: newIncident });
-		
-	const response = await httpClientService.asyncRequest(config);
-	if (response.message.statusCode === 200 && response.data.ReturnCode === 0) {
+
+	let response;
+	try {
+		response = await httpClientService.asyncRequest(config);
+	} catch (e) {
+		if (/routines:ssl3_get_record:wrong version number/.test(e.message)) {
+			throw new Error(`Error: ${config.host} does not appear to support HTTPS/TLS protocol`);
+		}
+		throw new Error(`${ERROR_CONTACTING_SERVER} ${config.host}: ${e.message}`);
+	}
+
+	console.log(response.message.statusCode)
+	console.log(JSON.parse(response.data));
+	
+	/*if (response.message.statusCode === 200 && response.data.ReturnCode === 0) {
 		try {
 			const data = JSON.parse(response.data);
 			return data;
@@ -138,7 +151,7 @@ incidentService.createIncident = async(incident) => {
 			throw new Error(`Received JSON data from HPSM server that was not well formed: ${e.message}`)
 		}
 	}
-	throw new Error(`HTTP ${response.message.statusCode} ${response.message.statusMessage} ${JSON.stringify(data)}`);
+	throw new Error(`HTTP ${response.message.statusCode} ${response.message.statusMessage} ${JSON.stringify(data)}`); */
 }
 
 incidentService.updateIncident = async(incident) => {
@@ -296,10 +309,9 @@ async function _duplicateOpenIncidentDetection(incident) {
 	const openIncidents = hpsmIncidentsStore.getAllNonClosedIncidents();
 	const potentialDuplicateDetected = openIncidents.find( e => {
 		const stored = e.Incident;
-		if ( 
-			   stored.IncidentID !== incident.IncidentID
-			&& stored.AffectedCI === incident.AffectedCI 
-			     && stored.Title === incident.Title
+		if ( stored.IncidentID !== incident.IncidentID &&
+				 stored.AffectedCI === incident.AffectedCI &&
+			     	 stored.Title === incident.Title
 		) return true;
 	});
 	// Call HPSM to get the latest status incase the incident was closed by someone else
