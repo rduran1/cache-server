@@ -14,6 +14,8 @@ const hpsmIncidentStatusesStore	= require('../models/hpsmIncidentStatusesModel')
 const hpsmAreaCategorySubCategoryStore = require('../models/hpsmAreaCategorySubCategoryModel');
 const hpsmPrimaryAffectedServicesStore = require('../models/hpsmPrimaryAffectedServicesModel');
 
+const ERROR_CONTACTING_SERVER = 'Error: Cannot contact HPSM server';
+
 const incidentService = {};
 
 // The following methods return an array of objects
@@ -65,14 +67,14 @@ incidentService.getEligibleAssigneesByGroup = async (groupName) => {
 	try {
 		response = await httpClientService.asyncRequest(config);
 	} catch (e) {
-		throw new Error(`Error encountered while attempting to contact HPSM server: ${e.message}`);
+		throw new Error(`${ERROR_CONTACTING_SERVER} ${config.host}: ${e.message}`);
 	}
 	if (response.message.statusCode === 200) {
 		response.data = JSON.parse(response.data);
 		if (response.data['@totalcount'] === 0) return [];
 		return response.data.content.map(e => e.OperatorAPI.Name);
 	} 
-	throw new Error(`HTTP ${response.message.statusCode} ${response.message.statusMessage} ${JSON.stringify(response.data)}`);
+	throw new Error(`${response.message.statusCode} ${response.message.statusMessage} ${JSON.stringify(response.data)}`);
 };
 
 incidentService.getIncidentById = async(id) => {
@@ -93,9 +95,9 @@ incidentService.getIncidentById = async(id) => {
 		response = await httpClientService.asyncRequest(config);
 	} catch (e) {
 		if (/routines:ssl3_get_record:wrong version number/.test(e.message)) {
-			throw new Error(`${config.host} does not appear to support HTTPS/TLS protocol`);
+			throw new Error(`Error: ${config.host} does not appear to support HTTPS/TLS protocol`);
 		}
-		throw new Error(`Error encountered while retrieving incident from ${config.host}: ${e.message}`);
+		throw new Error(`${ERROR_CONTACTING_SERVER} ${config.host}: ${e.message}`);
 	}
 	if (response.message.statusCode === 200) {
 		const data = JSON.parse(response.data);
@@ -104,10 +106,10 @@ incidentService.getIncidentById = async(id) => {
 
 	if (response.message.statusCode === 404) {
 		const data = JSON.parse(response.data);
-		throw new Error(`HTTP 404 ReturnCode: ${data.ReturnCode} ${data.Messages.join(' ')}`)
+		throw new Error(`404 ReturnCode: ${data.ReturnCode} ${data.Messages.join(' ')}`)
 	}
 
-	throw new Error(`HTTP ${response.message.statusCode} ${response.message.statusMessage} ${JSON.stringify(data)}`);
+	throw new Error(`${response.message.statusCode} ${response.message.statusMessage} ${JSON.stringify(data)}`);
 }
 
 incidentService.createIncident = async(incident) => {
