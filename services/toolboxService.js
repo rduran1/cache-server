@@ -140,7 +140,7 @@ toolboxService.initializeStore = (modelFileName, initValue) => {
 	return { store, storeFile };
 };
 
-toolboxService.saveStoreToFile = (fileName, store) => {
+toolboxService.saveStoreToFile = async (fileName, store) => {
 	if (fs.existsSync(fileName)) {
 		try {
 			fs.writeFileSync(fileName, JSON.stringify(store, null, '\t'));

@@ -4,6 +4,8 @@ const { store, storeFile } = toolboxService.initializeStore(__filename, '[]');
 
 const model = {};
 
+model.getApiDataPath = () => '/SM/9/rest/GlobalListAPI/problem status';
+
 model.save = async (data) => {
 	if (typeof data !== 'object') throw new Error('Parameter passed to save method must be a JSON object');
 	const tempStore = [];

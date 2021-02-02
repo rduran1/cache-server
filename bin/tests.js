@@ -4,8 +4,6 @@ const { test, testSummary: summary, servicesTestHeader, serviceTesting } = requi
 
 process.env.INSTALL_DIR = 'C:/Users/rovin/Documents/Projects/cache-server';
 
-const hpsmIncidentService = require('../services/hpsmIncidentService');
-
 const credentials = {
 	host: 'defaultserver',
 	port: 9000,

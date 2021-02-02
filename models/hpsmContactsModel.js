@@ -4,7 +4,7 @@ const { EOL } = require('os');
 const Joi = require('joi');
 const toolboxService = require('../services/toolboxService');
 
-const { store, storeFile } = toolboxService.initializeStore(__filename, '[]');
+const { store, storeFile } = toolboxService.initializeStore(__filename, '[[]]');
 
 const model = {};
 

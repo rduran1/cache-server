@@ -2,7 +2,7 @@
 /* eslint-disable comma-dangle */
 const toolboxService = require('../services/toolboxService');
 
-const { store, storeFile } = toolboxService.initializeStore(__filename, '[]');
+const { store, storeFile } = toolboxService.initializeStore(__filename, '[]'); // Array of objects
 
 const model = {};
 

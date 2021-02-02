@@ -22,6 +22,39 @@ const ERROR_CONTACTING_SERVER = 'Error: Cannot contact HPSM server';
 
 const incidentService = {};
 
+// Refresh models data with HPSM API service
+incidentService.syncModelState = async (model) => {
+	if (typeof model !== 'object') throw new Error('Parameter must be of type model object');
+	const accountInfo = accountService.getCredentials(env);
+	let path;
+	try {
+		path = model.getApiDataPath();
+	} catch (e) {
+		throw new Error('Model does not support syncModelState method');
+	}
+	const config = {
+		host: accountInfo.host,
+		port: accountInfo.port,
+		path,
+		auth: `${accountInfo.username}:${accountInfo.password}`,
+		method: 'GET',
+		useTls: accountInfo.useTls
+	};
+	let response;
+	try {
+		response = await httpClientService.asyncRequest(config);
+	} catch (e) {
+		if (/routines:ssl3_get_record:wrong version number/.test(e.message)) {
+			throw new Error(`Error: ${config.host} does not appear to support HTTPS/TLS protocol`);
+		}
+		throw new Error(`${ERROR_CONTACTING_SERVER} ${config.host}: ${e.message}`);
+	}
+	if (response.message.statusCode === 200) {
+		const data = JSON.parse(response.data);
+		await model.save(data);
+	}
+};
+
 // The following methods return an array of objects
 incidentService.getAllNonClosedIncidents = async () => await hpsmIncidentsModel.getAllNonClosedIncidents();
 // incidentService.getCauseCodes = async() => await hpsmCauseCodesStore.getCauseCodes();
