@@ -4,7 +4,7 @@ const { store, storeFile } = toolboxService.initializeStore(__filename, '[]');
 
 const model = {};
 
-model.getApiDataPath = () => '/SM/9/rest/GlobalListAPI/irs.aa.type.mits';
+model.getApiDataPath = () => '/SM/9/rest/GlobalListsAPI/irs.aa.type.mits';
 
 model.save = async (data) => {
 	if (typeof data !== 'object') throw new Error('Parameter passed to save method must be a JSON object');
