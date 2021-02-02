@@ -1,0 +1,21 @@
+{
+  "services": {
+    "hpsmIncidentService": {
+      "environment": "dev"
+    },
+		"toolboxService": {
+			"securedModels": []
+		}
+  },
+  "server": {
+		
+	},
+  "listener": {
+    "port": 5000,
+    "sslKey": "path/to/key",
+    "sslCert": "path/to/cert",
+    "allowedIps": [ 
+      "127.0.0.1"
+    ]
+  }
+}

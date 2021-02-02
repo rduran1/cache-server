@@ -1,50 +1,28 @@
-const { basename } = require('path');
+/* eslint-disable comma-dangle */
+const accountsModel = require('../models/accountsModel');
 
-const store = {
-  hpsmIncidentService: {
-    default: {
-      host: 'defaultsbxserver',
-      port: 123,
-      username: 'rduran',
-      password: 'sbxsecret'
-    },
-    dev: {
-      host: 'devserver',
-      port: 123,
-      username: 'rduran',
-      password: 'devsecret'
-    }
-  },
-  tester: {
-    default: {
-      host: 'defaultsbxserver',
-      port: 123,
-      username: 'rduran',
-      password: 'sbxsecret'
-    },
-    dev: {
-      host: 'devserver',
-      port: 123,
-      username: 'rduran',
-      password: 'devsecret'
-    }
-  }
-};
+function accountService(serviceFileName, forceCreate) {
+	const account = accountsModel.getAccountByName(serviceFileName, forceCreate);
+	return {
+		getCredentials: (env) => accountsModel.getCredentials(account, env),
 
-function accountService(accountName) {
-  const id = basename(accountName).split('.')[0];
-  if (!Object.keys(store).includes(id)) throw new Error(`Account for "${id}" does not exist in store`);
-  const account = store[id];
+		createNewEnvironmentCredentials: async (credentials, env) => {
+			let environment = env;
+			if (typeof environment === 'undefined' || typeof environmnent !== 'string') environment = 'default';
+			await accountsModel.createNewEnvironmentCredentials(account, credentials, environment);
+		},
 
-  return {
-    getCreds: (env) => {
-      if (typeof env === 'string') {
-        if (!Object.keys(account).includes(env)) throw new Error(`Environment "${env}" for "${id}" does not exist in store`);
-        return account[env];
-      }
-      return account['default'];
-    }
-  };
+		updateEnvironmentCredentials: async (credentials, env) => {
+			await accountsModel.updateEnvironmentCredentials(account, credentials, env);
+		},
+
+		deleteAccountEnvironment: async (env) => {
+			await accountsModel.deleteAccountEnvironment(account, env);
+		},
+
+		// eslint-disable-next-line no-return-await
+		deleteAccount: async () => await accountsModel.deleteAccount(account)
+	};
 }
 
 module.exports = accountService;

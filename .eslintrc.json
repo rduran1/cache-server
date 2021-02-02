@@ -16,6 +16,9 @@
     ],
     "rules": {
         "linebreak-style": ["error", "windows"],
-        "allowIndentationTabs": true
+        "indent": ["error", "tab"],
+        "no-tabs": ["off", { "allowIndentationTabs": true }],
+				"max-len": ["error", { "code": 150 }],
+				"comma-dangle": ["error", "never"]
     }
 }
