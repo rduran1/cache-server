@@ -144,7 +144,7 @@ toolboxService.saveStoreToFile = async (fileName, store, withTabFormat) => {
 	const tab = withTabFormat ? '\t' : '';
 	if (fs.existsSync(fileName)) {
 		try {
-			if (withTabFormat) fs.writeFileSync(fileName, JSON.stringify(store, null, tab));
+			fs.writeFileSync(fileName, JSON.stringify(store, null, tab));
 		} catch (e) {
 			throw new Error(`Error saving store to ${fileName}: ${e.message}`);
 		}

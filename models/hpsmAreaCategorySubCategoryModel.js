@@ -10,7 +10,7 @@ model.save = async (data) => {
 	if (typeof data !== 'object') throw new Error('Parameter passed to save method must be a JSON object');
 	const tempStore = [];
 	data.content.map((e) => tempStore.push(e.IncidentCategorizationAPI));
-	toolboxService.saveStoreToFile(storeFile, tempStore);
+	toolboxService.saveStoreToFile(storeFile, tempStore, true);
 	store.length = 0;
 	store.push(...tempStore);
 };
