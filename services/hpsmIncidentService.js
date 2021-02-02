@@ -54,7 +54,7 @@ incidentService.syncModelState = async (model) => {
 		await model.save(data);
 	}
 	if (response.message.statusCode === 404) {
-		data = JSON.parse(response.data);
+		const data = JSON.parse(response.data);
 		throw new Error(`404 ReturnCode: ${data.ReturnCode} ${data.Messages.join(' ')}`);
 	}
 };
