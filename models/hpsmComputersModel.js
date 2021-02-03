@@ -1,6 +1,6 @@
 const toolboxService = require('../services/toolboxService');
 
-const { store } = toolboxService.initializeStore(__filename, '[[]]');
+const { store, storeFile } = toolboxService.initializeStore(__filename, '[[]]');
 
 const model = {};
 
@@ -24,6 +24,14 @@ model.includes = (value) => store.includes(value);
 model.getComputerPropertiesByIRSBarcode = (barcode) => searchStoreAndReturnAsObject(barcode, 2);
 model.getComputerPropertiesByDisplayName = (displayName) => searchStoreAndReturnAsObject(displayName, 1);
 model.getComputerPropertiesByLogicalName = (logicalName) => searchStoreAndReturnAsObject(logicalName, 7);
+
+model.save = async (data, numOfColumns, bypassValidation) => {
+	if (typeof data !== 'object') throw new Error('Parameter passed to save method must be a JSON object');
+	const tempStore = toolboxService.parseCsvToArray(data, numOfColumns, bypassValidation);
+	toolboxService.saveStoreToFile(storeFile, tempStore);
+	store.length = 0;
+	store.push(...tempStore);
+};
 
 model.getAll = () => store;
 
