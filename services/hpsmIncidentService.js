@@ -22,6 +22,30 @@ const ERROR_CONTACTING_SERVER = 'Error: Cannot contact HPSM server';
 
 const incidentService = {};
 
+// ########################################## //
+// Beginning of Custom client service methods //
+// ########################################## //
+incidentService.saveToHpsmContactsModel = (data) => {
+	const columnCount = 9;
+	const bypassSchemaValidation = false;
+	hpsmContactsModel.save(data, columnCount, bypassSchemaValidation);
+};
+
+incidentService.saveToHpsmComputersModel = (data) => {
+	const columnCount = 19;
+	const bypassSchemaValidation = false;
+	hpsmContactsModel.save(data, columnCount, bypassSchemaValidation);
+};
+
+incidentService.saveToHpsmPrimaryAffectedServicesModel = (data) => {
+	const columnCount = 6;
+	const bypassSchemaValidation = false;
+	hpsmContactsModel.save(data, columnCount, bypassSchemaValidation);
+};
+// #################################### //
+// End of Custom client service methods //
+// #################################### //
+
 // Refresh models data with HPSM API service
 incidentService.syncModelState = async (model) => {
 	if (typeof model !== 'object') throw new Error('Parameter must be of type model object');
@@ -72,9 +96,6 @@ incidentService.getContactByEmail = async (emailAddress) => await hpsmContactsMo
 incidentService.getComputerPropertiesByIRSBarcode = async (IRSBarcode) => await hpsmComputersModel.getComputerPropertiesByIRSBarcode(IRSBarcode);
 incidentService.getComputerPropertiesByDisplayName = async (displayName) => await hpsmComputersModel.getComputerPropertiesByDisplayName(displayName);
 incidentService.getComputerPropertiesByLogicalName = async (logicalName) => await hpsmComputersModel.getComputerPropertiesByLogicalName(logicalName);
-
-// The following methods return a single string value if found
-incidentService.getIRSRespOrgByComputerDisplayName = async (displayName) => await hpsmComputersModel.getIRSRespOrgByComputerDisplayName(displayName);
 
 // The following methods return a array of strings
 incidentService.getAllAutoAssignTypes = async () => await hpsmAATypesModel.getAll();
