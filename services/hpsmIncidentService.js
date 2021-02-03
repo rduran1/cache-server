@@ -63,9 +63,8 @@ incidentService.syncModels = async () => {
 	await incidentService.syncModelState(hpsmAATypesModel);
 };
 
-// The following methods return an array of objects
+// The following methods return an array of objects or undefined if nothing is found
 incidentService.getAllNonClosedIncidents = async () => await hpsmIncidentsModel.getAllNonClosedIncidents();
-// incidentService.getCauseCodes = async() => await hpsmCauseCodesStore.getCauseCodes();
 
 // The following methods return a single object if found
 incidentService.getContactByOperatorId = async (operatorId) => await hpsmContactsModel.getContactByOperatorId(operatorId);
