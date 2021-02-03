@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 const fs = require('fs');
 const path = require('path');
+const { EOL } = require('os');
 const schemaService = require('./schemaService');
 
 const toolboxService = {};
@@ -151,6 +152,28 @@ toolboxService.saveStoreToFile = async (fileName, store, withTabFormat) => {
 	} else {
 		throw new Error(`Store for file '${fileName}' has not been initialized`);
 	}
+};
+
+toolboxService.parseCsvToArray = (content, cols, bypass) => {
+	const arr = [];
+	const schema = schemaService.arrayOfArraysWithStringElements(cols);
+	const rows = content.toString().split(EOL);
+	const len = rows.length;
+	// eslint-disable-next-line no-plusplus
+	for (let i = 0; i < len; i++) {
+		if (rows[i].length > 0) {
+			let el = rows[i].replace(/",(\d)/g, '","$1');
+			el = el.replace(/(\d),"/g, '$1","');
+			el = el.replace(/", "/g, '","');
+			const row = el.split('","');
+			row[0] = row[0].replace(/^"/, '');
+			row[row.length - 1] = row[row.length - 1].replace(/"$/, '');
+			arr.push(row);
+		}
+	}
+	if (bypass) return arr;
+	toolboxService.validate(arr, schema);
+	return arr;
 };
 
 module.exports = toolboxService;
