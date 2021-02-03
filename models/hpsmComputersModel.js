@@ -22,6 +22,8 @@ model.find = (value) => {
 model.includes = (value) => store.includes(value);
 
 model.getComputerPropertiesByIRSBarcode = (barcode) => searchStoreAndReturnAsObject(barcode, 2);
+model.getComputerPropertiesByDisplayName = (displayName) => searchStoreAndReturnAsObject(displayName, 1);
+model.getComputerPropertiesByLogicalName = (logicalName) => searchStoreAndReturnAsObject(logicalName, 7);
 
 model.getAll = () => store;
 
