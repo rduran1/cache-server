@@ -68,7 +68,7 @@ incidentService.getAllNonClosedIncidents = async () => await hpsmIncidentsModel.
 
 // The following methods return a single object if found
 incidentService.getContactByOperatorId = async (operatorId) => await hpsmContactsModel.getContactByOperatorId(operatorId);
-incidentService.getContactByEmailAddress = async (emailAddress) => await hpsmContactsModel.getContactByEmail(emailAddress);
+incidentService.getContactByEmail = async (emailAddress) => await hpsmContactsModel.getContactByEmail(emailAddress);
 incidentService.getComputerPropertiesByIRSBarcode = async (IRSBarcode) => await hpsmComputersModel.getComputerPropertiesByIRSBarcode(IRSBarcode);
 incidentService.getComputerPropertiesByDisplayName = async (displayName) => await hpsmComputersModel.getComputerPropertiesByDisplayName(displayName);
 incidentService.getComputerPropertiesByLogicalName = async (logicalName) => await hpsmComputersModel.getComputerPropertiesByLogicalName(logicalName);
