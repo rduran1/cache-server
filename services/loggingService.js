@@ -13,7 +13,7 @@ function loggingService(fileName) {
 	if (typeof fileName !== 'string') throw new Error('Parameter must be of type string');
 	if (!fileName.includes('.js')) throw new Error('File name must end in ".js"');
 	const baseName = path.basename(fileName).replace('.js', '.log');
-	const fileLocation = path(process.env.INSTALL_DIR, 'logs', baseName);
+	const fileLocation = path.join(process.env.INSTALL_DIR, 'logs', baseName);
 	return {
 		info: (message) => { logit(fileLocation, 'INFO', message); },
 		warn: (message) => { logit(fileLocation, 'WARN', message); },

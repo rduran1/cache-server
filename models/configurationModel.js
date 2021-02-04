@@ -5,6 +5,12 @@ const { store, fileName } = toolboxService.initializeStore(__filename, '{}');
 
 const model = {};
 
+model.getAppConfiguration = () => {
+	if (typeof store.server !== 'object') throw new Error('Cannot find server configuration!');
+	const clone = toolboxService.clone(store.application);
+	return clone;
+};
+
 model.getServerConfiguration = () => {
 	if (typeof store.server !== 'object') throw new Error('Cannot find server configuration!');
 	const clone = toolboxService.clone(store.server);
