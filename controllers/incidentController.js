@@ -37,6 +37,24 @@ function checkForParameter(req, res, controllerMethodName, paramName, paramType,
 	return param;
 }
 
+incidentController.processPayload = async (req, res) => {
+	const tag = req.params.contentTag;
+	const content = req.body;
+	switch (tag) {
+	case 'export_bizServices.csv':
+		incidentService.saveToHpsmPrimaryAffectedServicesModel(content);
+		break;
+	case 'export_computer.csv':
+		incidentService.saveToHpsmComputersModel(content);
+		break;
+	case 'export_contacts.csv':
+		incidentService.saveToHpsmContactsModel(content);
+		break;
+	default:
+		res.status(400).send('');
+	}
+};
+
 incidentController.getAssignmentGroups = async (req, res) => {
 	await processRequest(req, res, 'getAssignmentGroups', 'getAllAssignmentGroups');
 };
