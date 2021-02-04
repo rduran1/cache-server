@@ -18,6 +18,18 @@ model.save = async (data, numOfColumns, bypassValidation) => {
 	store.push(...tempStore);
 };
 
-model.getAll = () => store;
+model.getAll = async () => {
+	const clone = toolboxService.clone(store);
+	const keys = clone[0];
+	const results = [];
+	clone.forEach((element, index) => {
+		if (index === 0) return;
+		const obj = {};
+		// eslint-disable-next-line no-return-assign
+		element.forEach((e, i) => obj[keys[i]] = e);
+		results.push(obj);
+	});
+	return results;
+};
 
 module.exports = model;

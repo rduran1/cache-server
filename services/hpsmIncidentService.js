@@ -42,6 +42,18 @@ incidentService.saveToHpsmPrimaryAffectedServicesModel = (data) => {
 	const bypassSchemaValidation = false;
 	hpsmContactsModel.save(data, columnCount, bypassSchemaValidation);
 };
+
+incidentService.getIRSRespOrgGroupByComputerDisplayName = async (computerName) => {
+	const computer = incidentService.getComputerPropertiesByDisplayName(computerName);
+	if (computer) return computer.IRS_RESP_ORG;
+	return undefined;
+};
+
+incidentService.getLogicalNameByComputerDisplayName = async (computerName) => {
+	const computer = incidentService.getComputerPropertiesByDisplayName(computerName);
+	if (computer) return computer.LOGICAL_NAME;
+	return undefined;
+};
 // #################################### //
 // End of Custom client service methods //
 // #################################### //
@@ -88,7 +100,10 @@ incidentService.syncModels = async () => {
 };
 
 // The following methods return an array of objects or undefined if nothing is found
+incidentService.getAllCauseCodes = async () => await hpsmIncidentCauseCodesModel.getAll();
 incidentService.getAllNonClosedIncidents = async () => await hpsmIncidentsModel.getAllNonClosedIncidents();
+incidentService.getAllAreaCategorySubCategorys = async () => await hpsmAreaCategorySubCategoryModel.getAll();
+incidentService.getAllPrimaryAffectedServices = async () => await hpsmPrimaryAffectedServicesModel.getAll();
 
 // The following methods return a single object if found
 incidentService.getContactByOperatorId = async (operatorId) => await hpsmContactsModel.getContactByOperatorId(operatorId);
