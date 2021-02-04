@@ -27,7 +27,7 @@ schemas.bigfixOperator = Joi.object().keys({
 });
 
 schemas.hpsmAssignmentGroupName = Joi.object().keys({
-	assignmentGroup: Joi.string().min(2).max(100).required()
+	assignmentGroupName: Joi.string().min(2).max(100).required()
 });
 
 schemas.hpsmIncidentID = Joi.object().keys({

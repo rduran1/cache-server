@@ -44,13 +44,13 @@ incidentService.saveToHpsmPrimaryAffectedServicesModel = (data) => {
 };
 
 incidentService.getIRSRespOrgGroupByComputerDisplayName = async (computerName) => {
-	const computer = incidentService.getComputerPropertiesByDisplayName(computerName);
+	const computer = await incidentService.getComputerPropertiesByDisplayName(computerName);
 	if (computer) return computer.IRS_RESP_ORG;
 	return undefined;
 };
 
 incidentService.getLogicalNameByComputerDisplayName = async (computerName) => {
-	const computer = incidentService.getComputerPropertiesByDisplayName(computerName);
+	const computer = await incidentService.getComputerPropertiesByDisplayName(computerName);
 	if (computer) return computer.LOGICAL_NAME;
 	return undefined;
 };
@@ -102,7 +102,7 @@ incidentService.syncModels = async () => {
 // The following methods return an array of objects or undefined if nothing is found
 incidentService.getAllCauseCodes = async () => await hpsmIncidentCauseCodesModel.getAll();
 incidentService.getAllNonClosedIncidents = async () => await hpsmIncidentsModel.getAllNonClosedIncidents();
-incidentService.getAllAreaCategorySubCategorys = async () => await hpsmAreaCategorySubCategoryModel.getAll();
+incidentService.getAllAreaCategorySubCategories = async () => await hpsmAreaCategorySubCategoryModel.getAll();
 incidentService.getAllPrimaryAffectedServices = async () => await hpsmPrimaryAffectedServicesModel.getAll();
 
 // The following methods return a single object if found
@@ -249,7 +249,7 @@ incidentService.getIncidentById = async (id) => {
 	let data;
 	if (response.message.statusCode === 200) {
 		data = JSON.parse(response.data.Incident);
-		hpsmIncidentsModel.update(data);
+		await hpsmIncidentsModel.save(data);
 		return data;
 	}
 	if (response.message.statusCode === 404) {
