@@ -5,6 +5,12 @@ const { store, fileName } = toolboxService.initializeStore(__filename, '{}');
 
 const model = {};
 
+model.getServerConfiguration = () => {
+	if (typeof store.server !== 'object') throw new Error('Cannot find server configuration!');
+	const clone = toolboxService.clone(store.server);
+	return clone;
+};
+
 model.getServiceEnvironment = (serviceName) => {
 	if (typeof serviceName !== 'string') throw new Error('Service name or service file name is required');
 	if (serviceName.length < 1) throw new Error('Service name cannot be an empty string');

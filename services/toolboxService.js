@@ -135,7 +135,7 @@ toolboxService.initializeStore = (modelFileName, initValue) => {
 		}
 		tempStore = JSON.parse(storeContent);
 	} catch (e) {
-		throw new Error(`Error initializing store for model ${modelName}: ${e.message}`);
+		throw new Error(`Failed to initialize store for model ${modelName}: ${e.message}`);
 	}
 	const store = toolboxService.clone(tempStore);
 	return { store, storeFile };

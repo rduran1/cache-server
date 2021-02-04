@@ -1,5 +1,5 @@
 const accountService = require('./accountService')(__filename);
-const logger = require('./loggingService');
+const logger = require('./loggingService')(__filename);
 
 const accessService = {};
 

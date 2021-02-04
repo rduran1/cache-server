@@ -19,7 +19,7 @@ model.save = async (data) => {
 		tempStore[incidentIdx] = incidentObject;
 	}
 	const tempStore2 = tempStore.filter((el) => el.Status !== 'Closed');
-	toolboxService.saveStoreToFile(storeFile, tempStore2);
+	toolboxService.saveStoreToFile(storeFile, tempStore2, true);
 	store.length = 0;
 	store.push(...tempStore2);
 };

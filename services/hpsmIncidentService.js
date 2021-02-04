@@ -248,7 +248,7 @@ incidentService.getIncidentById = async (id) => {
 	}
 	let data;
 	if (response.message.statusCode === 200) {
-		data = JSON.parse(response.data.Incident);
+		data = JSON.parse(response.data).Incident;
 		await hpsmIncidentsModel.save(data);
 		return data;
 	}

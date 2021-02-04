@@ -15,8 +15,8 @@ function loggingService(fileName) {
 	const baseName = path.basename(fileName).replace('.js', '.log');
 	const fileLocation = path(process.env.INSTALL_DIR, 'logs', baseName);
 	return {
-		info: (message) => { logit(fileLocation, 'INFO ', message); },
-		warn: (message) => { logit(fileLocation, 'WARN ', message); },
+		info: (message) => { logit(fileLocation, 'INFO', message); },
+		warn: (message) => { logit(fileLocation, 'WARN', message); },
 		error: (message) => { logit(fileLocation, 'ERROR', message); },
 		debug: (message) => { logit(fileLocation, 'DEBUG', message); }
 	};
