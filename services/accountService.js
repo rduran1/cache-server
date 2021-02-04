@@ -4,6 +4,10 @@ const accountsModel = require('../models/accountsModel');
 function accountService(serviceFileName, forceCreate) {
 	const account = accountsModel.getAccountByName(serviceFileName, forceCreate);
 	return {
+		getAccessByToken: (token, env) => accountsModel.getAccesByToken(account, token, env),
+
+		getAccessByAccount: (subject, env) => accountsModel.getAccessByAccount(account, subject, env),
+
 		getCredentials: (env) => accountsModel.getCredentials(account, env),
 
 		createNewEnvironmentCredentials: async (credentials, env) => {

@@ -26,6 +26,8 @@ model.setServiceEnvironment = (serviceName, value) => {
 	toolboxService.saveStoreToFile(fileName, store);
 };
 
+model.getLoggingLevels = () => store.loggingLevels || [''];
+
 model.getServerConfiguration = () => {
 	const config = toolboxService.clone(store.server);
 	if (typeof config !== 'object') throw new Error('Server configuration is missing');

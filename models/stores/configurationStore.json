@@ -10,6 +10,7 @@
   "server": {
 		
 	},
+	"loggingLevels": ["debug","error","warn","info"],
   "listener": {
     "port": 5000,
     "sslKey": "path/to/key",

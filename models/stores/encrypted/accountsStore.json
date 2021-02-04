@@ -13,24 +13,27 @@
 			"password": "secret"
 		}
 	},
-	"tests": {
-		"default": {
-			"host": "defaultserver",
-			"port": 80,
-			"username": "user",
-			"password": "secret"
-		},
-		"dev": {
-			"host": "devserver",
-			"port": 443,
-			"username": "user",
-			"password": "secret"
-		},
-		"production": {
-			"host": "productionserver",
-			"port": 9000,
-			"username": "produser",
-			"password": "secret"
-		}
+	"accessService": {
+		"default": [
+			{
+				"type": "token",
+				"description": "My Token",
+				"issuedTo": "me@home.com",
+				"status": "active",
+				"token": "239742ghefjbhsd",
+				"access": [
+					{
+						"incidents": [
+							"read",
+							"create",
+							"update"
+						],
+						"hpsmcomputers": [
+							"read"
+						]
+					}
+				]
+			}
+		]
 	}
 }
