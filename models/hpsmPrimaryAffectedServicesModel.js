@@ -11,7 +11,7 @@ model.find = (value) => {
 model.includes = (value) => store.includes(value);
 
 model.save = async (data, numOfColumns, bypassValidation) => {
-	if (typeof data !== 'object') throw new Error('Parameter passed to save method must be a JSON object');
+	// if (typeof data !== 'object') throw new Error('Parameter passed to save method must be a JSON object');
 	const tempStore = toolboxService.parseCsvToArray(data, numOfColumns, bypassValidation);
 	await toolboxService.saveStoreToFile(storeFile, tempStore);
 	store.length = 0;

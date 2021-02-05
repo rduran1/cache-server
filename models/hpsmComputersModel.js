@@ -26,7 +26,7 @@ model.getComputerPropertiesByDisplayName = (displayName) => searchStoreAndReturn
 model.getComputerPropertiesByLogicalName = (logicalName) => searchStoreAndReturnAsObject(logicalName, 7);
 
 model.save = async (data, numOfColumns, bypassValidation) => {
-	if (typeof data !== 'object') throw new Error('Parameter passed to save method must be a JSON object');
+	// if (typeof data !== 'object') throw new Error('Parameter passed to save method must be a JSON object');
 	const tempStore = toolboxService.parseCsvToArray(data, numOfColumns, bypassValidation);
 	await toolboxService.saveStoreToFile(storeFile, tempStore);
 	store.length = 0;
