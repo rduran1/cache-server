@@ -9,9 +9,9 @@ model.getAccessByToken = (account, token, env) => {
 	let found;
 	let clone = {};
 	if (typeof env === 'string' && env.length > 0) {
-		found = model[account][env].find((e) => e.token === token);
+		found = store[account][env].find((e) => e.token === token);
 	} else {
-		found = model[account].default.find((e) => e.token === token);
+		found = store[account].default.find((e) => e.token === token);
 	}
 	if (found) clone = toolboxService.clone(found);
 	return clone.access;
@@ -21,9 +21,9 @@ model.getAccessByAccount = (account, subject, env) => {
 	let found;
 	let clone = {};
 	if (typeof env === 'string' && env.length > 0) {
-		found = model[account][env].find((e) => e.subject === subject);
+		found = store[account][env].find((e) => e.subject === subject);
 	} else {
-		found = model[account].default.find((e) => e.subject === subject);
+		found = store[account].default.find((e) => e.subject === subject);
 	}
 	if (found) clone = toolboxService.clone(found);
 	return clone.access;
