@@ -83,6 +83,9 @@ incidentService.syncModelState = async (model) => {
 		if (/routines:ssl3_get_record:wrong version number/.test(e.message)) {
 			throw new Error(`Error: ${config.host} does not appear to support HTTPS/TLS protocol`);
 		}
+		if (/alert bad certificate:/.test(e.message)) {
+			throw new Error(`Error: ${config.host} does not appear to support HTTPS/TLS protocol`);
+		}
 		throw new Error(`${ERROR_CONTACTING_SERVER} ${config.host}: ${e.message}`);
 	}
 	if (response.message.statusCode === 200) {
