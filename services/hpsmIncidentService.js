@@ -186,12 +186,24 @@ async function checkForValidAssignee(incident) {
 }
 
 async function validateFieldValues(incident) {
-	if (!hpsmIncidentStatusesModel.includes(incident.Status)) throw new Error('Status is not a valid entry');
-	if (!hpsmClosureCodesModel.includes(incident.ClosureCode)) throw new Error('ClosureCode is not a valid entry');
-	if (!hpsmAATypesModel.includes(incident.AutoAssignType)) throw new Error('AutoAssignType is not a valid entry');
-	if (!hpsmAssignmentgroupsModel.includes(incident.AssignmentGroup)) throw new Error('AssignmentGroup is not a valid entry');
-	if (!hpsmPrimaryAffectedServicesModel.includes(incident.Service)) throw new Error('Service is not a valid entry');
-	if (!hpsmContactsModel.includes(incident.Contact)) throw new Error('Contact is not a valid entry');
+	if (typeof incident.Status !== 'undefined' && !hpsmIncidentStatusesModel.includes(incident.Status)) {
+		throw new Error('Status is not a valid entry');
+	}
+	if (typeof incident.ClosureCode !== 'undefined' && !hpsmClosureCodesModel.includes(incident.ClosureCode)) {
+		throw new Error('ClosureCode is not a valid entry');
+	}
+	if (typeof incident.AutoAssignType !== 'undefined' && !hpsmAATypesModel.includes(incident.AutoAssignType)) {
+		throw new Error('AutoAssignType is not a valid entry');
+	}
+	if (typeof incident.AssignmentGroup !== 'undefined' && !hpsmAssignmentgroupsModel.includes(incident.AssignmentGroup)) {
+		throw new Error('AssignmentGroup is not a valid entry');
+	}
+	if (typeof incident.Service !== 'undefined' && !hpsmPrimaryAffectedServicesModel.includes(incident.Service)) {
+		throw new Error('Service is not a valid entry');
+	}
+	if (typeof incident.Contact !== 'undefined' && !hpsmContactsModel.includes(incident.Contact)) {
+		throw new Error('Contact is not a valid entry');
+	}
 	hpsmAreaCategorySubCategoryModel.validateCombinationTest(incident);
 	hpsmIncidentCauseCodesModel.validateCombinationTest(incident);
 	checkForOutageEndTimeBeforeOutageStartTime(incident);
