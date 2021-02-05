@@ -38,8 +38,4 @@ schemas.hpsmNewIncident = Joi.object().keys({
 
 });
 
-schemas.arrayOfArraysWithStringElements = (columnCount) => {
-	Joi.array().items(Joi.array().length(columnCount).items(Joi.string().allow('')));
-};
-
 module.exports = schemas;

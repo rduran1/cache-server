@@ -25,22 +25,22 @@ const incidentService = {};
 // ########################################## //
 // Beginning of Custom client service methods //
 // ########################################## //
-incidentService.saveToHpsmContactsModel = (data) => {
+incidentService.saveToHpsmContactsModel = async (data) => {
 	const columnCount = 9;
 	const bypassSchemaValidation = false;
-	hpsmContactsModel.save(data, columnCount, bypassSchemaValidation);
+	await hpsmContactsModel.save(data, columnCount, bypassSchemaValidation);
 };
 
-incidentService.saveToHpsmComputersModel = (data) => {
+incidentService.saveToHpsmComputersModel = async (data) => {
 	const columnCount = 19;
 	const bypassSchemaValidation = false;
-	hpsmContactsModel.save(data, columnCount, bypassSchemaValidation);
+	await hpsmComputersModel.save(data, columnCount, bypassSchemaValidation);
 };
 
-incidentService.saveToHpsmPrimaryAffectedServicesModel = (data) => {
+incidentService.saveToHpsmPrimaryAffectedServicesModel = async (data) => {
 	const columnCount = 6;
 	const bypassSchemaValidation = false;
-	hpsmContactsModel.save(data, columnCount, bypassSchemaValidation);
+	await hpsmPrimaryAffectedServicesModel.save(data, columnCount, bypassSchemaValidation);
 };
 
 incidentService.getIRSRespOrgGroupByComputerDisplayName = async (computerName) => {
@@ -102,7 +102,7 @@ incidentService.syncModels = async () => {
 // The following methods return an array of objects or undefined if nothing is found
 incidentService.getAllCauseCodes = async () => await hpsmIncidentCauseCodesModel.getAll();
 incidentService.getAllNonClosedIncidents = async () => await hpsmIncidentsModel.getAllNonClosedIncidents();
-incidentService.getAllAreaCategorySubCategories = async () => await hpsmAreaCategorySubCategoryModel.getAll();
+incidentService.getAllAreaCategorySubCategory = async () => await hpsmAreaCategorySubCategoryModel.getAll();
 incidentService.getAllPrimaryAffectedServices = async () => await hpsmPrimaryAffectedServicesModel.getAll();
 
 // The following methods return a single object if found

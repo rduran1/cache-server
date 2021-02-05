@@ -24,12 +24,9 @@ model.save = async (data) => {
 	store.push(...tempStore2);
 };
 
+// eslint-disable-next-line arrow-body-style
 model.getAllNonClosedIncidents = async () => {
-	store.filter((el) => el.Status !== 'Closed');
-};
-
-model.findByIncidentID = (id) => {
-	store.find((el) => el.IncidentID.toLowerCase() === id.toLowerCase());
+	return store.filter((el) => el.Status !== 'Closed');
 };
 
 model.getAll = () => store;

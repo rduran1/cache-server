@@ -42,13 +42,13 @@ incidentController.processPayload = async (req, res) => {
 	const content = req.body;
 	switch (tag) {
 	case 'export_bizServices.csv':
-		incidentService.saveToHpsmPrimaryAffectedServicesModel(content);
+		await incidentService.saveToHpsmPrimaryAffectedServicesModel(content);
 		break;
 	case 'export_computer.csv':
-		incidentService.saveToHpsmComputersModel(content);
+		await incidentService.saveToHpsmComputersModel(content);
 		break;
 	case 'export_contacts.csv':
-		incidentService.saveToHpsmContactsModel(content);
+		await incidentService.saveToHpsmContactsModel(content);
 		break;
 	default:
 		res.status(400).send('');
@@ -76,7 +76,7 @@ incidentController.getCauseCodes = async (req, res) => {
 };
 
 incidentController.getAreaCategorySubCategory = async (req, res) => {
-	await processRequest(req, res, 'getAreaCategorySubCategory', 'getAllAreaCategorySubCategorys');
+	await processRequest(req, res, 'getAreaCategorySubCategory', 'getAllAreaCategorySubCategory');
 };
 
 incidentController.getPrimaryAffectedServices = async (req, res) => {
@@ -89,7 +89,7 @@ incidentController.getAllIncidents = async (req, res) => {
 
 incidentController.getComputerProperties = async (req, res) => {
 	const computerName = checkForParameter(req, res, 'getComputerProperties', 'computerName', 'string', MISSING_COMPUTER_NAME);
-	if (computerName) await processRequest(req, res, 'getComputerProperties', 'getComputerProperties', computerName);
+	if (computerName) await processRequest(req, res, 'getComputerProperties', 'getComputerPropertiesByDisplayName', computerName);
 };
 
 incidentController.getIncidentById = async (req, res) => {

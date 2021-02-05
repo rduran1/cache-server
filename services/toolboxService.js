@@ -2,6 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const { EOL } = require('os');
+const Joi = require('joi');
 const schemaService = require('./schemaService');
 
 const toolboxService = {};
@@ -156,7 +157,7 @@ toolboxService.saveStoreToFile = async (fileName, store, withTabFormat) => {
 
 toolboxService.parseCsvToArray = (content, cols, bypass) => {
 	const arr = [];
-	const schema = schemaService.arrayOfArraysWithStringElements(cols);
+	const schema = Joi.array().items(Joi.array().length(cols).items(Joi.string().allow('')));
 	const rows = content.toString().split(EOL);
 	const len = rows.length;
 	// eslint-disable-next-line no-plusplus

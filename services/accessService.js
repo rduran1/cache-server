@@ -24,6 +24,8 @@ accessService.isAllowed = async (token, subject, resource, request) => {
 	logger.debug(`Performing account lookup based on ${token ? 'token' : 'subject'} provided`);
 
 	const access = token ? await accountService.getAccessByToken(token) : await accountService.getAccessByAccount(subject);
+	const identifier = token ? `Token ${token}` : `Subject ${subject}`;
+
 	if (typeof access === 'undefined') {
 		logger.error('Account lookup returned no results, request not allowed');
 		logger.debug('Exiting accessService.isAllowed service method');
@@ -31,16 +33,16 @@ accessService.isAllowed = async (token, subject, resource, request) => {
 	}
 	const resourceAccess = access.find((e) => e[resource]); // returns an array of permissions to resource
 	if (typeof resourceAccess === 'undefined') {
-		logger.debug(`${access.identifier} has not been granted access to ${resource}, request not allowed`);
+		logger.debug(`${identifier} has not been granted access to ${resource}, request not allowed`);
 		logger.debug('Exiting accessService.isAllowed service method');
 		return false;
 	}
 	if (resourceAccess[resource].includes(request)) {
-		logger.debug(`${access.identifier} is authorized to ${request} ${resource}`);
+		logger.debug(`${identifier} is authorized to ${request} ${resource}`);
 		logger.debug('Exiting accessService.isAllowed service method');
 		return true;
 	}
-	logger.debug(`${access.identifier} is not authorized to ${request} ${resource}, request not allowed`);
+	logger.debug(`${identifier} is not authorized to ${request} ${resource}, request not allowed`);
 	logger.debug('Exiting accessService.isAllowed service method');
 	return false;
 };
