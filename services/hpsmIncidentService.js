@@ -97,6 +97,11 @@ incidentService.syncModelState = async (model) => {
 
 incidentService.syncModels = async () => {
 	await incidentService.syncModelState(hpsmAATypesModel);
+	await incidentService.syncModelState(hpsmClosureCodesModel);
+	await incidentService.syncModelState(hpsmIncidentStatusesModel);
+	await incidentService.syncModelState(hpsmAssignmentgroupsModel);
+	await incidentService.syncModelState(hpsmIncidentCauseCodesModel);
+	await incidentService.syncModelState(hpsmAreaCategorySubCategoryModel);
 };
 
 // The following methods return an array of objects or undefined if nothing is found
