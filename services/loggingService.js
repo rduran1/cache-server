@@ -1,12 +1,12 @@
 const path = require('path');
 const { EOL } = require('os');
-const { writeFileSync } = require('fs');
+const { appendFileSync } = require('fs');
 const configurationService = require('./configurationService');
 
 function logit(fileName, level, msg) {
 	const loggingLevel = configurationService.getLoggingLevels().map((e) => e.toUpperCase());
 	if (!loggingLevel.includes(level)) return;
-	writeFileSync(fileName, `${Date()}: [${level}] ${msg}${EOL}`);
+	appendFileSync(fileName, `${Date()}: [${level}] ${msg}${EOL}`);
 }
 
 function loggingService(fileName) {
