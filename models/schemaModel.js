@@ -35,7 +35,21 @@ schemas.hpsmIncidentID = Joi.object().keys({
 });
 
 schemas.hpsmNewIncident = Joi.object().keys({
-
+	Area: Joi.string().required(),
+	AssignmentGroup: Joi.string().required(),
+	Assignee: Joi.string(),
+	Subcategory: Joi.string().required(),
+	AutoAssignType: Joi.string().required(),
+	AffectedCI: Joi.string().required(),
+	Category: Joi.string().required().allow(''),
+	Contact: Joi.string().required(),
+	Description: Joi.string().required(),
+	Impact: Joi.string().required().valid('3', '4', '5'),
+	Service: Joi.string().required(),
+	Title: Joi.string().required(),
+	Urgency: Joi.string().required().valid('3', '4', '5'),
+	Status: Joi.string(),
+	JournalUpdates: Joi.string()
 });
 
 module.exports = schemas;
