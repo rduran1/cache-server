@@ -8,7 +8,13 @@ model.find = (value) => {
 	store.find((el) => el.toLowerCase() === value.toLowerCase());
 };
 
-model.includes = (value) => store.includes(value);
+model.includes = (value) => {
+	let result = false;
+	store.forEach((row) => {
+		if (row[0].toLowerCase() === value.toLowerCase()) result = true;
+	});
+	return result;
+};
 
 model.save = async (data, numOfColumns, bypassValidation) => {
 	// if (typeof data !== 'object') throw new Error('Parameter passed to save method must be a JSON object');
