@@ -12,7 +12,10 @@ model.save = async (data) => {
 	data.content.map((e) => tempStore.push(e.AssignmentAPI.Name));
 	toolboxService.saveStoreToFile(storeFile, tempStore);
 	store.length = 0;
-	store.push(...tempStore);
+	const len = tempStore.length;
+	for (let i; i < len; i++) {
+		store.push(tempStore[i]);
+	}
 };
 
 model.find = (value) => {
