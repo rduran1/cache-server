@@ -53,6 +53,11 @@ httpClientService.asyncRequest = (options) => new Promise((resolve, reject) => {
 		if (typeof e.syscall !== 'undefined') eInfo.push(`syscall: ${e.syscall}`);
 		if (typeof e.host !== 'undefined') eInfo.push(`host: ${e.host}`);
 		if (typeof e.port !== 'undefined') eInfo.push(`port: ${e.port}`);
+		if (/routines:ssl3_get_record:wrong version number/.test(e.message)) {
+			return reject(new Error('Error: Server does not appear to support HTTPS/TLS protocol'));
+		}
+		const found = e.messsage.match(/:sslv3 (.+?):/)[0];
+		if (found) return reject(new Error(`Error: ${found}`));
 		return reject(new Error(`${e.message}: (${eInfo.join(' ')})`));
 	});
 
