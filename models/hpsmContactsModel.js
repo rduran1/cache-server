@@ -1,5 +1,3 @@
-/* eslint-disable no-plusplus */
-/* eslint-disable comma-dangle */
 const toolboxService = require('../services/toolboxService');
 
 const { store, storeFile } = toolboxService.initializeStore(__filename, '[[]]');
@@ -15,7 +13,6 @@ model.save = async (data, numOfColumns, bypassValidation) => {
 	for (let i; i < len; i++) {
 		store.push(tempStore[i]);
 	}
-	// store.push(...tempStore);
 };
 
 model.find = (val) => {
