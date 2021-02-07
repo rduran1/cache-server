@@ -11,7 +11,11 @@ model.save = async (data, numOfColumns, bypassValidation) => {
 	const tempStore = toolboxService.parseCsvToArray(data, numOfColumns, bypassValidation);
 	await toolboxService.saveStoreToFile(storeFile, tempStore);
 	store.length = 0;
-	store.push(...tempStore);
+	const len = tempStore.length;
+	for (let i; i < len; i++) {
+		store.push(tempStore[i]);
+	}
+	// store.push(...tempStore);
 };
 
 model.find = (val) => {
