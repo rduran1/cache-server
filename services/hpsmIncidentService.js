@@ -18,8 +18,6 @@ const hpsmIncidentStatusesModel = require('../models/hpsmIncidentStatusesModel')
 const hpsmAreaCategorySubCategoryModel = require('../models/hpsmAreaCategorySubCategoryModel');
 const hpsmPrimaryAffectedServicesModel = require('../models/hpsmPrimaryAffectedServicesModel');
 
-const ERROR_CONTACTING_SERVER = 'Error: Cannot contact HPSM server';
-
 const incidentService = {};
 
 // ########################################## //
@@ -76,18 +74,7 @@ incidentService.syncModelState = async (model) => {
 		method: 'GET',
 		useTls: accountInfo.useTls
 	};
-	let response;
-	try {
-		response = await httpClientService.asyncRequest(config);
-	} catch (e) {
-		if (/routines:ssl3_get_record:wrong version number/.test(e.message)) {
-			throw new Error(`Error: ${config.host} does not appear to support HTTPS/TLS protocol`);
-		}
-		if (/alert bad certificate:/.test(e.message)) {
-			throw new Error(`Error: ${config.host} did not provide a valid TLS certificate`);
-		}
-		throw new Error(`${ERROR_CONTACTING_SERVER} ${config.host}: ${e.message}`);
-	}
+	const response = await httpClientService.asyncRequest(config);
 	if (response.message.statusCode === 200) {
 		const data = JSON.parse(response.data);
 		await model.save(data);
@@ -227,15 +214,7 @@ incidentService.getEligibleAssigneesByGroup = async (groupName) => {
 		useTls: accountInfo.useTls
 	};
 
-	let response;
-	try {
-		response = await httpClientService.asyncRequest(config);
-	} catch (e) {
-		if (/routines:ssl3_get_record:wrong version number/.test(e.message)) {
-			throw new Error(`Error: ${config.host} does not appear to support HTTPS/TLS protocol`);
-		}
-		throw new Error(`${ERROR_CONTACTING_SERVER} ${config.host}: ${e.message}`);
-	}
+	const response = await httpClientService.asyncRequest(config);
 	if (response.message.statusCode === 200) {
 		response.data = JSON.parse(response.data);
 		if (response.data['@totalcount'] === 0) return [];
@@ -257,15 +236,7 @@ incidentService.getIncidentById = async (id) => {
 		useTls: accountInfo.useTls
 	};
 
-	let response;
-	try {
-		response = await httpClientService.asyncRequest(config);
-	} catch (e) {
-		if (/routines:ssl3_get_record:wrong version number/.test(e.message)) {
-			throw new Error(`Error: ${config.host} does not appear to support HTTPS/TLS protocol`);
-		}
-		throw new Error(`${ERROR_CONTACTING_SERVER} ${config.host}: ${e.message}`);
-	}
+	const response = await httpClientService.asyncRequest(config);
 	let data;
 	if (response.message.statusCode === 200) {
 		data = JSON.parse(response.data).Incident;
@@ -296,19 +267,7 @@ incidentService.createIncident = async (incident) => {
 	await duplicateOpenIncidentDetection(newIncident);
 	config.body = JSON.stringify({ Incident: newIncident });
 
-	let response;
-	try {
-		response = await httpClientService.asyncRequest(config);
-	} catch (e) {
-		if (/routines:ssl3_get_record:wrong version number/.test(e.message)) {
-			throw new Error(`Error: ${config.host} does not appear to support HTTPS/TLS protocol`);
-		}
-		if (/alert bad certificate/.test(e.message)) {
-			throw new Error(`Error: ${config.host} did not provide a valid TLS certificate`);
-		}
-		throw new Error(`${ERROR_CONTACTING_SERVER} ${config.host}: ${e.message}`);
-	}
-
+	const response = await httpClientService.asyncRequest(config);
 	if (response.message.statusCode === 200 && response.data.ReturnCode === 0) {
 		try {
 			const data = JSON.parse(response.data);
