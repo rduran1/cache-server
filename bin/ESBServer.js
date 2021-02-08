@@ -1,31 +1,65 @@
 process.env.INSTALL_DIR = '';
 
-const fs     	= require('fs');
-const https  	= require('https');
-const app    	= require('./app');
-const logger	= require('../services/loggingService')(__filename);
-const config	= require('../services/configurationService').getServerConfiguration();
+const { readFileSync } = require('fs');
+const https = require('https');
+const app = require('./app');
+const logger = require('../services/loggingService')(__filename);
+const config = require('../services/configurationService').getServerConfiguration();
+
+let keyFile;
+let	certFile;
+try {
+	keyFile = readFileSync(config.key);
+} catch (e) {
+	logger.error(`Failed to read key file: ${e.message}`);
+}
+try {
+	certFile = readFileSync(config.cert);
+} catch (e) {
+	logger.error(`Failed to read cert file(s): ${e.message}`);
+}
 
 const options = {
-    key:  fs.readFileSync(config.key),
-    cert: fs.readFileSync(config.cert)
+	key: keyFile,
+	cert: certFile
 };
 
 const server = https.createServer(options, app);
-if (config.timeout) server.setTimeout(config.timeout);
-server.listen(config.port);
-server.on('listening', onListening);
-server.on('error', onError);
 
-function onError(e) {
-	logger.error(e.message);
-	console.error(`${Date()}: ${e.message}`);
+function onError(error) {
+	if (error.syscall !== 'listen') {
+		throw error;
+	}
+
+	const bind = typeof port === 'string'
+		? `Pipe ${config.port}`
+		: `Port ${config.port}`;
+
+	// handle specific listen errors with friendly messages
+
+	switch (error.code) {
+	case 'EACCES':
+		logger.error(`${bind} requires elevated privileges`);
+		break;
+
+	case 'EADDRINUSE':
+		logger.error(`${bind} is already in use`);
+		break;
+
+	default:
+		throw error;
+	}
+	logger.error(error.message);
 	process.exit(1);
 }
 
 function onListening() {
-	let addr = server.address();
-	let bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
-	logger.info(`${Date()}: Server listening on ${bind}`);
-	console.log(`${Date()}: Server listening on ${bind}`);
+	const addr = server.address();
+	const bind = typeof addr === 'string' ? `pipe ${addr}` : `port ${addr.port}`;
+	logger.info(`Server listening on ${bind}`);
 }
+
+if (config.timeout) server.setTimeout(config.timeout);
+server.listen(config.port);
+server.on('listening', onListening);
+server.on('error', onError);

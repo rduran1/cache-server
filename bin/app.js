@@ -1,12 +1,13 @@
-const helmet	  	= require('helmet');
+const helmet = require('helmet');
 const express		= require('express');
+
 const app		= express();
-const bodyParser	= require('body-parser');
-const cookieParser	= require('cookie-parser');
-const logger		= require('../services/loggingService')(__filename);
-const config		= require('../services/configurationService').getAppConfiguration();
-const incidentService	= require('../services/hpsmIncidentService');
-const scheduler 	= require('../scheduler');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const logger = require('../services/loggingService')(__filename);
+const config = require('../services/configurationService').getAppConfiguration();
+// eslint-disable-next-line no-unused-vars
+const scheduler = require('../scheduler');
 
 app.set('view engine', 'ejs');
 app.set('views', config.viewsDirectory);
@@ -23,9 +24,9 @@ app.use('/', require('../routes/hpsm'));
 // Error handler for middleware
 app.use((e, req, res, next) => {
 	if (!e) return next();
-	const { connection: {remoteAddress}, originalUrl } = req;
+	const { connection: { remoteAddress }, originalUrl } = req;
 	if (/^Failed to decode param/.test(e.message)) {
-		logger.error(`Request from ${remoteAddress} contains malformed URL: ${originalUrl.replace(/token=[0-9a-z]+/,'token=[FILTERED]')}`);
+		logger.error(`Request from ${remoteAddress} contains malformed URL: ${originalUrl.replace(/token=[0-9a-z]+/, 'token=[FILTERED]')}`);
 		return res.status(400).send(`${e.message}. Check URL encoding`);
 	}
 	if (/request entity too large/.test(e.message)) {
