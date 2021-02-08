@@ -16,9 +16,9 @@ model.includes = (value) => {
 	return result;
 };
 
-model.save = async (data, numOfColumns, bypassValidation) => {
-	// if (typeof data !== 'object') throw new Error('Parameter passed to save method must be a JSON object');
-	const tempStore = toolboxService.parseCsvToArray(data, numOfColumns, bypassValidation);
+model.save = async (data) => {
+	if (typeof data !== 'object') throw new Error('Parameter passed to save method must be a JSON object');
+	const tempStore = toolboxService.cloneAndValidate(data, 'hpsmPrimaryAffectedServices');
 	await toolboxService.saveStoreToFile(storeFile, tempStore);
 	store.length = 0;
 	const len = tempStore.length;

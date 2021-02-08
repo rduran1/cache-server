@@ -24,21 +24,18 @@ const incidentService = {};
 // Beginning of Custom client service methods //
 // ########################################## //
 incidentService.saveToHpsmContactsModel = async (data) => {
-	const columnCount = 9;
-	const bypassSchemaValidation = false;
-	await hpsmContactsModel.save(data, columnCount, bypassSchemaValidation);
+	const arr = toolboxService.parseCsvToArray(data);
+	await hpsmContactsModel.save(arr);
 };
 
 incidentService.saveToHpsmComputersModel = async (data) => {
-	const columnCount = 19;
-	const bypassSchemaValidation = false;
-	await hpsmComputersModel.save(data, columnCount, bypassSchemaValidation);
+	const arr = toolboxService.parseCsvToArray(data);
+	await hpsmComputersModel.save(arr);
 };
 
 incidentService.saveToHpsmPrimaryAffectedServicesModel = async (data) => {
-	const columnCount = 6;
-	const bypassSchemaValidation = false;
-	await hpsmPrimaryAffectedServicesModel.save(data, columnCount, bypassSchemaValidation);
+	const arr = toolboxService.parseCsvToArray(data);
+	await hpsmPrimaryAffectedServicesModel.save(arr);
 };
 
 incidentService.getIRSRespOrgGroupByComputerDisplayName = async (computerName) => {

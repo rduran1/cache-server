@@ -4,9 +4,9 @@ const { store, storeFile } = toolboxService.initializeStore(__filename, '[[]]');
 
 const model = {};
 
-model.save = async (data, numOfColumns, bypassValidation) => {
-	// if (typeof data !== 'object') throw new Error('Parameter passed to save method must be a JSON object');
-	const tempStore = toolboxService.parseCsvToArray(data, numOfColumns, bypassValidation);
+model.save = async (data) => {
+	if (typeof data !== 'object') throw new Error('Parameter passed to save method must be a JSON object');
+	const tempStore = toolboxService.cloneAndValidate(data, 'hpsmContacts');
 	await toolboxService.saveStoreToFile(storeFile, tempStore);
 	store.length = 0;
 	const len = tempStore.length;

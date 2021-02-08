@@ -52,4 +52,10 @@ schemas.hpsmNewIncident = Joi.object().keys({
 	JournalUpdates: Joi.string()
 });
 
+schemas.hpsmContacts = Joi.array().items(Joi.array().length(9).items(Joi.string().allow('')));
+
+schemas.hpsmComputers = Joi.array().items(Joi.array().length(19).items(Joi.string().allow('')));
+
+schemas.hpsmPrimaryAffectedServices = Joi.array().items(Joi.array().length(6).items(Joi.string().allow('')));
+
 module.exports = schemas;
