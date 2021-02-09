@@ -1,5 +1,5 @@
 const incidentService = require('../services/hpsmIncidentService');
-const logger = require('../services/loggingService')(__filename);
+const logger = require('../services/loggingService')('scheduler.js');
 
 setInterval(async () => {
 	try {
@@ -7,4 +7,4 @@ setInterval(async () => {
 	} catch (e) {
 		logger.error(`Failed to sync models: ${e.message}`);
 	}
-});
+}, 600000);

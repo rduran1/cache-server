@@ -40,18 +40,23 @@ function checkForParameter(req, res, controllerMethodName, paramName, paramType,
 incidentController.processPayload = async (req, res) => {
 	const tag = req.params.contentTag;
 	const content = req.body;
-	switch (tag) {
-	case 'export_bizServices.csv':
-		await incidentService.saveToHpsmPrimaryAffectedServicesModel(content);
-		break;
-	case 'export_computer.csv':
-		await incidentService.saveToHpsmComputersModel(content);
-		break;
-	case 'export_contacts.csv':
-		await incidentService.saveToHpsmContactsModel(content);
-		break;
-	default:
-		res.status(400).send('');
+	try {
+		switch (tag) {
+		case 'export_bizServices.csv':
+			await incidentService.saveToHpsmPrimaryAffectedServicesModel(content);
+			break;
+		case 'export_computer.csv':
+			await incidentService.saveToHpsmComputersModel(content);
+			break;
+		case 'export_contacts.csv':
+			await incidentService.saveToHpsmContactsModel(content);
+			break;
+		default:
+			res.status(400).send('');
+		}
+	} catch (e) {
+		logger.error(`Failed to process ${tag}: ${e.message}`);
+		res.status(400).send(e.message);
 	}
 };
 
