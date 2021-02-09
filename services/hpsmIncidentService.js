@@ -167,7 +167,7 @@ async function checkForValidAssignee(incident) {
 	}
 	if (incident.Assignee === '' || typeof incident.Assignee === 'undefined') return;
 	const eligibleAssignees = await incidentService.getEligibleAssigneesByGroup(incident.AssignmentGroup);
-	if (!eligibleAssignees.includes(incident.AssignmentGroup)) throw new Error('Assignee is invalid');
+	if (!eligibleAssignees.includes(incident.Assignee)) throw new Error('Assignee is invalid');
 }
 
 async function validateFieldValues(incident) {
