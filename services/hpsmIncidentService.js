@@ -200,7 +200,7 @@ incidentService.getEligibleAssigneesByGroup = async (groupName) => {
 	toolboxService.validate({ assignmentGroupName: groupName }, 'hpsmAssignmentGroupName');
 	const accountInfo = accountService.getCredentials(env);
 
-	const uri1 = `/SM/9/rest/OperatorAPI/?query=AssignmentGroups=%22${encodeURI(groupName)}%22`;
+	const uri1 = `/SM/9/rest/OperatorAPI/?query=AssignmentGroups=%22${encodeURI(groupName.replace(/&/g, '%26'))}%22`;
 	const uri2 = encodeURI(' and EssOnly="false" and TemplateOperator="false"');
 
 	const config = {
