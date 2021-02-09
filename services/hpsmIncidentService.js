@@ -119,7 +119,7 @@ async function duplicateOpenIncidentDetection(incident) {
 	if (/CI\d\d\d\d\d\d\d/.test(incident.AffectedCI)) {
 		logicalName = incident.AffectedCI;
 	} else {
-		logicalName = incidentService.getLogicalNameByComputerDisplayName(incident.AffectedCI.split('.')[0]);
+		logicalName = await incidentService.getLogicalNameByComputerDisplayName(incident.AffectedCI.split('.')[0]);
 		if (!logicalName) logicalName = incident.AffectedCI;
 	}
 	const potentialDuplicateDetected = openIncidents.find((el) => {
@@ -133,7 +133,7 @@ async function duplicateOpenIncidentDetection(incident) {
 	if (potentialDuplicateDetected) {
 		const id = potentialDuplicateDetected.IncidentID;
 		const latest = await incidentService.getIncidentById(id);
-		if (latest.Incident.Status !== 'Closed') throw new Error(`Request is a duplicate of ${latest.Incident.IncidentID}`);
+		if (latest.Status !== 'Closed') throw new Error(`Request is a duplicate of ${latest.IncidentID}`);
 	}
 }
 
@@ -288,7 +288,7 @@ incidentService.createIncident = async (incident) => {
 };
 
 incidentService.updateIncident = async (incident) => {
-	toolboxService.validate({ incidentID: incident.IncidentID }, 'hpsmIncidentID');
+	toolboxService.validate({ IncidentID: incident.IncidentID }, 'hpsmIncidentID');
 	const accountInfo = accountService.getCredentials(env);
 
 	const config = {
@@ -323,7 +323,7 @@ incidentService.updateIncident = async (incident) => {
 	delete retrievedIncident.ClosedTime;
 
 	const mergedIncident = {};
-	Object.assign(mergedIncident, retrievedIncident);
+	Object.assign(mergedIncident, retrievedIncident, incident);
 
 	toolboxService.validate(mergedIncident, 'hpsmExistingIncident');
 	await validateFieldValues(mergedIncident);

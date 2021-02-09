@@ -52,6 +52,29 @@ schemas.hpsmNewIncident = Joi.object().keys({
 	JournalUpdates: Joi.string()
 });
 
+schemas.hpsmExistingIncident = Joi.object().keys({
+	Area: Joi.string(),
+	AssignmentGroup: Joi.string(),
+	Assignee: Joi.string(),
+	AutoAssignType: Joi.string(),
+	Subcategory: Joi.string().required(),
+	OutageStartTime: Joi.date().iso(),
+	OUtageEndTime: Joi.date().iso(),
+	AffectedCI: Joi.string().required(),
+	Phase: Joi.string(),
+	Priority: Joi.string(),
+	JournalUpdates: Joi.string().required(),
+	Category: Joi.string().required().allow(''),
+	Contact: Joi.string().required(),
+	Description: Joi.string().required(),
+	Impact: Joi.string().required().valid('3', '4', '5'),
+	Service: Joi.string().required(),
+	Title: Joi.string().required(),
+	Urgency: Joi.string().required().valid('3', '4', '5'),
+	Status: Joi.string(),
+	IncidentID: Joi.string().required()
+});
+
 schemas.hpsmContacts = Joi.array().items(Joi.array().length(9).items(Joi.string().allow('')));
 
 schemas.hpsmComputers = Joi.array().items(Joi.array().length(19).items(Joi.string().allow('')));
