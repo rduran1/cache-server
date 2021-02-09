@@ -266,13 +266,15 @@ incidentService.createIncident = async (incident) => {
 	config.body = JSON.stringify({ Incident: newIncident });
 
 	const response = await httpClientService.asyncRequest(config);
-	if (response.message.statusCode === 200 && response.data.ReturnCode === 0) {
+	if (response.message.statusCode === 200) {
+		let data;
 		try {
-			const data = JSON.parse(response.data);
-			return data;
+			data = JSON.parse(response.data);
 		} catch (e) {
 			throw new Error(`Received JSON data from HPSM server that was not well formed: ${e.message}`);
 		}
+		await hpsmIncidentsModel.save(data);
+		return data;
 	}
 	throw new Error(`HTTP ${response.message.statusCode} ${response.message.statusMessage} ${JSON.stringify(response.data)}`);
 };
