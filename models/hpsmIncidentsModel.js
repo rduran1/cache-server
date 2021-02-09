@@ -27,7 +27,8 @@ model.save = async (data) => {
 
 // eslint-disable-next-line arrow-body-style
 model.getAllNonClosedIncidents = async () => {
-	return store.filter((el) => el.Status !== 'Closed');
+	// eslint-disable-next-line no-return-await
+	return await store.filter((el) => el.Status !== 'Closed');
 };
 
 model.getAll = () => store;

@@ -112,11 +112,19 @@ incidentService.getAllAssignmentGroups = async () => await hpsmAssignmentgroupsM
 
 async function duplicateOpenIncidentDetection(incident) {
 	// Dups have the following matching fields: AffectedCI and Title
+	// Need to convert CI displayname to logical name before AffectedCI comparison
 	const openIncidents = await hpsmIncidentsModel.getAllNonClosedIncidents();
-	if (typeof openIncidents === 'undefined') return;
+	if (openIncidents.length === 0) return;
+	let logicalName = '';
+	if (/CI\d\d\d\d\d\d\d/.test(incident.AffectedCI)) {
+		logicalName = incident.AffectedCI;
+	} else {
+		logicalName = incidentService.getLogicalNameByComputerDisplayName(incident.AffectedCI.split('.')[0]);
+		if (!logicalName) logicalName = incident.AffectedCI;
+	}
 	const potentialDuplicateDetected = openIncidents.find((el) => {
 		if (el.IncidentID !== incident.IncidentID
-			&& el.AffectedCI === incident.AffectedCI
+			&& (el.AffectedCI === incident.AffectedCI || el.AffectedCI === logicalName)
 			&& el.Title === incident.Title
 		) return true;
 		return false;
