@@ -112,7 +112,8 @@ incidentService.getAllAssignmentGroups = async () => await hpsmAssignmentgroupsM
 
 async function duplicateOpenIncidentDetection(incident) {
 	// Dups have the following matching fields: AffectedCI and Title
-	const openIncidents = hpsmIncidentsModel.getAllNonClosedIncidents();
+	const openIncidents = await hpsmIncidentsModel.getAllNonClosedIncidents();
+	if (typeof openIncidents === 'undefined') return;
 	const potentialDuplicateDetected = openIncidents.find((el) => {
 		if (el.IncidentID !== incident.IncidentID
 			&& el.AffectedCI === incident.AffectedCI
