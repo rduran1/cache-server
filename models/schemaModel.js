@@ -59,7 +59,7 @@ schemas.hpsmExistingIncident = Joi.object().keys({
 	AutoAssignType: Joi.string(),
 	Subcategory: Joi.string().required(),
 	OutageStartTime: Joi.date().iso(),
-	OUtageEndTime: Joi.date().iso(),
+	OutageEndTime: Joi.date().iso(),
 	AffectedCI: Joi.string().required(),
 	Phase: Joi.string(),
 	Priority: Joi.string(),
@@ -72,7 +72,10 @@ schemas.hpsmExistingIncident = Joi.object().keys({
 	Title: Joi.string().required(),
 	Urgency: Joi.string().required().valid('3', '4', '5'),
 	Status: Joi.string(),
-	IncidentID: Joi.string().required()
+	IncidentID: Joi.string().required(),
+	CauseCode: Joi.string(),
+	Solution: Joi.string(),
+	ClosureCode: Joi.string()
 });
 
 schemas.hpsmContacts = Joi.array().items(Joi.array().length(9).items(Joi.string().allow('')));
