@@ -21,6 +21,10 @@ httpClientService.asyncRequest = (options) => new Promise((resolve, reject) => {
 	if (typeof opts.method === 'undefined') opts.method = 'GET';
 
 	toolboxService.validate(opts, 'httpClient');
+	if (opts.auth) {
+		const count = (opts.auth.match(/:/g) || []).length;
+		if (count > 1) throw new Error('Validation failure: Username or password cannot contain a ":" when using basic authentication');
+	}
 
 	const httpClient = opts.useTls ? https : http;
 	const { body } = opts;
