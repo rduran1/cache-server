@@ -14,11 +14,16 @@ httpClientService.asyncRequest = (options) => new Promise((resolve, reject) => {
 	if (typeof opts.rejectUnauthorized === 'undefined') opts.rejectUnauthorized = true;
 	if (typeof opts.returnClientRequest === 'undefined') opts.returnClientRequest = false;
 	if (typeof opts.returnHttpIncomingMessage === 'undefined') opts.returnHttpIncomingMessage = false;
+	if (typeof opts.port === 'undefined') {
+		opts.port = opts.useTls ? 443 : 80;
+	}
+	if (typeof opts.path === 'undefined') opts.path = '/';
+	if (typeof opts.method === 'undefined') opts.method = 'GET';
 
 	toolboxService.validate(opts, 'httpClient');
 
 	const httpClient = opts.useTls ? https : http;
-	const body = opts.body || null;
+	const { body } = opts;
 	const timeout = opts.timeout || null;
 	const { returnClientRequest } = opts;
 	const { returnHttpIncomingMessage } = opts;
@@ -56,8 +61,8 @@ httpClientService.asyncRequest = (options) => new Promise((resolve, reject) => {
 		if (/routines:ssl3_get_record:wrong version number/.test(e.message)) {
 			return reject(new Error('Server does not appear to support HTTPS/TLS protocol'));
 		}
-		const found = e.message.match(/:sslv3 alert (.+?):/)[1];
-		if (found) return reject(new Error(`${found}`));
+		const found = e.message.match(/:sslv3 alert (.+?):/);
+		if (found) return reject(new Error(`${found[1]}`));
 		return reject(new Error(`${e.message}: (${eInfo.join(' ')})`));
 	});
 
@@ -65,10 +70,11 @@ httpClientService.asyncRequest = (options) => new Promise((resolve, reject) => {
 
 	clientRequest.on('timeout', () => {
 		clientRequest.destroy();
-		return reject(new Error('Request timed out waiting for server response'));
+		return reject(new Error('Client timeout exceeded waiting for server response'));
 	});
 
 	if (body) {
+		clientRequest.setHeader('Content-Length', body.length);
 		clientRequest.end(body);
 	} else {
 		clientRequest.end();
