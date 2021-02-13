@@ -300,7 +300,7 @@ incidentService.updateIncident = async (incident) => {
 		useTls: accountInfo.useTls
 	};
 
-	const { Incident: retrievedIncident } = await incidentService.getIncidentById(incident.IncidentID);
+	const retrievedIncident = await incidentService.getIncidentById(incident.IncidentID);
 
 	// Convert Description and Solution array to a string type if necessary
 	if (Array.isArray(retrievedIncident.Description)) {
