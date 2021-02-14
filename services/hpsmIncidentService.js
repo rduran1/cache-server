@@ -13,8 +13,8 @@ const hpsmIncidentsModel = require('../models/hpsmIncidentsModel');
 const hpsmComputersModel = require('../models/hpsmComputersModel');
 const hpsmClosureCodesModel = require('../models/hpsmClosureCodesModel');
 const hpsmAssignmentgroupsModel = require('../models/hpsmAssignmentgroupsModel');
-const hpsmIncidentCauseCodesModel = require('../models/hpsmIncidentCauseCodesModel');
 const hpsmIncidentStatusesModel = require('../models/hpsmIncidentStatusesModel');
+const hpsmIncidentCauseCodesModel = require('../models/hpsmIncidentCauseCodesModel');
 const hpsmAreaCategorySubCategoryModel = require('../models/hpsmAreaCategorySubCategoryModel');
 const hpsmPrimaryAffectedServicesModel = require('../models/hpsmPrimaryAffectedServicesModel');
 
