@@ -2,7 +2,6 @@
 const fs = require('fs');
 const path = require('path');
 const { EOL } = require('os');
-const Joi = require('joi');
 const schemaService = require('./schemaService');
 
 const toolboxService = {};
