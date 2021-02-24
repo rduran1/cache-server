@@ -69,7 +69,8 @@ incidentService.syncModelState = async (model) => {
 		path,
 		auth: `${accountInfo.username}:${accountInfo.password}`,
 		method: 'GET',
-		useTls: accountInfo.useTls
+		useTls: accountInfo.useTls,
+		rejectUnauthorized: accountInfo.rejectUnauthorized
 	};
 	const response = await httpClientService.asyncRequest(config);
 	if (response.message.statusCode === 200) {
@@ -217,7 +218,8 @@ incidentService.getEligibleAssigneesByGroup = async (groupName) => {
 		path: `${uri1}${uri2}`,
 		auth: `${accountInfo.username}:${accountInfo.password}`,
 		method: 'GET',
-		useTls: accountInfo.useTls
+		useTls: accountInfo.useTls,
+		rejectUnauthorized: accountInfo.rejectUnauthorized
 	};
 
 	const response = await httpClientService.asyncRequest(config);
@@ -239,7 +241,8 @@ incidentService.getIncidentById = async (id) => {
 		path: `/SM/9/rest/incidents/${id}`,
 		auth: `${accountInfo.username}:${accountInfo.password}`,
 		method: 'GET',
-		useTls: accountInfo.useTls
+		useTls: accountInfo.useTls,
+		rejectUnauthorized: accountInfo.rejectUnauthorized
 	};
 
 	const response = await httpClientService.asyncRequest(config);
@@ -266,7 +269,8 @@ incidentService.createIncident = async (incident) => {
 		path: '/SM/9/rest/incidents',
 		auth: `${accountInfo.username}:${accountInfo.password}`,
 		method: 'POST',
-		useTls: accountInfo.useTls
+		useTls: accountInfo.useTls,
+		rejectUnauthorized: accountInfo.rejectUnauthorized
 	};
 
 	await validateFieldValues(newIncident);
@@ -297,7 +301,8 @@ incidentService.updateIncident = async (incident) => {
 		path: `/SM/9/rest/incidents/${incident.IncidentID}`,
 		auth: `${accountInfo.username}:${accountInfo.password}`,
 		method: 'POST',
-		useTls: accountInfo.useTls
+		useTls: accountInfo.useTls,
+		rejectUnauthorized: accountInfo.rejectUnauthorized
 	};
 
 	const retrievedIncident = await incidentService.getIncidentById(incident.IncidentID);
