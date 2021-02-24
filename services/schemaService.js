@@ -8,6 +8,9 @@ schemaService.validate = (object, schemaName) => {
 	if (typeof schemas[schemaName] === 'undefined') throw new Error(`Schema definition for "${schemaName}" does not exist in the schema model`);
 	const validationResult = schemas[schemaName].validate(object);
 	if (validationResult.error != null) {
+		if (typeof validationResult.error.details === 'object' && typeof validationResult.error.details[0].message === 'string') {
+			throw new Error(`Validation failure: ${validationResult.error.details[0].message}`);
+		}
 		const validateErrorMessage = validationResult.error.message.replace(/.+?\[/, '').replace(/\]$/, '');
 		throw new Error(`Validation failure: ${validateErrorMessage}`);
 	}
