@@ -84,4 +84,10 @@ schemas.hpsmComputers = Joi.array().items(Joi.array().length(19).items(Joi.strin
 
 schemas.hpsmPrimaryAffectedServices = Joi.array().items(Joi.array().length(6).items(Joi.string().allow('')));
 
+schemas.mssqlServiceDbNameAndBackupFile = Joi.object().keys({
+	databaseName: Joi.string().required().regex(/^[\w]+$/),
+	backupFileLocation: Joi.string().required().regex(/^[\w\\:.]+$/),
+	timeout: Joi.number().min(0)
+});
+
 module.exports = schemas;
