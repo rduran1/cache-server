@@ -72,7 +72,12 @@ incidentService.syncModelState = async (model) => {
 		useTls: accountInfo.useTls,
 		rejectUnauthorized: accountInfo.rejectUnauthorized
 	};
-	const response = await httpClientService.asyncRequest(config);
+	let response;
+	try {
+		response = await httpClientService.asyncRequest(config);
+	} catch (e) {
+		throw new Error(`Error contacting ${config.host}: ${e.message}`);
+	}
 	if (response.message.statusCode === 200) {
 		const data = JSON.parse(response.data);
 		await model.save(data);
@@ -123,7 +128,7 @@ async function duplicateOpenIncidentDetection(incident) {
 		logicalName = await incidentService.getLogicalNameByComputerDisplayName(incident.AffectedCI.split('.')[0]);
 		if (!logicalName) logicalName = incident.AffectedCI;
 	}
-	const potentialDuplicateDetected = openIncidents.find((el) => {
+	const potentialDuplicateDetected = openIncidents.filter((el) => {
 		if (el.IncidentID !== incident.IncidentID
 			&& (el.AffectedCI === incident.AffectedCI || el.AffectedCI === logicalName)
 			&& el.Title === incident.Title
@@ -131,11 +136,16 @@ async function duplicateOpenIncidentDetection(incident) {
 		return false;
 	});
 	// Call HPSM to get the latest status incase the incident was closed by someone else
-	if (potentialDuplicateDetected) {
-		const id = potentialDuplicateDetected.IncidentID;
-		const latest = await incidentService.getIncidentById(id);
-		if (latest.Status !== 'Closed') throw new Error(`Request is a duplicate of ${latest.IncidentID}`);
-	}
+	potentialDuplicateDetected.forEach(async (potentialDuplicate) => {
+		const id = potentialDuplicate.IncidentID;
+		let latest;
+		try {
+			latest = await incidentService.getIncidentById(id);
+		} catch (e) {
+			if (!e.message.includes('404 ReturnCode: 9 ')) throw new Error(e.message);
+		}
+		if (typeof latest !== 'undefined' && latest.Status !== 'Closed') throw new Error(`Request is a duplicate of ${latest.IncidentID}`);
+	});
 }
 
 function checkForOutageEndTimeBeforeOutageStartTime(incident) {
@@ -221,8 +231,12 @@ incidentService.getEligibleAssigneesByGroup = async (groupName) => {
 		useTls: accountInfo.useTls,
 		rejectUnauthorized: accountInfo.rejectUnauthorized
 	};
-
-	const response = await httpClientService.asyncRequest(config);
+	let response;
+	try {
+		response = await httpClientService.asyncRequest(config);
+	} catch (e) {
+		throw new Error(`Error contacting ${config.host}: ${e.message}`);
+	}
 	if (response.message.statusCode === 200) {
 		response.data = JSON.parse(response.data);
 		if (response.data['@totalcount'] === 0) return [];
@@ -244,8 +258,12 @@ incidentService.getIncidentById = async (id) => {
 		useTls: accountInfo.useTls,
 		rejectUnauthorized: accountInfo.rejectUnauthorized
 	};
-
-	const response = await httpClientService.asyncRequest(config);
+	let response;
+	try {
+		response = await httpClientService.asyncRequest(config);
+	} catch (e) {
+		throw new Error(`Error contacting ${config.host}: ${e.message}`);
+	}
 	let data;
 	if (response.message.statusCode === 200) {
 		data = JSON.parse(response.data).Incident;
