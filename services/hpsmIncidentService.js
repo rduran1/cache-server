@@ -136,16 +136,17 @@ async function duplicateOpenIncidentDetection(incident) {
 		return false;
 	});
 	// Call HPSM to get the latest status incase the incident was closed by someone else
-	potentialDuplicateDetected.forEach(async (potentialDuplicate) => {
-		const id = potentialDuplicate.IncidentID;
+	for (let i = 0; i < potentialDuplicateDetected.length; i++) {
+		const id = potentialDuplicateDetected[i].IncidentID;
 		let latest;
 		try {
+			// eslint-disable-next-line no-await-in-loop
 			latest = await incidentService.getIncidentById(id);
 		} catch (e) {
 			if (!e.message.includes('404 ReturnCode: 9 ')) throw new Error(e.message);
 		}
 		if (typeof latest !== 'undefined' && latest.Status !== 'Closed') throw new Error(`Request is a duplicate of ${latest.IncidentID}`);
-	});
+	}
 }
 
 function checkForOutageEndTimeBeforeOutageStartTime(incident) {
