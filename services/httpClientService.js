@@ -46,6 +46,8 @@ httpClientService.asyncRequest = (options) => new Promise((resolve, reject) => {
 
 		httpIncomingMessage.on('aborted', (e) => reject(new Error(`httpIncomingMessage aborted: ${e.message}`)));
 
+		httpIncomingMessage.on('error', (e) => reject(new Error(`httpIncomingMessage error: ${e.message}`)));
+
 		let data = '';
 		httpIncomingMessage.on('data', (chunk) => {
 			data += chunk;
