@@ -11,7 +11,7 @@ const request = {
 };
 
 accessController.isAllowed = async (req, res, next) => {
-	logger.debug('Entering isAllowed controller method');
+	logger.debug('Entering accessController.isAllowed');
 	const token = req.query.token || req.body.token;
 	const reqOriginalUrl = req.originalUrl;
 	const subject = req.session ? req.session.userId : undefined;
@@ -20,15 +20,16 @@ accessController.isAllowed = async (req, res, next) => {
 
 	// Extract the resource from the URL
 	const resource = /^\/(.+?)(\/|\?)/.exec(reqOriginalUrl) ? /^\/(.+?)(\/|\?)/.exec(reqOriginalUrl)[1] : undefined;
-
-	logger.debug(`Request from ${remoteAddress} to authenticate and authorize (${token}, ${subject}, ${resource}, ${method})`);
-	logger.debug('Calling accessService.isAllowed');
+	const pre = `${remoteAddress}: Request`;
+	logger.info(`${pre} (token=${token}, subject=${subject}, resource=${resource}, request=${method})`);
+	logger.debug(`Calling accessService.isAllowed(${token}, ${subject}, ${resource}, ${method})`);
 	if (await accessService.isAllowed(token, subject, resource, method)) {
-		logger.debug(`Request to ${method} ${resource} is allowed`);
+		logger.info(`${pre} for ${token ? `token=${token}` : `subject=${subject}`} to ${method} ${resource} allowed`);
+		logger.debug('Exiting accessController.isAllowed');
 		return next();
 	}
-	logger.info(`Request from ${remoteAddress} denied, responding with HTTP 401`);
-	logger.debug('Exiting isAllowed controller method');
+	logger.info(`${pre} for ${token ? `token=${token}` : `subject=${subject}`} to ${method} ${resource} denied, responding with HTTP 401`);
+	logger.debug('Exiting accessController.isAllowed');
 	return res.status(401).send();
 };
 
