@@ -150,7 +150,7 @@ toolboxService.saveStoreToFile = async (fileName, store, withTabFormat) => {
 			throw new Error(`Error saving store to ${fileName}: ${e.message}`);
 		}
 	} else {
-		throw new Error(`Store for file '${fileName}' has not been initialized`);
+		throw new Error(`Store file '${fileName}' has not been initialized`);
 	}
 };
 
