@@ -1,10 +1,27 @@
 /* eslint-disable no-return-await */
+const { readFileSync } = require('fs');
+// const logger = require('./loggingService')(__filename);
 const accountService = require('./accountService')(__filename);
 const toolboxService = require('./toolboxService');
+
 const httpClientService = require('./httpClientService');
 const configurationService = require('./configurationService');
 
 const env = configurationService.getServiceEnvironment(__filename);
+const accountInfo = accountService.getCredentials(env);
+const globalConfig = {
+	host: accountInfo.host,
+	port: accountInfo.port,
+	auth: `${accountInfo.username}:${accountInfo.password}`,
+	useTls: accountInfo.useTls,
+	rejectUnauthorized: accountInfo.rejectUnauthorized
+};
+try {
+	if (typeof accountInfo.key === 'string') globalConfig.key = readFileSync(accountInfo.key);
+	if (typeof accountInfo.cert === 'string') globalConfig.cert = readFileSync(accountInfo.cert);
+} catch (e) {
+	throw new Error(`Cannot read key and or cert file from config: ${e.message}`);
+}
 
 // Load data models
 const hpsmAATypesModel = require('../models/hpsmAATypesModel');
@@ -56,22 +73,16 @@ incidentService.getLogicalNameByComputerDisplayName = async (computerName) => {
 // Refresh models data with HPSM API service
 incidentService.syncModelState = async (model) => {
 	if (typeof model !== 'object') throw new Error('Parameter must be of type model object');
-	const accountInfo = accountService.getCredentials(env);
 	let path;
 	try {
 		path = model.getApiDataPath();
 	} catch (e) {
 		throw new Error('Model does not support syncModelState method');
 	}
-	const config = {
-		host: accountInfo.host,
-		port: accountInfo.port,
-		path,
-		auth: `${accountInfo.username}:${accountInfo.password}`,
-		method: 'GET',
-		useTls: accountInfo.useTls,
-		rejectUnauthorized: accountInfo.rejectUnauthorized
-	};
+	const config = toolboxService.clone(globalConfig);
+	config.path = path;
+	config.method = 'GET';
+
 	let response;
 	try {
 		response = await httpClientService.asyncRequest(config);
@@ -218,20 +229,14 @@ async function validateFieldValues(incident) {
 
 incidentService.getEligibleAssigneesByGroup = async (groupName) => {
 	toolboxService.validate({ assignmentGroupName: groupName }, 'hpsmAssignmentGroupName');
-	const accountInfo = accountService.getCredentials(env);
 
 	const uri1 = `/SM/9/rest/OperatorAPI/?query=AssignmentGroups=%22${encodeURI(groupName.replace(/&/g, '%26'))}%22`;
 	const uri2 = encodeURI(' and EssOnly="false" and TemplateOperator="false"');
 
-	const config = {
-		host: accountInfo.host,
-		port: accountInfo.port,
-		path: `${uri1}${uri2}`,
-		auth: `${accountInfo.username}:${accountInfo.password}`,
-		method: 'GET',
-		useTls: accountInfo.useTls,
-		rejectUnauthorized: accountInfo.rejectUnauthorized
-	};
+	const config = toolboxService.clone(globalConfig);
+	config.path = `${uri1}${uri2}`;
+	config.method = 'GET';
+
 	let response;
 	try {
 		response = await httpClientService.asyncRequest(config);
@@ -248,17 +253,11 @@ incidentService.getEligibleAssigneesByGroup = async (groupName) => {
 
 incidentService.getIncidentById = async (id) => {
 	toolboxService.validate({ IncidentID: id }, 'hpsmIncidentID');
-	const accountInfo = accountService.getCredentials(env);
 
-	const config = {
-		host: accountInfo.host,
-		port: accountInfo.port,
-		path: `/SM/9/rest/incidents/${id}`,
-		auth: `${accountInfo.username}:${accountInfo.password}`,
-		method: 'GET',
-		useTls: accountInfo.useTls,
-		rejectUnauthorized: accountInfo.rejectUnauthorized
-	};
+	const config = toolboxService.clone(globalConfig);
+	config.path = `/SM/9/rest/incidents/${id}`;
+	config.method = 'GET';
+
 	let response;
 	try {
 		response = await httpClientService.asyncRequest(config);
@@ -280,17 +279,10 @@ incidentService.getIncidentById = async (id) => {
 
 incidentService.createIncident = async (incident) => {
 	const newIncident = toolboxService.cloneAndValidate(incident, 'hpsmNewIncident');
-	const accountInfo = accountService.getCredentials(env);
 
-	const config = {
-		host: accountInfo.host,
-		port: accountInfo.port,
-		path: '/SM/9/rest/incidents',
-		auth: `${accountInfo.username}:${accountInfo.password}`,
-		method: 'POST',
-		useTls: accountInfo.useTls,
-		rejectUnauthorized: accountInfo.rejectUnauthorized
-	};
+	const config = toolboxService.clone(globalConfig);
+	config.path = '/SM/9/rest/incidents';
+	config.method = 'POST';
 
 	await validateFieldValues(newIncident);
 	await duplicateOpenIncidentDetection(newIncident);
@@ -312,17 +304,10 @@ incidentService.createIncident = async (incident) => {
 
 incidentService.updateIncident = async (incident) => {
 	toolboxService.validate({ IncidentID: incident.IncidentID }, 'hpsmIncidentID');
-	const accountInfo = accountService.getCredentials(env);
 
-	const config = {
-		host: accountInfo.host,
-		port: accountInfo.port,
-		path: `/SM/9/rest/incidents/${incident.IncidentID}`,
-		auth: `${accountInfo.username}:${accountInfo.password}`,
-		method: 'POST',
-		useTls: accountInfo.useTls,
-		rejectUnauthorized: accountInfo.rejectUnauthorized
-	};
+	const config = toolboxService.clone(globalConfig);
+	config.path = `/SM/9/rest/incidents/${incident.IncidentID}`;
+	config.method = 'POST';
 
 	const retrievedIncident = await incidentService.getIncidentById(incident.IncidentID);
 
