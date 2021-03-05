@@ -14,6 +14,8 @@ schemas.httpClient = Joi.object().keys({
 	body: Joi.string().allow('').allow(null),
 	returnClientRequest: Joi.boolean().required(),
 	returnHttpIncomingMessage: Joi.boolean().required(),
+	key: Joi.string().regex(/^[/\w\\:.]+$/),
+	cert: Joi.string().regex(/^[/\w\\:.]+$/),
 	auth: Joi.string() // Basic authentication i.e. 'user:password'
 });
 
