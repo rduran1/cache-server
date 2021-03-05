@@ -11,13 +11,24 @@ const incidentController = {};
 
 async function processRequest(req, res, controllerMethod, serviceMethod, parameter) {
 	const { remoteAddress } = req.connection;
-	logger.info(`Received request from ${remoteAddress}`);
-	logger.debug(`Entering ${controllerMethod} method`);
+	const msg = `${remoteAddress}: Request to ${controllerMethod}`;
+	logger.info(msg);
+	const param = typeof parameter === 'object' ? 'object' : parameter;
 	try {
+		logger.debug(`Calling incidentService.${serviceMethod}(${param})`);
 		const results = await incidentService[serviceMethod](parameter);
 		res.send(results);
+		logger.info(`${msg} successful, responded to client with HTTP 200 and ${results.length} bytes of data`);
 	} catch (e) {
-		// competse
+		logger.error(`${msg} failed: ${e.message}`);
+		if (e.message.match(/^Error contacting /)) {
+			res.statusCode(503).send(e.message);
+			logger.info(`${remoteAddress}: Responded to client with HTTP 503, ${e.message}`);
+		}
+		if (e.message.match(/^404/)) {
+			res.statusCode(404).send(e.message);
+			logger.info(`${remoteAddress}: Responded to client with HTTP 404, ${e.message}`);
+		}
 	}
 }
 
@@ -28,36 +39,48 @@ function checkForParameter(req, res, controllerMethodName, paramName, paramType,
 	const { remoteAddress } = req.connection;
 	// eslint-disable-next-line valid-typeof
 	if (typeof param !== paramType) {
-		logger.debug(`Entering ${controllerMethodName} method`);
-		logger.error(`Error processing request from ${remoteAddress}: ${errConstant}`);
-		logger.info(`Responding to ${remoteAddress} with HTTP 400 "${errConstant}"`);
+		const msg = `${remoteAddress}: Request to ${controllerMethodName}`;
+		logger.info(msg);
+		logger.error(`${msg} failed: ${errConstant}`);
 		res.status(400).send(errConstant);
-		logger.debug(`Exiting ${controllerMethodName} method`);
+		logger.info(`${remoteAddress}: Responded to client with HTTP 400, ${errConstant}`);
 	}
 	return param;
 }
 
 incidentController.processPayload = async (req, res) => {
+	const { remoteAddress } = req.connection;
 	const tag = req.params.contentTag;
 	const content = req.body;
+	const msg = `${remoteAddress}: Request to upload "${tag}" ${content.length} bytes`;
+	logger.info(msg);
 	try {
 		switch (tag) {
 		case 'export_bizServices.csv':
 			await incidentService.saveToHpsmPrimaryAffectedServicesModel(content);
+			res.status(201).send();
 			break;
 		case 'export_computer.csv':
 			await incidentService.saveToHpsmComputersModel(content);
+			res.status(201).send();
 			break;
 		case 'export_contacts.csv':
 			await incidentService.saveToHpsmContactsModel(content);
+			res.status(201).send();
 			break;
 		default:
-			res.status(400).send('');
+			logger.error(`${msg} failed: No storage defined for "${tag}"`);
+			res.status(400).send(`No storage defined for "${tag}"`);
+			logger.info(`${remoteAddress}: Responded to client with HTTP 400`);
+			return undefined;
 		}
 	} catch (e) {
-		logger.error(`Failed to process ${tag}: ${e.message}`);
+		logger.error(`${remoteAddress}: Failed to process "${tag}": ${e.message}`);
 		res.status(400).send(e.message);
+		logger.info(`${remoteAddress}: Responded to client with HTTP 400`);
+		return undefined;
 	}
+	logger.info(`${remoteAddress}: Successfully processed ${tag}, responded to client with HTTP 201`);
 };
 
 incidentController.getAssignmentGroups = async (req, res) => {
