@@ -17,8 +17,8 @@ const globalConfig = {
 	rejectUnauthorized: accountInfo.rejectUnauthorized
 };
 try {
-	if (typeof accountInfo.key === 'string') globalConfig.key = readFileSync(accountInfo.key);
-	if (typeof accountInfo.cert === 'string') globalConfig.cert = readFileSync(accountInfo.cert);
+	if (typeof accountInfo.key === 'string') globalConfig.key = readFileSync(accountInfo.key).toString();
+	if (typeof accountInfo.cert === 'string') globalConfig.cert = readFileSync(accountInfo.cert).toString();
 } catch (e) {
 	throw new Error(`Cannot read key and or cert file from config: ${e.message}`);
 }
