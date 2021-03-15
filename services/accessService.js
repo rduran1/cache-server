@@ -4,10 +4,10 @@ const logger = require('./loggingService')(__filename);
 const accessService = {};
 
 accessService.isAllowed = async (token, subject, resource, request) => {
-	logger.debug(`Entering accessService.isAllowed(token=${token},subject=${subject},resource=${resource},request=${request}) service method`);
+	logger.debug(`Entering accessService.isAllowed(${token}, ${subject}, ${resource}, ${request})`);
 	if (typeof token !== 'string' && typeof subject !== 'string') {
-		logger.error('Called isAllowed service method without required token or subject parameter, request not allowed');
-		logger.debug('Exiting accessService.isAllowed service method');
+		logger.error('Called accessService.isAllowed without required token or subject parameter, request not allowed');
+		logger.debug(`Exiting accessService.isAllowed(${token}, ${subject}, ${resource}, ${request})`);
 		return false;
 	}
 	if (typeof resource !== 'string' || typeof request !== 'string') {
