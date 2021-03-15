@@ -1,8 +1,12 @@
+const { basename } = require('path');
 const toolboxService = require('../services/toolboxService');
 
 const { store, storeFile } = toolboxService.initializeStore(__filename, '[]');
 
 const model = {};
+
+const mName = (basename(__filename).replace(/\.js$/i, ''));
+model.name = mName;
 
 model.getApiDataPath = () => '/SM/9/rest/GlobalListsAPI/irs.aa.type.mits';
 

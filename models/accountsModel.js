@@ -5,6 +5,9 @@ const { store, storeFile } = toolboxService.initializeStore(__filename, '{}');
 
 const model = {};
 
+const mName = (basename(__filename).replace(/\.js$/i, ''));
+model.name = mName;
+
 model.getAccessByToken = (account, token, env) => {
 	let found;
 	let clone = {};

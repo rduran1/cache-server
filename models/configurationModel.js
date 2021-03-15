@@ -1,9 +1,12 @@
 const { basename } = require('path');
 const toolboxService = require('../services/toolboxService');
 
-const { store, fileName } = toolboxService.initializeStore(__filename, '{}');
+const { store, storeFile } = toolboxService.initializeStore(__filename, '{}');
 
 const model = {};
+
+const mName = (basename(__filename).replace(/\.js$/i, ''));
+model.name = mName;
 
 model.getAppConfiguration = () => {
 	if (typeof store.server !== 'object') throw new Error('Cannot find server configuration!');
@@ -35,7 +38,7 @@ model.setServiceEnvironment = (serviceName, value) => {
 	const service = basename(serviceName).split('.')[0];
 	if (!Object.keys(store.services).includes(service)) throw new Error(`Service "${service}" does not exist in configuration store`);
 	store.services[service].environment = value;
-	toolboxService.saveStoreToFile(fileName, store);
+	toolboxService.saveStoreToFile(storeFile, store);
 };
 
 model.getLoggingLevels = () => store.loggingLevels || [''];
