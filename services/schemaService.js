@@ -14,6 +14,7 @@ schemaService.validate = (object, schemaName) => {
 		const validateErrorMessage = validationResult.error.message.replace(/.+?\[/, '').replace(/\]$/, '');
 		throw new Error(`Validation failure: ${validateErrorMessage}`);
 	}
+	return validationResult;
 };
 
 module.exports = schemaService;
