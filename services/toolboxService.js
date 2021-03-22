@@ -31,40 +31,41 @@ const logger = loggingService(__filename);
 toolboxService.truncateFile = (strFileName, len, strAppend) => new Promise((resolve, reject) => {
 	const callMsg = `truncateFile(strFileName = "${strFileName}", len = ${len}, strAppend = "${strAppend}")`;
 	logger.debug(`Entering ${callMsg}`);
+	let v; // validated Object holder;
 	try {
-		toolboxService.validate({ strFileName, len, strAppend }, 'toolboxService_truncateFile');
+		v = toolboxService.validate({ strFileName, len, strAppend }, 'toolboxService_truncateFile');
 	} catch (e) {
 		logger.debug(`Exiting ${callMsg}`);
 		return reject(e);
 	}
 	let stats;
 	try {
-		stats = fs.statSync(strFileName);
+		stats = fs.statSync(v.strFileName);
 	} catch (e) {
-		const msg = `truncateFile::fs.statSync(strFileName = "${strFileName}") returned an error: ${e.message}`;
+		const msg = `truncateFile::fs.statSync(strFileName = "${v.strFileName}") returned an error: ${e.message}`;
 		logger.error(msg);
 		logger.debug(`Exiting ${callMsg}`);
 		return reject(e);
 	}
-	const trim = stats.size - len;
+	const trim = stats.size - v.len;
 	logger.debug(`truncateFile::trim variable value: ${trim}`);
 	if (trim < 1) {
 		logger.debug(`Exiting ${callMsg}`);
 		return resolve();
 	}
 	try {
-		fs.truncateSync(strFileName, trim);
+		fs.truncateSync(v.strFileName, trim);
 	} catch (e) {
-		const msg = `truncateFile::fs.truncateSync(strFileName = "${strFileName}", trim = ${trim}) returned an error: ${e.message}`;
+		const msg = `truncateFile::fs.truncateSync(strFileName = "${v.strFileName}", trim = ${trim}) returned an error: ${e.message}`;
 		logger.error(msg);
 		logger.debug(`Exiting ${callMsg}`);
 		return reject(e);
 	}
-	if (strAppend) {
+	if (v.strAppend) {
 		try {
-			fs.appendFileSync(strFileName, strAppend);
+			fs.appendFileSync(v.strFileName, v.strAppend);
 		} catch (e) {
-			const msg = `truncateFile::fs.appendFileSync(strFileName = "${strFileName}", strAppend = "${strAppend}") returned an error: ${e.message}`;
+			const msg = `truncateFile::fs.appendFileSync(strFileName = "${v.strFileName}", strAppend = "${v.strAppend}") returned an error: ${e.message}`;
 			logger.error(msg);
 			logger.debug(`Exiting ${callMsg}`);
 			return reject(e);
@@ -93,8 +94,9 @@ toolboxService.validate = (object, schemaName) => {
 	const callMsg = `validate(object = ${typeof object}, schemaName = "${schemaName}")`;
 	logger.debug(`Entering ${callMsg}`);
 	try {
-		schemaService.validate(object, schemaName);
+		const validatedObject = schemaService.validate(object, schemaName);
 		logger.debug(`Exiting ${callMsg}`);
+		return validatedObject;
 	} catch (e) {
 		const msg = `validate::schemaService.validate(object, "${schemaName}") returned an error: ${e.message}`;
 		logger.error(msg);
@@ -179,8 +181,9 @@ toolboxService.testSummary = () => {
 toolboxService.initializeStore = (modelFileName, initValue) => {
 	const callMsg = `initializeStore(modelFileName = "${modelFileName}", initValue = "${initValue}")`;
 	logger.debug(`Entering ${callMsg}`);
+	let v;
 	try {
-		toolboxService.validate({ modelFileName, initValue }, 'toolboxService_initializeStore');
+		v = toolboxService.validate({ modelFileName, initValue }, 'toolboxService_initializeStore');
 	} catch (e) {
 		logger.debug(`Exiting ${callMsg}`);
 		throw e;
@@ -191,13 +194,13 @@ toolboxService.initializeStore = (modelFileName, initValue) => {
 		logger.debug(`Exiting ${callMsg}`);
 		throw new Error(emsg);
 	}
-	if (!modelFileName.endsWith('Model.js')) {
+	if (!v.modelFileName.endsWith('Model.js')) {
 		const emsg = 'Model file name must end with "Model.js"';
 		logger.error(emsg);
 		logger.debug(`Exiting ${callMsg}`);
 		throw new Error(emsg);
 	}
-	const modelName = path.basename(modelFileName).split('.')[0];
+	const modelName = path.basename(v.modelFileName).split('.')[0];
 	let storeFile = '';
 	const secured = ['accountsModel']; // These models have encrypted stores
 	if (secured.includes(modelName)) {
@@ -212,9 +215,8 @@ toolboxService.initializeStore = (modelFileName, initValue) => {
 		if (fs.existsSync(storeFile)) {
 			storeContent = fs.readFileSync(storeFile);
 		} else {
-			JSON.parse(initValue); // test if initValue is a valid object before writing to file
-			fs.writeFileSync(storeFile, initValue);
-			storeContent = initValue;
+			fs.writeFileSync(storeFile, v.initValue);
+			storeContent = v.initValue;
 		}
 		tempStore = JSON.parse(storeContent);
 	} catch (e) {
@@ -231,24 +233,25 @@ toolboxService.initializeStore = (modelFileName, initValue) => {
 toolboxService.saveStoreToFile = async (fileName, store, withTabFormat) => {
 	const callMsg = `saveStoreToFile(fileName = "${fileName}", store = ${typeof store}, withTabFormat = ${withTabFormat})`;
 	logger.debug(`Entering ${callMsg}`);
+	let v;
 	try {
-		toolboxService.validate({ fileName, store, withTabFormat }, 'toolboxService_saveStoreToFile');
+		v = toolboxService.validate({ fileName, store, withTabFormat }, 'toolboxService_saveStoreToFile');
 	} catch (e) {
 		logger.debug(`Exiting ${callMsg}`);
 		throw e;
 	}
-	const tab = withTabFormat ? '\t' : '';
-	if (fs.existsSync(fileName)) {
+	const tab = v.withTabFormat ? '\t' : '';
+	if (fs.existsSync(v.fileName)) {
 		try {
-			fs.writeFileSync(fileName, JSON.stringify(store, null, tab));
+			fs.writeFileSync(v.fileName, JSON.stringify(store, null, tab));
 		} catch (e) {
-			const emsg = `saveStoreToFile::fs.writeFileSync(fileName = "${fileName}") returned an error: ${e.message}`;
+			const emsg = `saveStoreToFile::fs.writeFileSync(fileName = "${v.fileName}") returned an error: ${e.message}`;
 			logger.error(emsg);
 			logger.debug(`Exiting ${callMsg}`);
 			throw e;
 		}
 	} else {
-		const emsg = `Store file "${fileName}" has not been initialized`;
+		const emsg = `Store file "${v.fileName}" has not been initialized`;
 		logger.error(emsg);
 		logger.debug(`Exiting ${callMsg}`);
 		throw new Error(emsg);
@@ -258,15 +261,16 @@ toolboxService.saveStoreToFile = async (fileName, store, withTabFormat) => {
 toolboxService.parseCsvToArray = (content) => {
 	const callMsg = `parseCsvToArray("${typeof content}")`;
 	logger.debug(`Entering ${callMsg}`);
+	let v;
 	try {
-		toolboxService.validate({ content }, 'toolboxService_parseCsvToArray');
+		v = toolboxService.validate({ content }, 'toolboxService_parseCsvToArray');
 	} catch (e) {
 		logger.debug(`Exiting ${callMsg}`);
 		throw e;
 	}
 	logger.debug(`parseCsvToArray::EOL variable value: "${EOL}"`);
 	const arr = [];
-	const rows = content.toString().split(EOL);
+	const rows = v.content.toString().split(EOL);
 	const len = rows.length;
 	logger.debug(`parseCsvToArray::len variable value: ${len}`);
 	for (let i = 0; i < len; i++) {
