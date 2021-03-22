@@ -92,4 +92,28 @@ schemas.mssqlServiceDbNameAndBackupFile = Joi.object().keys({
 	timeout: Joi.number().min(0)
 });
 
+/** ***********************************
+ toolboxService Schemas
+************************************* */
+schemas.toolboxService_truncateFile = Joi.object().keys({
+	strFileName: Joi.string().max(120).required(),
+	len: Joi.number().required(),
+	strAppend: Joi.string()
+});
+
+schemas.toolboxService_initializeStore = Joi.object().keys({
+	modelFileName: Joi.string().max(30).required(),
+	initValue: Joi.string().required()
+});
+
+schemas.toolboxService_saveStoreToFile = Joi.object().keys({
+	fileName: Joi.string().max(90).required(),
+	store: Joi.object().required(),
+	withTabFormat: Joi.boolean()
+});
+
+schemas.toolboxService_parseCsvToArray = Joi.object().keys({
+	parseCsvToArray: Joi.string()
+});
+
 module.exports = schemas;
