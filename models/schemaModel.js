@@ -86,7 +86,7 @@ schemas.toolboxService_truncateFile = Joi.object().keys({
 });
 
 schemas.toolboxService_initializeStore = Joi.object().keys({
-	modelFileName: Joi.string().max(30).required(),
+	modelFileName: Joi.string().max(120).required(),
 	initValue: Joi.string().required().valid('{}', '[]', '[[]]')
 });
 
@@ -119,5 +119,16 @@ schemas.httpClientService_asyncRequest = Joi.object().keys({
 	// auth: Joi.string().regex(/:/, { invert: true }) // DO NOT USE or will leak credentials
 	auth: Joi.string()
 });
+
+/** ***********************************
+ accessService methods Schema
+************************************* */
+schemas.accessService_isAllowed = Joi.object().keys({
+	token: Joi.string().token(),
+	subject: Joi.string(),
+	resource: Joi.string().required(),
+	request: Joi.string().required()
+})
+	.xor('token', 'subject');
 
 module.exports = schemas;
