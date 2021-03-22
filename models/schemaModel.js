@@ -120,20 +120,4 @@ schemas.httpClientService_asyncRequest = Joi.object().keys({
 	auth: Joi.string()
 });
 
-schemas.httpClient = Joi.object().keys({
-	host: Joi.string().min(2).required(),
-	path: Joi.string().required(),
-	method: Joi.string().valid('GET', 'POST', 'PUT', 'DELETE', 'get', 'post', 'put', 'delete').required(),
-	port: Joi.number().min(80).max(65534).required(),
-	rejectUnauthorized: Joi.boolean().required(),
-	timeout: Joi.number(),
-	useTls: Joi.boolean().required(),
-	body: Joi.string().allow('').allow(null),
-	returnClientRequest: Joi.boolean().required(),
-	returnHttpIncomingMessage: Joi.boolean().required(),
-	key: Joi.string().regex(/^[/\w\\:.]+$/),
-	cert: Joi.string().regex(/^[/\w\\:.]+$/),
-	auth: Joi.string() // Basic authentication i.e. 'user:password'
-});
-
 module.exports = schemas;
