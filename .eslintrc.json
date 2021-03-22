@@ -18,7 +18,7 @@
         "linebreak-style": ["error", "windows"],
         "indent": ["error", "tab"],
         "no-tabs": ["off", { "allowIndentationTabs": true }],
-				"max-len": ["error", { "code": 150 }],
+				"max-len": ["error", { "code": 155 }],
 				"comma-dangle": ["error", "never"],
 				"no-plusplus": ["error", { "allowForLoopAfterthoughts": true }]
     }
