@@ -6,19 +6,9 @@ const httpClientService = {};
 
 // eslint-disable-next-line consistent-return
 httpClientService.asyncRequest = (options) => new Promise((resolve, reject) => {
-	const opts = {};
-	Object.assign(opts, options);
-
-	// Set defaults for httpClient
-	if (typeof opts.useTls === 'undefined') opts.useTls = true;
-	if (typeof opts.rejectUnauthorized === 'undefined') opts.rejectUnauthorized = true;
-	if (typeof opts.returnClientRequest === 'undefined') opts.returnClientRequest = false;
-	if (typeof opts.returnHttpIncomingMessage === 'undefined') opts.returnHttpIncomingMessage = false;
+	const opts = toolboxService.validate(options, 'httpClientService_asyncRequest');
 	if (typeof opts.port === 'undefined') opts.port = opts.useTls ? 443 : 80;
-	if (typeof opts.path === 'undefined') opts.path = '/';
-	if (typeof opts.method === 'undefined') opts.method = 'GET';
-
-	toolboxService.validate(opts, 'httpClient');
+	// Normally we validate using Joi but avoid here so as not to leak credential information
 	if (opts.auth) {
 		const count = (opts.auth.match(/:/g) || []).length;
 		if (count > 1) throw new Error('Validation failure: Username or password cannot contain a ":" when using basic authentication');
