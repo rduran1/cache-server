@@ -1,49 +1,41 @@
-const accountService = require('./accountService')(__filename);
+const toolboxService = require('./toolboxService');
 const logger = require('./loggingService')(__filename);
+const accountService = require('./accountService')(__filename);
 
 const accessService = {};
 
 accessService.isAllowed = async (token, subject, resource, request) => {
-	logger.debug(`Entering accessService.isAllowed(${token}, ${subject}, ${resource}, ${request})`);
-	if (typeof token !== 'string' && typeof subject !== 'string') {
-		logger.error('Called accessService.isAllowed without required token or subject parameter, request not allowed');
-		logger.debug(`Exiting accessService.isAllowed(${token}, ${subject}, ${resource}, ${request})`);
-		return false;
+	const callMsg = `isAllowed(token = "${token}", subject = "${subject}", resource = "${resource}", request = "${request}")`;
+	logger.debug(`Entering ${callMsg}`);
+	let v; // validated Object holder;
+	try {
+		// eslint-disable-next-line object-curly-newline
+		v = toolboxService.validate({ token, subject, resource, request }, 'accessService_isAllowed');
+	} catch (e) {
+		logger.debug(`Exiting ${callMsg}`);
+		throw e;
 	}
-	if (typeof resource !== 'string' || typeof request !== 'string') {
-		logger.error('Called accessService.isAllowed service method without required resource and request parameters, request not allowed');
-		logger.debug('Exiting accessService.isAllowed service method');
-		return false;
-	}
-	if (typeof token === 'string' && typeof subject === 'string') {
-		logger.error('Called accessService.isAllowed service method with token and subject parameters but only one is required, request not allowed');
-		logger.debug('Exiting accessService.isAllowed service method');
-		return false;
-	}
-
-	logger.debug(`Performing account lookup based on ${token ? 'token' : 'subject'} provided`);
-
-	const access = token ? await accountService.getAccessByToken(token) : await accountService.getAccessByAccount(subject);
-	const identifier = token ? `Token ${token}` : `Subject ${subject}`;
-
+	logger.debug(`Performing account lookup based on ${v.token ? 'token' : 'subject'} provided`);
+	const access = token ? await accountService.getAccessByToken(v.token) : await accountService.getAccessByAccount(v.subject);
+	const identifier = v.token ? `Token ${v.token}` : `Subject ${v.subject}`;
 	if (typeof access === 'undefined') {
-		logger.error('Account lookup returned no results, request not allowed');
-		logger.debug('Exiting accessService.isAllowed service method');
+		logger.info('Account lookup returned no results, request not allowed');
+		logger.debug(`Exiting ${callMsg}`);
 		return false;
 	}
 	const resourceAccess = access.find((e) => e[resource]); // returns an array of permissions to resource
 	if (typeof resourceAccess === 'undefined') {
-		logger.debug(`${identifier} has not been granted access to ${resource}, request not allowed`);
-		logger.debug('Exiting accessService.isAllowed service method');
+		logger.info(`${identifier} has not been granted access to ${v.resource}, request not allowed`);
+		logger.debug(`Exiting ${callMsg}`);
 		return false;
 	}
-	if (resourceAccess[resource].includes(request)) {
-		logger.debug(`${identifier} is authorized to ${request} ${resource}`);
-		logger.debug('Exiting accessService.isAllowed service method');
+	if (resourceAccess[v.resource].includes(v.request)) {
+		logger.debug(`${identifier} is authorized to ${v.request} ${v.resource}`);
+		logger.debug(`Exiting ${callMsg}`);
 		return true;
 	}
-	logger.debug(`${identifier} is not authorized to ${request} ${resource}, request not allowed`);
-	logger.debug('Exiting accessService.isAllowed service method');
+	logger.info(`${identifier} is not authorized to ${v.request} ${v.resource}, request not allowed`);
+	logger.debug(`Exiting ${callMsg}`);
 	return false;
 };
 
