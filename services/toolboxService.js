@@ -4,51 +4,116 @@ const path = require('path');
 const { EOL } = require('os');
 const schemaService = require('./schemaService');
 
+const loggingLevel = ['ERROR'];
+loggingLevel.push('DEBUG');
+
 const toolboxService = {};
 
+function logit(fileName, level, msg) {
+	if (!loggingLevel.includes(level)) return;
+	const padding = ' '.repeat(5 - level.length);
+	fs.appendFileSync(fileName, `${Date()}: [${level}${padding}] ${msg}${EOL}`);
+}
+
+function loggingService(fileName) {
+	if (typeof process.env.INSTALL_DIR === 'undefined') throw new Error('Environmental variable INSTALL_DIR is undefined');
+	if (!fileName.endsWith('.js')) throw new Error('File name must end with ".js"');
+	const baseName = path.basename(fileName).replace(/\.js$/i, '.log');
+	const fileLocation = path.join(process.env.INSTALL_DIR, 'logs', baseName);
+	return {
+		error: (message) => { logit(fileLocation, 'ERROR', message); },
+		debug: (message) => { logit(fileLocation, 'DEBUG', message); }
+	};
+}
+
+const logger = loggingService(__filename);
+
 toolboxService.truncateFile = (strFileName, len, strAppend) => new Promise((resolve, reject) => {
+	const callMsg = `truncateFile(strFileName = "${strFileName}", len = ${len}, strAppend = "${strAppend}")`;
+	logger.debug(`Entering ${callMsg}`);
+	try {
+		toolboxService.validate({ strFileName, len, strAppend }, 'toolboxService_truncateFile');
+	} catch (e) {
+		logger.debug(`Exiting ${callMsg}`);
+		return reject(e);
+	}
 	let stats;
 	try {
 		stats = fs.statSync(strFileName);
 	} catch (e) {
-		return reject(new Error(`Error getting file size of ${strFileName}: ${e.message}`));
+		const msg = `truncateFile::fs.statSync(strFileName = "${strFileName}") returned an error: ${e.message}`;
+		logger.error(msg);
+		logger.debug(`Exiting ${callMsg}`);
+		return reject(e);
 	}
 	const trim = stats.size - len;
-	if (trim < 1) return resolve();
+	logger.debug(`truncateFile::trim variable value: ${trim}`);
+	if (trim < 1) {
+		logger.debug(`Exiting ${callMsg}`);
+		return resolve();
+	}
 	try {
 		fs.truncateSync(strFileName, trim);
 	} catch (e) {
-		const s = trim === 1 ? '' : 's';
-		return reject(new Error(`Error truncating ${strFileName} by ${len} character${s}: ${e.message}`));
+		const msg = `truncateFile::fs.truncateSync(strFileName = "${strFileName}", trim = ${trim}) returned an error: ${e.message}`;
+		logger.error(msg);
+		logger.debug(`Exiting ${callMsg}`);
+		return reject(e);
 	}
 	if (strAppend) {
 		try {
 			fs.appendFileSync(strFileName, strAppend);
 		} catch (e) {
-			return reject(new Error(`Error appending "${strAppend}" to ${strFileName}: ${e.message}`));
+			const msg = `truncateFile::fs.appendFileSync(strFileName = "${strFileName}", strAppend = "${strAppend}") returned an error: ${e.message}`;
+			logger.error(msg);
+			logger.debug(`Exiting ${callMsg}`);
+			return reject(e);
 		}
 	}
+	logger.debug(`Exiting ${callMsg}`);
 	return resolve();
 });
 
 toolboxService.clone = (object) => {
-	if (typeof object === 'undefined') throw new Error('Error cloning object: Object is undefined');
+	const callMsg = `clone(object = ${typeof object})`;
+	logger.debug(`Entering ${callMsg}`);
 	try {
 		const clone = JSON.parse(JSON.stringify(object));
+		logger.debug(`Exiting ${callMsg}`);
 		return clone;
 	} catch (e) {
-		throw new Error(`Error cloning object: ${e.message}`);
+		const msg = `clone::JSON.parse(object) returned an error: ${e.message}`;
+		logger.error(msg);
+		logger.debug(`Exiting ${callMsg}`);
+		throw e;
 	}
 };
 
 toolboxService.validate = (object, schemaName) => {
-	schemaService.validate(object, schemaName);
+	const callMsg = `validate(object = ${typeof object}, schemaName = "${schemaName}")`;
+	logger.debug(`Entering ${callMsg}`);
+	try {
+		schemaService.validate(object, schemaName);
+		logger.debug(`Exiting ${callMsg}`);
+	} catch (e) {
+		const msg = `validate::schemaService.validate(object, "${schemaName}") returned an error: ${e.message}`;
+		logger.error(msg);
+		logger.debug(`Exiting ${callMsg}`);
+		throw e;
+	}
 };
 
 toolboxService.cloneAndValidate = (config, schemaName) => {
-	const configCopy = toolboxService.clone(config);
-	schemaService.validate(configCopy, schemaName);
-	return configCopy;
+	const callMsg = `cloneAndValidate(config = ${typeof config}, schemaName = "${schemaName}")`;
+	logger.debug(`Entering ${callMsg}`);
+	try {
+		const configCopy = toolboxService.clone(config);
+		schemaService.validate(configCopy, schemaName);
+		return configCopy;
+	} catch (e) {
+		logger.debug(`Exiting ${callMsg}`);
+		throw (e);
+	}
 };
 
 const testSummary = {
@@ -57,6 +122,7 @@ const testSummary = {
 	numberFailing: 0,
 	runTime: 0
 };
+
 toolboxService.test = (desc) => {
 	const defaultWidth = 105;
 	const spaceForTime = 11;
@@ -111,54 +177,98 @@ toolboxService.testSummary = () => {
 };
 
 toolboxService.initializeStore = (modelFileName, initValue) => {
-	if (typeof process.env.INSTALL_DIR === 'undefined') throw new Error('Environmental variable INSTALL_DIR is undefined');
-	if (typeof modelFileName !== 'string' || typeof initValue !== 'string') throw new Error('Parameters must be of type string');
-	if (!modelFileName.includes('Model.js')) throw new Error('Model file name must end with "Model.js"');
+	const callMsg = `initializeStore(modelFileName = "${modelFileName}", initValue = "${initValue}")`;
+	logger.debug(`Entering ${callMsg}`);
+	try {
+		toolboxService.validate({ modelFileName, initValue }, 'toolboxService_initializeStore');
+	} catch (e) {
+		logger.debug(`Exiting ${callMsg}`);
+		throw e;
+	}
+	if (typeof process.env.INSTALL_DIR === 'undefined') {
+		const emsg = 'Environmental variable INSTALL_DIR is undefined';
+		logger.error(emsg);
+		logger.debug(`Exiting ${callMsg}`);
+		throw new Error(emsg);
+	}
+	if (!modelFileName.endsWith('Model.js')) {
+		const emsg = 'Model file name must end with "Model.js"';
+		logger.error(emsg);
+		logger.debug(`Exiting ${callMsg}`);
+		throw new Error(emsg);
+	}
 	const modelName = path.basename(modelFileName).split('.')[0];
 	let storeFile = '';
 	const secured = ['accountsModel']; // These models have encrypted stores
 	if (secured.includes(modelName)) {
-		storeFile = path.join(process.env.INSTALL_DIR, 'models', 'stores', 'encrypted', modelName.replace('Model', 'Store.json'));
+		storeFile = path.join(process.env.INSTALL_DIR, 'models', 'stores', 'encrypted', modelName.replace(/Model$/, 'Store.json'));
 	} else {
-		storeFile = path.join(process.env.INSTALL_DIR, 'models', 'stores', modelName.replace('Model', 'Store.json'));
+		storeFile = path.join(process.env.INSTALL_DIR, 'models', 'stores', modelName.replace(/Model$/, 'Store.json'));
 	}
-
+	logger.debug(`initializeStore::storeFile variable value: ${storeFile}`);
 	let storeContent;
 	let tempStore; // Temporary store location while initializing. Once initialized we load store into a const variable
-
 	try {
 		if (fs.existsSync(storeFile)) {
 			storeContent = fs.readFileSync(storeFile);
 		} else {
+			JSON.parse(initValue); // test if initValue is a valid object before writing to file
 			fs.writeFileSync(storeFile, initValue);
 			storeContent = initValue;
 		}
 		tempStore = JSON.parse(storeContent);
 	} catch (e) {
-		throw new Error(`Failed to initialize store for model ${modelName}: ${e.message}`);
+		const emsg = `Failed to initialize local store file for model ${modelName}: ${e.message}`;
+		logger.error(emsg);
+		logger.debug(`Exiting ${callMsg}`);
+		throw e;
 	}
 	const store = toolboxService.clone(tempStore);
+	logger.debug(`Exiting ${callMsg}`);
 	return { store, storeFile };
 };
 
 toolboxService.saveStoreToFile = async (fileName, store, withTabFormat) => {
+	const callMsg = `saveStoreToFile(fileName = "${fileName}", store = ${typeof store}, withTabFormat = ${withTabFormat})`;
+	logger.debug(`Entering ${callMsg}`);
+	try {
+		toolboxService.validate({ fileName, store, withTabFormat }, 'toolboxService_saveStoreToFile');
+	} catch (e) {
+		logger.debug(`Exiting ${callMsg}`);
+		throw e;
+	}
 	const tab = withTabFormat ? '\t' : '';
 	if (fs.existsSync(fileName)) {
 		try {
 			fs.writeFileSync(fileName, JSON.stringify(store, null, tab));
 		} catch (e) {
-			throw new Error(`Error saving store to ${fileName}: ${e.message}`);
+			const emsg = `saveStoreToFile::fs.writeFileSync(fileName = "${fileName}") returned an error: ${e.message}`;
+			logger.error(emsg);
+			logger.debug(`Exiting ${callMsg}`);
+			throw e;
 		}
 	} else {
-		throw new Error(`Store file '${fileName}' has not been initialized`);
+		const emsg = `Store file "${fileName}" has not been initialized`;
+		logger.error(emsg);
+		logger.debug(`Exiting ${callMsg}`);
+		throw new Error(emsg);
 	}
 };
 
 toolboxService.parseCsvToArray = (content) => {
+	const callMsg = `parseCsvToArray("${typeof content}")`;
+	logger.debug(`Entering ${callMsg}`);
+	try {
+		toolboxService.validate({ content }, 'toolboxService_parseCsvToArray');
+	} catch (e) {
+		logger.debug(`Exiting ${callMsg}`);
+		throw e;
+	}
+	logger.debug(`parseCsvToArray::EOL variable value: "${EOL}"`);
 	const arr = [];
 	const rows = content.toString().split(EOL);
 	const len = rows.length;
-	// eslint-disable-next-line no-plusplus
+	logger.debug(`parseCsvToArray::len variable value: ${len}`);
 	for (let i = 0; i < len; i++) {
 		if (rows[i].length > 0) {
 			let el = rows[i].replace(/",(\d)/g, '","$1');
@@ -170,6 +280,7 @@ toolboxService.parseCsvToArray = (content) => {
 			arr.push(row);
 		}
 	}
+	logger.debug(`Exiting ${callMsg}`);
 	return arr;
 };
 
