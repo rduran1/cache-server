@@ -11,6 +11,7 @@ function logit(fileName, level, msg) {
 }
 
 function loggingService(fileName) {
+	if (typeof process.env.INSTALL_DIR === 'undefined') throw new Error('Environmental variable INSTALL_DIR is undefined');
 	if (typeof fileName !== 'string') throw new Error('Parameter must be of type string');
 	if (!fileName.endsWith('.js')) throw new Error('File name must end with ".js"');
 	const baseName = path.basename(fileName).replace(/\.js$/i, '.log');
