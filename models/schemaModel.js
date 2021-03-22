@@ -3,22 +3,6 @@ const Joi = require('joi');
 
 const schemas = {};
 
-schemas.httpClient = Joi.object().keys({
-	host: Joi.string().min(2).required(),
-	path: Joi.string().required(),
-	method: Joi.string().valid('GET', 'POST', 'PUT', 'DELETE', 'get', 'post', 'put', 'delete').required(),
-	port: Joi.number().min(80).max(65534).required(),
-	rejectUnauthorized: Joi.boolean().required(),
-	timeout: Joi.number(),
-	useTls: Joi.boolean().required(),
-	body: Joi.string().allow('').allow(null),
-	returnClientRequest: Joi.boolean().required(),
-	returnHttpIncomingMessage: Joi.boolean().required(),
-	key: Joi.string().regex(/^[/\w\\:.]+$/),
-	cert: Joi.string().regex(/^[/\w\\:.]+$/),
-	auth: Joi.string() // Basic authentication i.e. 'user:password'
-});
-
 schemas.bigfixAuthentication = Joi.object().keys({
 	username: Joi.string().min(2).required(),
 	password: Joi.string().min(2).required()
@@ -93,27 +77,63 @@ schemas.mssqlServiceDbNameAndBackupFile = Joi.object().keys({
 });
 
 /** ***********************************
- toolboxService Schemas
+ toolboxService methods Schema
 ************************************* */
 schemas.toolboxService_truncateFile = Joi.object().keys({
 	strFileName: Joi.string().max(120).required(),
-	len: Joi.number().required(),
+	len: Joi.number().default(0),
 	strAppend: Joi.string()
 });
 
 schemas.toolboxService_initializeStore = Joi.object().keys({
 	modelFileName: Joi.string().max(30).required(),
-	initValue: Joi.string().required()
+	initValue: Joi.string().required().valid('{}', '[]', '[[]]')
 });
 
 schemas.toolboxService_saveStoreToFile = Joi.object().keys({
 	fileName: Joi.string().max(90).required(),
 	store: Joi.object().required(),
-	withTabFormat: Joi.boolean()
+	withTabFormat: Joi.boolean().default(false)
 });
 
 schemas.toolboxService_parseCsvToArray = Joi.object().keys({
-	parseCsvToArray: Joi.string()
+	content: Joi.string().required()
+});
+
+/** ***********************************
+ httpClientService methods Schema
+************************************* */
+schemas.httpClientService_asyncRequest = Joi.object().keys({
+	host: Joi.string().hostname().required(),
+	path: Joi.string().default('/'),
+	method: Joi.string().valid('GET', 'POST', 'PUT', 'DELETE', 'get', 'post', 'put', 'delete').default('GET'),
+	port: Joi.number().min(80).max(65534),
+	rejectUnauthorized: Joi.boolean().default(true),
+	timeout: Joi.number(),
+	useTls: Joi.boolean().default(true),
+	body: Joi.string().allow('').allow(null),
+	returnClientRequest: Joi.boolean().default(false),
+	returnHttpIncomingMessage: Joi.boolean().default(false),
+	key: Joi.string().regex(/^[/\w\\:.]+$/),
+	cert: Joi.string().regex(/^[/\w\\:.]+$/),
+	// auth: Joi.string().regex(/:/, { invert: true }) // DO NOT USE or will leak credentials
+	auth: Joi.string()
+});
+
+schemas.httpClient = Joi.object().keys({
+	host: Joi.string().min(2).required(),
+	path: Joi.string().required(),
+	method: Joi.string().valid('GET', 'POST', 'PUT', 'DELETE', 'get', 'post', 'put', 'delete').required(),
+	port: Joi.number().min(80).max(65534).required(),
+	rejectUnauthorized: Joi.boolean().required(),
+	timeout: Joi.number(),
+	useTls: Joi.boolean().required(),
+	body: Joi.string().allow('').allow(null),
+	returnClientRequest: Joi.boolean().required(),
+	returnHttpIncomingMessage: Joi.boolean().required(),
+	key: Joi.string().regex(/^[/\w\\:.]+$/),
+	cert: Joi.string().regex(/^[/\w\\:.]+$/),
+	auth: Joi.string() // Basic authentication i.e. 'user:password'
 });
 
 module.exports = schemas;
