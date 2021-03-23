@@ -1,0 +1,17 @@
+Models:
+	1. Can only be accessed through a service
+	2. More than one model can belong to the same service
+	3. A model can only belong to one service
+	4. Models are responsible for data persistence
+	5. Rely on service to perform parameter validation
+
+Services:
+	1. Can only access models owned by the service
+	2. Responsible for validating parameters before calling a model method
+
+Controllers:
+	1. Handle request and response objects
+	2. Responsible for setting HTTP response code and message
+
+Routes:
+	1. Responsible for defining all possible routes
