@@ -1,16 +1,17 @@
+const path = require('path');
 const helmet = require('helmet');
-const express		= require('express');
+const express	= require('express');
 
 const app		= express();
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const logger = require('../services/loggingService')(__filename);
-const config = require('../services/configurationService').getAppConfiguration();
+const config = require('../services/configurationService').getExpressConfiguration();
 // eslint-disable-next-line no-unused-vars
 const scheduler = require('../scheduler');
 
 app.set('view engine', 'ejs');
-app.set('views', config.viewsDirectory);
+app.set('views', path.join(process.env.INSTALL_DIR, config.viewsDirectory));
 
 app.use(cookieParser());
 app.use(express.static(config.staticDirectory));
