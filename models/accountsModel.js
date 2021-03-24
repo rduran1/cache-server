@@ -1,57 +1,48 @@
 const { basename } = require('path');
 const toolboxService = require('../services/toolboxService');
 
-const { store, storeFile } = toolboxService.initializeStore(__filename, '{}');
+const storeTemplate = {};
+
+const { store, storeFile } = toolboxService.initializeStore(__filename, storeTemplate);
 
 const model = {};
 
 const mName = (basename(__filename).replace(/\.js$/i, ''));
 model.name = mName;
 
-model.getAccessByToken = (account, token, env) => {
+model.getAccessControlList = (serviceName, env, subjectType, subject) => {
 	let found;
 	let clone = {};
-	if (typeof env === 'string' && env.length > 0) {
-		found = store[account][env].find((e) => e.token === token);
+	if (env === 'default') {
+		found = store[serviceName].default.find((e) => e[subjectType] === subject);
 	} else {
-		found = store[account].default.find((e) => e.token === token);
+		found = store[serviceName][env].find((e) => e[subjectType] === subject);
 	}
 	if (found) clone = toolboxService.clone(found);
-	return clone.access;
+	return clone.getAccessControlList;
 };
 
-model.getAccessByAccount = (account, subject, env) => {
-	let found;
-	let clone = {};
-	if (typeof env === 'string' && env.length > 0) {
-		found = store[account][env].find((e) => e.subject === subject);
-	} else {
-		found = store[account].default.find((e) => e.subject === subject);
-	}
-	if (found) clone = toolboxService.clone(found);
-	return clone.access;
-};
-
-model.getAccountByName = (serviceFileName, create) => {
-	let storeModified = false;
-	if (typeof serviceFileName !== 'string') throw new Error('First paramter must be of type string');
-	if (typeof create !== 'undefined' && typeof create !== 'boolean') throw new Error('Second parameter must be of type boolean');
-	// eslint-disable-next-line no-unneeded-ternary
-	const forceCreate = create ? true : false;
+model.accountExists = (serviceFileName) => {
 	const account = basename(serviceFileName).split('.')[0];
-	const accountExists = Object.keys(store).includes(account);
-	if (!accountExists && !forceCreate) throw new Error(`Account "${account}" does not exist in store`);
-	if (accountExists && forceCreate) throw new Error(`Account "${account}" already exists in store`);
-	if (!accountExists && forceCreate) {
-		store[account] = {};
-		storeModified = true;
-	}
-	if (storeModified) toolboxService.saveStoreToFile(storeFile, store);
+	return Object.keys(store).includes(account);
+};
+
+model.getAccountByName = (serviceFileName) => {
+	const account = basename(serviceFileName).split('.')[0];
+	if (!model.accountExists(serviceFileName)) throw new Error(`Account "${account}" does not exist in store`);
 	return account;
 };
 
+model.createAccount = (serviceFileName) => {
+	const account = basename(serviceFileName).split('.')[0];
+	const accountExists = Object.keys(store).includes(account);
+	if (accountExists) throw new Error(`Account "${account}" already exists in store`);
+	store[account] = {};
+	toolboxService.saveStoreToFile(storeFile, store);
+};
+
 model.getCredentials = (account, env) => {
-	if (typeof env === 'string' && env.length > 0) {
+	if (env !== 'default') {
 		if (env in store[account]) return store[account][env];
 		throw new Error(`Environment "${env}" for "${account}" does not exist in store`);
 	}

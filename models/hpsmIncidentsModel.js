@@ -1,7 +1,9 @@
 const { basename } = require('path');
 const toolboxService = require('../services/toolboxService');
 
-const { store, storeFile } = toolboxService.initializeStore(__filename, '[]'); // Array of objects
+const storeTemplate = [];
+
+const { store, storeFile } = toolboxService.initializeStore(__filename, storeTemplate);
 
 const model = {};
 
