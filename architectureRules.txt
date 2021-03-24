@@ -4,10 +4,12 @@ Models:
 	3. A model can only belong to one service
 	4. Models are responsible for data persistence
 	5. Rely on service to perform parameter validation
+	6. Responsible to store schema
 
 Services:
 	1. Can only access models owned by the service
 	2. Responsible for validating parameters before calling a model method
+	3. Use curried or revealing module patterns
 
 Controllers:
 	1. Handle request and response objects
