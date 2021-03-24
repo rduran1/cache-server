@@ -5,7 +5,7 @@ const { EOL } = require('os');
 const schemaService = require('./schemaService');
 
 const loggingLevel = ['ERROR'];
-loggingLevel.push('DEBUG');
+// loggingLevel.push('DEBUG');
 
 const toolboxService = {};
 
@@ -179,7 +179,7 @@ toolboxService.testSummary = () => {
 };
 
 toolboxService.initializeStore = (modelFileName, initValue) => {
-	const callMsg = `initializeStore(modelFileName = "${modelFileName}", initValue = "${initValue}")`;
+	const callMsg = `initializeStore(modelFileName = "${modelFileName}", initValue = ${typeof initValue})`;
 	logger.debug(`Entering ${callMsg}`);
 	let v;
 	try {
@@ -215,8 +215,9 @@ toolboxService.initializeStore = (modelFileName, initValue) => {
 		if (fs.existsSync(storeFile)) {
 			storeContent = fs.readFileSync(storeFile);
 		} else {
-			fs.writeFileSync(storeFile, v.initValue);
-			storeContent = v.initValue;
+			const initStoreContent = JSON.stringify(v.initValue, null, '\t');
+			fs.writeFileSync(storeFile, initStoreContent);
+			storeContent = initStoreContent;
 		}
 		tempStore = JSON.parse(storeContent);
 	} catch (e) {
