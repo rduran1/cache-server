@@ -20,6 +20,13 @@ app.use(bodyParser.json({ limit: config.bodyParserJsonSizeLimit }));
 app.use(bodyParser.text({ limit: config.bodyParserTextSizeLimit }));
 app.use(helmet());
 
+function logIncomingRequest(req, res, next) {
+	const { connection: { remoteAddress }, originalUrl, method } = req;
+	logger.info(`${remoteAddress} ${method} ${originalUrl.split('?')[0]}`);
+	next();
+}
+
+app.use(logIncomingRequest);
 app.use('/', require('../routes/hpsm'));
 
 // Error handler for middleware
