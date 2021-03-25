@@ -1,7 +1,9 @@
-process.env.INSTALL_DIR = '';
-
 const { readFileSync } = require('fs');
 const https = require('https');
+const path = require('path');
+
+process.env.INSTALL_DIR = (path.join(__dirname, '..'));
+
 const app = require('./app');
 const logger = require('../services/loggingService')(__filename);
 const config = require('../services/configurationService').getServerConfiguration();
@@ -9,12 +11,12 @@ const config = require('../services/configurationService').getServerConfiguratio
 let keyFile;
 let	certFile;
 try {
-	keyFile = readFileSync(config.key);
+	keyFile = readFileSync(path.join(process.env.INSTALL_DIR, config.key));
 } catch (e) {
 	logger.error(`Failed to read key file: ${e.message}`);
 }
 try {
-	certFile = readFileSync(config.cert);
+	certFile = readFileSync(path.join(process.env.INSTALL_DIR, config.cert));
 } catch (e) {
 	logger.error(`Failed to read cert file(s): ${e.message}`);
 }
