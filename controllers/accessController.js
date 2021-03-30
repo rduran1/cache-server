@@ -1,4 +1,4 @@
-const accessService = require('../services/accessService');
+const accessControlService = require('../services/accessControlService');
 const logger = require('../services/loggingService')(__filename);
 
 const accessController = {};
@@ -11,25 +11,44 @@ const request = {
 };
 
 accessController.isAllowed = async (req, res, next) => {
-	logger.debug('Entering accessController.isAllowed');
+	const { remoteAddress } = req.connection;
+	logger.debug(`${remoteAddress}: Entering isAllowed`);
+	logger.debug(`${remoteAddress}: isAllowed::req.method value: ${req.method}`);
+	logger.debug(`${remoteAddress}: isAllowed::req.originalUrl value: ${req.originalUrl}`);
+	logger.debug(`${remoteAddress}: isAllowed::req.query.token value: ${req.query.token}`);
+	logger.debug(`${remoteAddress}: isAllowed::req.body.token value: ${req.body.token}`);
+	logger.debug(`${remoteAddress}: isAllowed::req.session.userId value: ${req.session ? req.session.userId : undefined}`);
+
 	const token = req.query.token || req.body.token;
 	const reqOriginalUrl = req.originalUrl;
-	const subject = req.session ? req.session.userId : undefined;
-	const { remoteAddress } = req.connection;
+	const accountId = req.session ? req.session.userId : undefined;
 	const method = request[req.method.toLowerCase()];
 
 	// Extract the resource from the URL
-	const resource = /^\/(.+?)(\/|\?)/.exec(reqOriginalUrl) ? /^\/(.+?)(\/|\?)/.exec(reqOriginalUrl)[1] : undefined;
-	const pre = `${remoteAddress}: Request`;
-	logger.info(`${pre} (token=${token}, subject=${subject}, resource=${resource}, request=${method})`);
-	logger.debug(`Calling accessService.isAllowed(${token}, ${subject}, ${resource}, ${method})`);
-	if (await accessService.isAllowed(token, subject, resource, method)) {
-		logger.info(`${pre} for ${token ? `token=${token}` : `subject=${subject}`} to ${method} ${resource} allowed`);
-		logger.debug('Exiting accessController.isAllowed');
+	const resource = /^\/(.+?)(\/|$|\?)/.test(reqOriginalUrl) ? /^\/(.+?)(\/|$|\?)/.exec(reqOriginalUrl)[1] : undefined;
+	let accessAllowed = false;
+	const callMsg = `accessControlService.isAllowed(token=${token}, accountId=${accountId}, resource=${resource}, request=${method})`;
+	try {
+		logger.debug(`${remoteAddress}: Calling ${callMsg}`);
+		accessAllowed = await accessControlService.isAllowed(token, accountId, resource, method);
+	} catch (e) {
+		if (/Schema definition for ".+?" does not exist in the schema model/.test(e.message)) {
+			logger.error(`${remoteAddress}: ${e.message}, responding with HTTP 500`);
+			res.status(500).send('A problem has been detected and reported to the administrator. Please try again later.');
+			return logger.debug(`${remoteAddress}: Exiting isAllowed`);
+		}
+		logger.error(`${remoteAddress}: ${e.message}, responding with HTTP 400`);
+		res.status(400).send(e.message);
+		return logger.debug(`${remoteAddress}: Exiting isAllowed`);
+	}
+	const subject = token ? 'token based' : 'subject based';
+	if (accessAllowed) {
+		logger.info(`${remoteAddress}: ${subject} request to ${method} ${resource} allowed`);
+		logger.debug(`${remoteAddress}: Exiting isAllowed`);
 		return next();
 	}
-	logger.info(`${pre} for ${token ? `token=${token}` : `subject=${subject}`} to ${method} ${resource} denied, responding with HTTP 401`);
-	logger.debug('Exiting accessController.isAllowed');
+	logger.info(`${remoteAddress}: ${subject} request to ${method} ${resource} denied, responding with HTTP 401`);
+	logger.debug(`${remoteAddress}: Exiting isAllowed`);
 	return res.status(401).send();
 };
 
