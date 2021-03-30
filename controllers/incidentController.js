@@ -29,6 +29,10 @@ async function processRequest(req, res, controllerMethod, serviceMethod, paramet
 			res.statusCode(404).send(e.message);
 			logger.info(`${remoteAddress}: Responded to client with HTTP 404, ${e.message}`);
 		}
+		if (e.message.match(/Cannot read key and or cert file from config/)) {
+			res.statusCode(500).send(e.message);
+			logger.info(`${remoteAddress}: Responded to client with HTTP 500, see hpsmIncidentService.log for details`);
+		}
 	}
 }
 
