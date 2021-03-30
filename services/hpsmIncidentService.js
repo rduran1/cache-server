@@ -1,7 +1,7 @@
 /* eslint-disable no-return-await */
 const { readFileSync } = require('fs');
 const logger = require('./loggingService')(__filename);
-const accountsService = require('./accountsService')(__filename);
+const accountsService = require('./serviceAccountsService')(__filename);
 const toolboxService = require('./toolboxService');
 
 const httpClientService = require('./httpClientService');
