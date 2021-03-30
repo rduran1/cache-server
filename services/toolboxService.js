@@ -4,7 +4,9 @@ const path = require('path');
 const { EOL } = require('os');
 const schemaService = require('./schemaService');
 
+const secured = ['serviceAccountsModel', 'accessControlModel']; // These models use encrypted stores
 const loggingLevel = ['ERROR'];
+
 // loggingLevel.push('DEBUG');
 
 const toolboxService = {};
@@ -202,7 +204,6 @@ toolboxService.initializeStore = (modelFileName, initValue) => {
 	}
 	const modelName = path.basename(v.modelFileName).split('.')[0];
 	let storeFile = '';
-	const secured = ['accountsModel']; // These models have encrypted stores
 	if (secured.includes(modelName)) {
 		storeFile = path.join(process.env.INSTALL_DIR, 'models', 'stores', 'encrypted', modelName.replace(/Model$/, 'Store.json'));
 	} else {
