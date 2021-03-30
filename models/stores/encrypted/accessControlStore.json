@@ -1,0 +1,41 @@
+[
+	{
+		"type": "token",
+		"description": "My Token",
+		"issuedTo": "me@home.com",
+		"status": "active",
+		"token": "239742ghefjbhsd",
+		"accessControlList": [
+			{
+				"incidents": [
+					"read",
+					"create",
+					"update"
+				],
+				"hpsmcomputers": [
+					"read"
+				]
+			}
+			
+		]
+	},
+	{
+		"type": "subject",
+		"description": "administrator",
+		"issuedTo": "admin@home.com",
+		"status": "active",
+		"id": "root",
+		"accessControlList": [
+			{
+				"incidents": [
+					"read",
+					"create",
+					"update"
+				],
+				"hpsmcomputers": [
+					"read"
+				]
+			}
+		]
+	}
+]
