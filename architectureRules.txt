@@ -14,6 +14,7 @@ Services:
 Controllers:
 	1. Handle request and response objects
 	2. Responsible for setting HTTP response code and message
+	3. Responsible for call one or more services to satisfy request
 
 Routes:
 	1. Responsible for defining all possible routes
