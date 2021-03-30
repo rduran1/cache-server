@@ -1,14 +1,14 @@
 /* eslint-disable no-return-await */
 const { readFileSync } = require('fs');
-// const logger = require('./loggingService')(__filename);
-const accountService = require('./accountService')(__filename);
+const logger = require('./loggingService')(__filename);
+const accountsService = require('./accountsService')(__filename);
 const toolboxService = require('./toolboxService');
 
 const httpClientService = require('./httpClientService');
 const configurationService = require('./configurationService');
 
 const env = configurationService.getServiceEnvironment(__filename);
-const accountInfo = accountService.getCredentials(env);
+const accountInfo = accountsService.getCredentials(env);
 const globalConfig = {
 	host: accountInfo.host,
 	port: accountInfo.port,
@@ -16,6 +16,7 @@ const globalConfig = {
 	useTls: accountInfo.useTls,
 	rejectUnauthorized: accountInfo.rejectUnauthorized
 };
+
 try {
 	if (typeof accountInfo.key === 'string') globalConfig.key = readFileSync(accountInfo.key).toString();
 	if (typeof accountInfo.cert === 'string') globalConfig.cert = readFileSync(accountInfo.cert).toString();
@@ -100,12 +101,16 @@ incidentService.syncModelState = async (model) => {
 };
 
 incidentService.syncModels = async () => {
-	await incidentService.syncModelState(hpsmAATypesModel);
-	await incidentService.syncModelState(hpsmClosureCodesModel);
-	await incidentService.syncModelState(hpsmIncidentStatusesModel);
-	await incidentService.syncModelState(hpsmAssignmentgroupsModel);
-	await incidentService.syncModelState(hpsmIncidentCauseCodesModel);
-	await incidentService.syncModelState(hpsmAreaCategorySubCategoryModel);
+	try {
+		await incidentService.syncModelState(hpsmAATypesModel);
+		await incidentService.syncModelState(hpsmClosureCodesModel);
+		await incidentService.syncModelState(hpsmIncidentStatusesModel);
+		await incidentService.syncModelState(hpsmAssignmentgroupsModel);
+		await incidentService.syncModelState(hpsmIncidentCauseCodesModel);
+		await incidentService.syncModelState(hpsmAreaCategorySubCategoryModel);
+	} catch (e) {
+		logger.error(e.message);
+	}
 };
 
 // The following methods return an array of objects or undefined if nothing is found
