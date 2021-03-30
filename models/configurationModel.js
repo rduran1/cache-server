@@ -2,22 +2,25 @@ const { basename } = require('path');
 const toolboxService = require('../services/toolboxService');
 
 const storeTemplate = {
-	services: {
-
+	express: {
+		staticDirectory: 'static',
+		viewsDirectory: 'views',
+		bodyParserUrlencodedExtended: true,
+		bodyParserJsonSizeLimit: '50mb',
+		bodyParserTextSizeLimit: '50mb'
 	},
 	server: {
-
+		port: 3000,
+		key: 'bin/server.key',
+		cert: 'bin/server.cert'
 	},
-	express: {
-
+	services: {
 	},
-	listener: {
-		port: 5000,
-		sslKey: 'path/to/key',
-		sslCert: 'path/to/cert',
-		allowedIps: ['127.0.0.1']
-	},
-	loggingLevels: ['error', 'warn', 'info']
+	loggingLevels: [
+		'error',
+		'warn',
+		'info'
+	]
 };
 
 const { store, storeFile } = toolboxService.initializeStore(__filename, storeTemplate);
@@ -58,11 +61,5 @@ model.setServiceEnvironment = (serviceName, value) => {
 };
 
 model.getLoggingLevels = () => store.loggingLevels || [''];
-
-model.getServerConfiguration = () => {
-	const config = toolboxService.clone(store.server);
-	if (typeof config !== 'object') throw new Error('Server configuration is missing');
-	return config;
-};
 
 module.exports = model;
