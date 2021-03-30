@@ -1,22 +1,23 @@
 {
-  "services": {
+	"express": {
+		"staticDirectory": "static",
+		"viewsDirectory": "views",
+		"bodyParserUrlencodedExtended": true, 
+		"bodyParserJsonSizeLimit": "50mb",
+		"bodyParserTextSizeLimit": "50mb"
+	},
+  "server": {
+		"port": 3000,
+		"key": "bin/server.key",
+    "cert": "bin/server.cert"
+	},
+	"services": {
     "hpsmIncidentService": {
       "environment": "dev"
     },
-		"toolboxService": {
-			"securedModels": []
+		"accessControlService": {
+			"environment": "default"
 		}
   },
-  "server": {
-		
-	},
-	"loggingLevels": ["debug","error","warn","info"],
-  "listener": {
-    "port": 5000,
-    "sslKey": "path/to/key",
-    "sslCert": "path/to/cert",
-    "allowedIps": [ 
-      "127.0.0.1"
-    ]
-  }
+	"loggingLevels": ["debug","error","warn","info"]
 }
