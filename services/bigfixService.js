@@ -1,5 +1,6 @@
 const { promisify } = require('util');
 const { pipeline } = require('stream');
+const { execFile } = require('child_process');
 const { createWriteStream, readFileSync, unlinkSync } = require('fs');
 const toolboxService = require('./toolboxService');
 const httpClientService = require('./httpClientService');
@@ -147,8 +148,28 @@ bigfixService.query = async (config) => {
 	return response;
 };
 
-bigfixService.getActionInformationById = async (config) => {
+const execServerKeyTool = (config) => new Promise((resolve, reject) => {
+	execFile('ServerKeyTool.exe', config, { windowsVerbatimArguments: true }, (error) => {
+		if (error) {
+			const e = error.message;
+			if (e.includes(' ENOENT')) reject(new Error(e.replace('ENOENT', 'Cannot find file')));
+			if (e.includes(' EACCES')) reject(new Error(e.replace('EACCES', 'Permission denied')));
+			reject(new Error(e));
+		}
+		resolve();
+	});
+});
 
+bigfixService.decryptServerKeys = async (config) => {
+	const { dirIn, dirOut } = config;
+	const args = ['/decrypt', `/dirIn:"${dirIn}"`, `/dirOut:"${dirOut}"`];
+	await execServerKeyTool(args);
+};
+
+bigfixService.encryptServerKeys = async (config) => {
+	const { dirIn, dirOut } = config;
+	const args = ['/encrypt', `/dirIn:"${dirIn}"`, `/dirOut:"${dirOut}"`];
+	await execServerKeyTool(args);
 };
 
 module.exports = bigfixService;
