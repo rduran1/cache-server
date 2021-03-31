@@ -1,4 +1,4 @@
-const accessService = require('../services/accessService');
+const accessService = require('../services/accessControlService');
 const logger = require('../services/loggingService')(__filename);
 
 const collectionController = {};

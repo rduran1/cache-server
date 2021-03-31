@@ -172,37 +172,37 @@ schemas.accessControlService_isAllowed = Joi.object().keys({
 	.xor('token', 'accountId');
 
 /** ***********************************
- accountsService methods Schema
+ servicesAccountService methods Schema
 ************************************* */
-schemas.accountsService = Joi.object().keys({
+schemas.serviceAccountService = Joi.object().keys({
 	serviceFileName
 });
 
-schemas.accountService_getAccessByToken = Joi.object().keys({
+schemas.servicesAccountService_getAccessByToken = Joi.object().keys({
 	token: Joi.string().token(),
 	env
 });
 
-schemas.accountService_getAccessByAccount = Joi.object().keys({
+schemas.servicesAccountService_getAccessByAccount = Joi.object().keys({
 	subject: Joi.string().required(),
 	env
 });
 
-schemas.accountService_getCredentials = Joi.object().keys({
+schemas.serviceAccountService_getCredentials = Joi.object().keys({
 	env
 });
 
-schemas.accountService_createNewEnvironmentCredentials = Joi.object().keys({
+schemas.serviceAccountService_createNewEnvironmentCredentials = Joi.object().keys({
 	credentials,
 	env
 });
 
-schemas.accountService_updateEnvironmentCredentials = Joi.object().keys({
+schemas.serviceAccountService_updateEnvironmentCredentials = Joi.object().keys({
 	credentials,
 	env
 });
 
-schemas.accountService_deleteAccountEnvironment = Joi.object().keys({
+schemas.serviceAccountService_deleteAccountEnvironment = Joi.object().keys({
 	env
 });
 
