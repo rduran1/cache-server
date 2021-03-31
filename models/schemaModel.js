@@ -77,6 +77,43 @@ schemas.mssqlServiceDbNameAndBackupFile = Joi.object().keys({
 });
 
 /** ***********************************
+ Global Schema key definitions
+************************************* */
+const credentials = Joi.string();
+const env = Joi.string().default('default');
+const serviceFileName = Joi.string().regex(/Service\.js$/).required();
+
+/** ***********************************
+ configurationService methods Schema
+************************************* */
+schemas.configurationService_setExpressConfiguration = Joi.object().keys({
+	staticDirectory: Joi.string(),
+	viewsDirectory: Joi.string(),
+	bodyParserUrlencodedExtended: Joi.boolean(),
+	bodyParserJsonSizeLimit: Joi.string(),
+	bodyParserTextSizeLimit: Joi.string()
+});
+
+schemas.configurationService_setServerConfiguration = Joi.object().keys({
+	port: Joi.number().default(3000),
+	key: Joi.string().required(),
+	cert: Joi.string().required()
+});
+
+schemas.configurationService_getServiceEnvironment = Joi.object().keys({
+	serviceFileName
+});
+
+schemas.configurationService_setServiceEnvironment = Joi.object().keys({
+	serviceFileName,
+	env
+});
+
+schemas.configurationService_setLoggingLevels = Joi.object().keys({
+	loggingLevels: Joi.array().items(Joi.string().lowercase().valid('debug', 'error', 'warn', 'info'))
+});
+
+/** ***********************************
  toolboxService methods Schema
 ************************************* */
 schemas.toolboxService_truncateFile = Joi.object().keys({
@@ -87,7 +124,10 @@ schemas.toolboxService_truncateFile = Joi.object().keys({
 
 schemas.toolboxService_initializeStore = Joi.object().keys({
 	modelFileName: Joi.string().max(120).required(),
-	initValue: Joi.string().required().valid('{}', '[]', '[[]]')
+	initValue: Joi.alternatives().try(
+		Joi.object(),
+		Joi.array()
+	).required()
 });
 
 schemas.toolboxService_saveStoreToFile = Joi.object().keys({
@@ -121,14 +161,49 @@ schemas.httpClientService_asyncRequest = Joi.object().keys({
 });
 
 /** ***********************************
- accessService methods Schema
+ accessControlService methods Schema
 ************************************* */
-schemas.accessService_isAllowed = Joi.object().keys({
+schemas.accessControlService_isAllowed = Joi.object().keys({
 	token: Joi.string().token(),
-	subject: Joi.string(),
+	accountId: Joi.string(),
 	resource: Joi.string().required(),
 	request: Joi.string().required()
 })
-	.xor('token', 'subject');
+	.xor('token', 'accountId');
+
+/** ***********************************
+ accountsService methods Schema
+************************************* */
+schemas.accountsService = Joi.object().keys({
+	serviceFileName
+});
+
+schemas.accountService_getAccessByToken = Joi.object().keys({
+	token: Joi.string().token(),
+	env
+});
+
+schemas.accountService_getAccessByAccount = Joi.object().keys({
+	subject: Joi.string().required(),
+	env
+});
+
+schemas.accountService_getCredentials = Joi.object().keys({
+	env
+});
+
+schemas.accountService_createNewEnvironmentCredentials = Joi.object().keys({
+	credentials,
+	env
+});
+
+schemas.accountService_updateEnvironmentCredentials = Joi.object().keys({
+	credentials,
+	env
+});
+
+schemas.accountService_deleteAccountEnvironment = Joi.object().keys({
+	env
+});
 
 module.exports = schemas;
