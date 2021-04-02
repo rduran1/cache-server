@@ -14,8 +14,6 @@ const storeTemplate = {
 		key: 'bin/server.key',
 		cert: 'bin/server.cert'
 	},
-	services: {
-	},
 	loggingLevels: [
 		'error',
 		'warn',
@@ -54,23 +52,6 @@ model.setServerConfiguration = (config) => {
 	clone.server = config;
 	toolboxService.saveStoreToFile(storeFile, clone, true);
 	store.express = config;
-};
-
-model.getServiceEnvironment = (serviceFileName) => {
-	const service = basename(serviceFileName).split('.')[0];
-	if (!Object.keys(store.services).includes(service)) throw new Error(`Service "${service}" does not exist in configuration store`);
-	const env = store.services[service].environment;
-	if (typeof env === 'undefined') throw new Error(`Service ${service} does not have an environment value`);
-	return env;
-};
-
-model.setServiceEnvironment = (serviceName, value) => {
-	const service = basename(serviceName).split('.')[0];
-	if (!Object.keys(store.services).includes(service)) throw new Error(`Service "${service}" does not exist in configuration store`);
-	const clone = toolboxService.clone(store);
-	clone.services[service].environment = value;
-	toolboxService.saveStoreToFile(storeFile, clone, true);
-	store.services[service].environment = value;
 };
 
 model.getLoggingLevels = () => store.loggingLevels || [''];
