@@ -11,5 +11,7 @@
 		"key": "bin/server.key",
     "cert": "bin/server.cert"
 	},
-	"loggingLevels": ["error","warn","info"]
+	"services": {
+	},
+	"loggingLevels": ["debug", "error","warn","info"]
 }
