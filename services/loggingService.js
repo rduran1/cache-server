@@ -11,11 +11,17 @@ function logit(fileName, level, msg) {
 }
 
 function loggingService(fileName) {
-	if (typeof process.env.INSTALL_DIR === 'undefined') throw new Error('Environmental variable INSTALL_DIR is undefined');
-	const config = readFileSync(path.join(process.env.INSTALL_DIR, 'models', 'stores', 'configurationStore.json'), 'utf-8');
-	loggingLevel = JSON.parse(config).loggingLevels;
-	if (typeof fileName !== 'string') throw new Error('Parameter must be of type string');
-	if (!fileName.endsWith('.js')) throw new Error('File name must end with ".js"');
+	if (typeof process.env.INSTALL_DIR === 'undefined') throw new Error('Environmental variable "INSTALL_DIR" is undefined');
+	if (typeof fileName !== 'string') throw new TypeError('fileName parameter must be of type string');
+	if (!fileName.endsWith('.js')) throw new Error('fileName parameter must end with ".js"');
+	const pathToConfigFile = path.join(process.env.INSTALL_DIR, 'models', 'stores', 'configurationStore.json');
+	try {
+		const config = readFileSync(pathToConfigFile, 'utf-8');
+		loggingLevel = JSON.parse(config).loggingLevels;
+	} catch (e) {
+		throw new Error(`Error reading ${pathToConfigFile}: ${e.message}`);
+	}
+	if (!Array.isArray(loggingLevel)) throw new TypeError(`"loggingLevels" is not an Array:  Typeof loggingLevels "${typeof loggingLevel}"`);
 	const baseName = path.basename(fileName).replace(/\.js$/i, '.log');
 	const fileLocation = path.join(process.env.INSTALL_DIR, 'logs', baseName);
 	return {
