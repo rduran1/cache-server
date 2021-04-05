@@ -5,9 +5,7 @@ const { EOL } = require('os');
 const schemaService = require('./schemaService');
 
 const secured = ['serviceAccountsModel', 'accessControlModel']; // These models use encrypted stores
-const loggingLevel = ['ERROR'];
-
-// loggingLevel.push('DEBUG');
+let loggingLevel = [];
 
 const toolboxService = {};
 
@@ -18,11 +16,22 @@ function logit(fileName, level, msg) {
 }
 
 function loggingService(fileName) {
-	if (typeof process.env.INSTALL_DIR === 'undefined') throw new Error('Environmental variable INSTALL_DIR is undefined');
-	if (!fileName.endsWith('.js')) throw new Error('File name must end with ".js"');
+	if (typeof process.env.INSTALL_DIR === 'undefined') throw new Error('Environmental variable "INSTALL_DIR" is undefined');
+	if (typeof fileName !== 'string') throw new TypeError('fileName parameter must be of type string');
+	if (!fileName.endsWith('.js')) throw new Error('fileName parameter must end with ".js"');
+	const pathToConfigFile = path.join(process.env.INSTALL_DIR, 'models', 'stores', 'configurationStore.json');
+	try {
+		const config = fs.readFileSync(pathToConfigFile, 'utf-8');
+		loggingLevel = JSON.parse(config).loggingLevels;
+	} catch (e) {
+		throw new Error(`Error reading ${pathToConfigFile}: ${e.message}`);
+	}
+	if (!Array.isArray(loggingLevel)) throw new TypeError(`"loggingLevels" is not an Array:  Typeof loggingLevels "${typeof loggingLevel}"`);
 	const baseName = path.basename(fileName).replace(/\.js$/i, '.log');
 	const fileLocation = path.join(process.env.INSTALL_DIR, 'logs', baseName);
 	return {
+		info: (message) => { logit(fileLocation, 'INFO', message); },
+		warn: (message) => { logit(fileLocation, 'WARN', message); },
 		error: (message) => { logit(fileLocation, 'ERROR', message); },
 		debug: (message) => { logit(fileLocation, 'DEBUG', message); }
 	};
