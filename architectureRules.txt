@@ -6,11 +6,16 @@ Models:
 	5. Rely on service to perform parameter validation
 	6. Responsible for store schema
 	7. Stores can only be accessed through a model
+	8. Do not perform logging, instead throw error for service to catch and log
+	9. Return a copy of the data and not a reference
 
 Services:
 	1. Can only access models owned by the service
 	2. Responsible for validating parameters before calling a model method
 	3. Use curried or revealing module patterns
+	4. Responsible for performing logging at the service level and catching and logging errors propagated from the model
+	5. Return a copy of the data and not a reference
+	6. Getter methods do not return errors, they only return requested data or undefined
 
 Controllers:
 	1. Handle request and response objects
@@ -19,3 +24,12 @@ Controllers:
 
 Routes:
 	1. Responsible for defining all possible routes
+	2. Call controllers
+
+Schema:
+	1. Sets default values
+	2. Validate data types and apply constraints
+
+Error Messages:
+	1. Error messages that are meaningful to a larger audience
+	2. Avoid superfluous error messages
