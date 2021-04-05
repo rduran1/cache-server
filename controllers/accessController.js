@@ -26,10 +26,11 @@ accessController.isAllowed = async (req, res, next) => {
 
 	// Extract the resource from the URL
 	const resource = /^\/(.+?)(\/|$|\?)/.test(reqOriginalUrl) ? /^\/(.+?)(\/|$|\?)/.exec(reqOriginalUrl)[1] : undefined;
+	logger.debug(`${remoteAddress}: isAllowed::resource value: ${resource}`);
 	let accessAllowed = false;
-	const callMsg = `accessControlService.isAllowed(token=${token}, accountId=${accountId}, resource=${resource}, request=${method})`;
 	try {
-		logger.debug(`${remoteAddress}: Calling ${callMsg}`);
+		const callmsg = `accessControlService.isAllowed(token=${token}, accountId=${accountId}, resource=${resource}, request=${method})`;
+		logger.debug(`${remoteAddress}: Calling ${callmsg}`);
 		accessAllowed = await accessControlService.isAllowed(token, accountId, resource, method);
 	} catch (e) {
 		if (/Schema definition for ".+?" does not exist in the schema model/.test(e.message)) {
