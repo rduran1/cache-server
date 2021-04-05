@@ -13,7 +13,7 @@ function configurationService(serviceFileName) {
 	let v;
 	try {
 		v = toolboxService.validate({ serviceFileName }, 'configurationService');
-		v.serviceName = (basename(__filename).replace(/\.js$/i, ''));
+		if (serviceFileName) v.serviceName = (basename(serviceFileName).replace(/\.js$/i, ''));
 	} catch (e) {
 		logger.error(e.message);
 		logger.debug(`Exiting ${callmsg}`);
@@ -23,7 +23,7 @@ function configurationService(serviceFileName) {
 	if (typeof v.serviceFileName === 'undefined') return staticMethods;
 	return {
 		get: (propertyName) => {
-			callmsg = `configurationService[${v.serviceName}].get(propertyName = ${propertyName})`;
+			callmsg = `configurationService["${v.serviceName}"].get(propertyName = "${propertyName}")`;
 			logger.debug(`Entering ${callmsg}`);
 			let v2;
 			try {
@@ -37,7 +37,7 @@ function configurationService(serviceFileName) {
 			return configurationModel.get(v.serviceName, v2.propertyName);
 		},
 		set: async (config) => {
-			callmsg = `configurationService[${v.serviceName}].set(config = ${typeof config})`;
+			callmsg = `configurationService["${v.serviceName}"].set(config = ${typeof config})`;
 			logger.debug(`Entering ${callmsg}`);
 			let v2;
 			try {
@@ -59,7 +59,7 @@ function configurationService(serviceFileName) {
 			logger.debug(`Exiting ${callmsg}`);
 		},
 		exists: (propertyName) => {
-			callmsg = `configurationService[${v.serviceName}].exists(propertyName = ${propertyName})`;
+			callmsg = `configurationService["${v.serviceName}"].exists(propertyName = "${propertyName}")`;
 			logger.debug(`Entering ${callmsg}`);
 			let v2;
 			try {
