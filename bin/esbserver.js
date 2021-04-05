@@ -6,7 +6,7 @@ process.env.INSTALL_DIR = (path.join(__dirname, '..'));
 
 const app = require('./app');
 const logger = require('../services/loggingService')(__filename);
-const config = require('../services/configurationService').getServerConfiguration();
+const config = require('../services/configurationService')().getServerConfiguration();
 
 let keyFile;
 let	certFile;

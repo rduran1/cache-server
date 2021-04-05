@@ -1,14 +1,14 @@
 /* eslint-disable no-return-await */
 const { readFileSync } = require('fs');
 const logger = require('./loggingService')(__filename);
-const accountsService = require('./serviceAccountsService')(__filename);
+const accountsService = require('./serviceAccountService')(__filename);
 const toolboxService = require('./toolboxService');
 
 const httpClientService = require('./httpClientService');
-const configurationService = require('./configurationService');
+const configurationService = require('./configurationService')(__filename);
 
-const env = configurationService.getServiceEnvironment(__filename);
-const accountInfo = accountsService.getCredentials(env);
+const environment = configurationService.get('environment');
+const accountInfo = accountsService.getCredentials(environment);
 const globalConfig = {
 	host: accountInfo.host,
 	port: accountInfo.port,

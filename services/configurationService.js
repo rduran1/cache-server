@@ -1,85 +1,158 @@
+const { basename } = require('path');
 const configurationModel = require('../models/configurationModel');
 const toolboxService = require('./toolboxService');
 const logger = require('./loggingService')(__filename);
 
-const configurationService = {};
+const CONFIG_OBJECT_MERGE = true; // When true merges with existing object properties vs replacing with current object
 
-configurationService.getExpressConfiguration = () => {
-	const callMsg = 'getExpressConfiguration()';
-	logger.debug(`Entering ${callMsg}`);
-	logger.debug(`Exiting ${callMsg}`);
+const staticMethods = {};
+
+function configurationService(serviceFileName) {
+	let callmsg = `configurationService(serviceFileName = "${serviceFileName}")`;
+	logger.debug(`Entering ${callmsg}`);
+	let v;
+	try {
+		v = toolboxService.validate({ serviceFileName }, 'configurationService');
+		v.serviceName = (basename(__filename).replace(/\.js$/i, ''));
+	} catch (e) {
+		logger.error(e.message);
+		logger.debug(`Exiting ${callmsg}`);
+		throw e;
+	}
+	logger.debug(`Exiting ${callmsg}`);
+	if (typeof v.serviceFileName === 'undefined') return staticMethods;
+	return {
+		get: (propertyName) => {
+			callmsg = `configurationService[${v.serviceName}].get(propertyName = ${propertyName})`;
+			logger.debug(`Entering ${callmsg}`);
+			let v2;
+			try {
+				v2 = toolboxService.validate({ propertyName }, 'configurationService_get');
+			} catch (e) {
+				logger.error(`${callmsg} returned error: ${e.message}`);
+				logger.debug(`Exiting ${callmsg}`);
+				throw e;
+			}
+			logger.debug(`Exiting ${callmsg}`);
+			return configurationModel.get(v.serviceName, v2.propertyName);
+		},
+		set: async (config) => {
+			callmsg = `configurationService[${v.serviceName}].set(config = ${typeof config})`;
+			logger.debug(`Entering ${callmsg}`);
+			let v2;
+			try {
+				v2 = toolboxService.validate(config, 'configurationService_set');
+			} catch (e) {
+				logger.error(`${callmsg} returned error: ${e.messaga}`);
+				logger.debug(`Exiting ${callmsg}`);
+				throw e;
+			}
+			try {
+				const storedConfig = configurationModel.get(v.serviceName);
+				const arg = CONFIG_OBJECT_MERGE ? Object.assign(storedConfig, v2) : v2;
+				configurationModel.set(v.serviceName, arg);
+			} catch (e) {
+				logger.error(`configurationModel.set(serviceName = ${v.serviceName}, config = ${typeof arg}) returned error: ${e.message}`);
+				logger.debug(`Exiting ${callmsg}`);
+				throw e;
+			}
+			logger.debug(`Exiting ${callmsg}`);
+		},
+		exists: (propertyName) => {
+			callmsg = `configurationService[${v.serviceName}].exists(propertyName = ${propertyName})`;
+			logger.debug(`Entering ${callmsg}`);
+			let v2;
+			try {
+				v2 = toolboxService.validate({ propertyName }, 'configurationService_exists');
+			} catch (e) {
+				logger.error(`${callmsg} returned error: ${e.message}`);
+				logger.debug(`Exiting ${callmsg}`);
+				throw e;
+			}
+			logger.debug(`Exiting ${callmsg}`);
+			const retval = configurationModel.get(v.serviceName, v2.propertyName);
+			return (!!retval);
+		}
+	};
+}
+
+staticMethods.getExpressConfiguration = () => {
+	const callmsg = 'getExpressConfiguration()';
+	logger.debug(`Entering ${callmsg}`);
+	logger.debug(`Exiting ${callmsg}`);
 	return configurationModel.getExpressConfiguration();
 };
 
-configurationService.setExpressConfiguration = (config) => {
-	const callMsg = `setExpressConfiguration(config = ${typeof config})`;
-	logger.debug(`Entering ${callMsg}`);
-	const v = toolboxService.validate(config, 'configurationService_setExpressConfiguration');
+staticMethods.setExpressConfiguration = (config) => {
+	const callmsg = `setExpressConfiguration(config = ${typeof config})`;
+	logger.debug(`Entering ${callmsg}`);
+	let v2;
 	try {
-		const storedConfig = configurationService.getExpressConfiguration();
-		configurationModel.setExpressConfiguration(Object.assign(storedConfig, v));
+		v2 = toolboxService.validate(config, 'configurationService_setExpressConfiguration');
 	} catch (e) {
-		logger.error(`Failed to set express configuration: ${e.message}`);
-		logger.debug(`Exiting ${callMsg}`);
+		logger.error(e.message);
+		logger.debug(`Exiting ${callmsg}`);
+		throw e;
 	}
-	logger.debug(`Exiting ${callMsg}`);
+	try {
+		const storedConfig = configurationModel.getExpressConfiguration();
+		const arg = CONFIG_OBJECT_MERGE ? Object.assign(storedConfig, v2) : v2;
+		configurationModel.setExpressConfiguration(arg);
+	} catch (e) {
+		logger.error(`configurationModel.setExpressConfiguration(${typeof arg}) returned error: ${e.message}`);
+		logger.debug(`Exiting ${callmsg}`);
+		throw e;
+	}
+	logger.debug(`Exiting ${callmsg}`);
 };
 
-configurationService.getServerConfiguration = () => {
-	const callMsg = 'getServerConfiguration()';
-	logger.debug(`Entering ${callMsg}`);
-	logger.debug(`Exiting ${callMsg}`);
+staticMethods.getServerConfiguration = () => {
+	const callmsg = 'getServerConfiguration()';
+	logger.debug(`Entering ${callmsg}`);
+	logger.debug(`Exiting ${callmsg}`);
 	return configurationModel.getServerConfiguration();
 };
 
-configurationService.setServerConfiguration = (config) => {
-	const callMsg = `setServerConfiguration(config = ${typeof config})`;
-	const v = toolboxService.validate(config, 'configurationService_setServerConfiguration');
+staticMethods.setServerConfiguration = (config) => {
+	const callmsg = `setServerConfiguration(config = ${typeof config})`;
+	logger.debug(`Entering ${callmsg}`);
+	let v2;
+	try {
+		v2 = toolboxService.validate(config, 'configurationService_setServerConfiguration');
+	} catch (e) {
+		logger.error(e.message);
+		logger.debug(`Exiting ${callmsg}`);
+		throw e;
+	}
 	try {
 		const storedConfig = configurationService.getServerConfiguration();
-		configurationModel.setServerConfiguration(Object.assign(storedConfig, v));
+		const arg = CONFIG_OBJECT_MERGE ? Object.assign(storedConfig, v2) : v2;
+		configurationModel.setServerConfiguration(arg);
 	} catch (e) {
-		logger.error(`Failed to set server configuration: ${e.message}`);
-		logger.debug(`Exiting ${callMsg}`);
+		logger.error(`configurationModel.setServerConfiguration(${typeof storedConfig}) returned error: ${e.message}`);
+		logger.debug(`Exiting ${callmsg}`);
 	}
-	logger.debug(`Exiting ${callMsg}`);
+	logger.debug(`Exiting ${callmsg}`);
 };
 
-configurationService.getServiceEnvironment = (serviceFileName) => {
-	const callMsg = `getServiceEnvironment(serviceFileName = ${serviceFileName})`;
-	logger.debug(`Entering ${callMsg}`);
-	const v = toolboxService.validate({ serviceFileName }, 'configurationService_getServiceEnvironment');
-	logger.debug(`Exiting ${callMsg}`);
-	return configurationModel.getServiceEnvironment(v.serviceFileName);
-};
-
-configurationService.setServiceEnvironment = (config) => {
-	const callMsg = `setServiceEnvironment(config = ${typeof config})`;
-	const v = toolboxService.validate(config, 'configurationService_setServiceEnvironment');
-	try {
-		configurationModel.setServiceEnvironment(v);
-	} catch (e) {
-		logger.error(`Failed to set service environment: ${e.message}`);
-		logger.debug(`Exiting ${callMsg}`);
-	}
-	logger.debug(`Exiting ${callMsg}`);
-};
-
-configurationService.getLoggingLevels = () => {
+staticMethods.getLoggingLevels = () => {
 	const callMsg = 'getLoggingLevels()';
 	logger.debug(`Entering ${callMsg}`);
+	const loggingLevels = configurationModel.getLoggingLevels();
+	logger.debug(`getLoggingLevels::logginglevels value: ${JSON.stringify(loggingLevels)}`);
 	logger.debug(`Exiting ${callMsg}`);
-	configurationModel.getLoggingLevels();
+	return loggingLevels;
 };
 
-configurationService.setLoggingLevels = (config) => {
+staticMethods.setLoggingLevels = (config) => {
 	const callMsg = `setLoggingLevels(config = ${typeof config})`;
 	const v = toolboxService.validate(config, 'configurationService_setLoggingLevels');
 	try {
 		configurationModel.setLoggingLevels(v);
 	} catch (e) {
-		logger.error(`Failed to set logging levels: ${e.message}`);
+		logger.error(`configurationModel.setLoggingLevels(${JSON.stringify(v)}) returned error: ${e.message}`);
 		logger.debug(`Exiting ${callMsg}`);
+		throw e;
 	}
 	logger.debug(`Exiting ${callMsg}`);
 };

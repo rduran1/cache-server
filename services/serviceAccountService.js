@@ -2,57 +2,80 @@
 const { basename } = require('path');
 const logger = require('./loggingService')(__filename);
 const toolboxService = require('./toolboxService');
-const configurationService = require('./configurationService');
 
 const serviceAccountsModel = require('../models/serviceAccountsModel');
 
-function serviceAccountsService(serviceFileName) {
-	const callMsg = `accountsService(serviceFileName = "${serviceFileName}")`;
-	logger.debug(`Entering ${callMsg}`);
+function serviceAccountService(serviceFileName) {
+	let callmsg = `serviceAccountService(serviceFileName = "${serviceFileName}")`;
+	logger.debug(`Entering ${callmsg}`);
 	let v; // validated Object holder;
 	try {
-		logger.debug('Calling toolboxService.validate');
-		v = toolboxService.validate({ serviceFileName }, 'accountsService');
+		v = toolboxService.validate({ serviceFileName }, 'serviceAccountService');
 	} catch (e) {
-		logger.debug(`Exiting ${callMsg}`);
+		logger.error(e.message);
+		logger.debug(`Exiting ${callmsg}`);
 		throw e;
 	}
-	if (!serviceAccountsModel.serviceEntryExists(v.serviceFileName)) {
-		serviceAccountsModel.createDefaultServiceEntry(v.serviceFileName);
-		configurationService.createDefaultServiceEnvironment(v.serviceFileName);
+	v.serviceName = basename(v.serviceFileName).replace(/\.js$/i, '');
+	if (!serviceAccountsModel.serviceEntryExists(v.serviceName)) {
+		const callmsg2 = `serviceAccountsModel.createDefaultServiceEntry(v.serviceName = ${v.serviceName})`;
+		try {
+			logger.debug(`Calling ${callmsg2}`);
+			serviceAccountsModel.createDefaultServiceEntry(v.serviceName);
+		} catch (e) {
+			const msg = `${callmsg2} returned error: ${e.message}`;
+			logger.error(msg);
+			logger.debug(`Exiting ${callmsg}`);
+			throw e;
+		}
 	}
-	const serviceName = basename(v.serviceFileName).split(/\.js$/)[0];
-	let env = configurationService.getServiceEnvironment(serviceName);
-	logger.debug(`Exiting ${callMsg}`);
 	return {
-		setServiceEnvironment: (newEnv) => {
-			// Check if environment value exists in store, throw error if it doesnt
-			env = newEnv;
+		setCredentials: async (credentials, environment) => {
+			callmsg = `setCredentials(credentials = ${typeof credentials}, environment = ${environment})`;
+			logger.debug(`Entering ${callmsg}`);
+			let v2;
+			try {
+				v2 = toolboxService.validate({ environment, credentials }, 'serviceAccountService_setCredentials');
+			} catch (e) {
+				logger.error(e.message);
+				logger.debug(`Exiting ${callmsg}`);
+				throw e;
+			}
+			const args = `serviceName = ${v.serviceName}, environment = ${v2.environment}, credentials = ${typeof v2.credentials}`;
+			const callmsg2 = `serviceAccountsModel.setCredentials(${args})`;
+			try {
+				logger.debug(`Calling ${callmsg2}`);
+				await serviceAccountsModel.setCredentials(v.serviceName, v2.environment, v2.credentials);
+			} catch (e) {
+				logger.error(`${callmsg2} returned error: ${e.message}`);
+				logger.debug(`Exiting ${callmsg}`);
+				throw new Error(e.message);
+			}
 		},
-		setCredentials: (env, creds) => {
-
+		getCredentials: (environment) => {
+			callmsg = `getCredentials(environment = ${environment})`;
+			logger.debug(`Entering ${callmsg}`);
+			let v2;
+			try {
+				v2 = toolboxService.validate({ environment }, 'serviceAccountService_getCredentials');
+			} catch (e) {
+				logger.error(e.message);
+				logger.debug(`Exiting ${callmsg}`);
+				throw e;
+			}
+			logger.debug(`Exiting ${callmsg}`);
+			return serviceAccountsModel.getCredentials(v.serviceName, v2.environment);
 		},
-		getAccessControlList: (subject, subjectType) => {
-			const v2 = toolboxService.validate({ subject, subjectType }, 'accountsService_getAccessControlList');
-			return serviceAccountsModel.getAccessControlList(serviceName, env, v2.subjectType, v2.subject);
+		getEnvironments: () => {
+			callmsg = 'getEnvironments()';
+			logger.debug(`Entering ${callmsg}`);
+			logger.debug('Exiting getEnvironments()');
+			return serviceAccountsModel.getEnvironments(v.serviceName);
 		},
-		getCredentials: () => serviceAccountsModel.getCredentials(serviceName, env),
-		createNewEnvironmentCredentials: async (credentials) => {
-			const v2 = toolboxService.validate({ credentials, env }, 'accountService_createNewEnvironmentCredentials');
-			await serviceAccountsModel.createNewEnvironmentCredentials(account, v2.credentials, v2.env);
-		},
-		updateEnvironmentCredentials: async (credentials) => {
-			const v2 = toolboxService.validate({ credentials, env }, 'accountService_createNewEnvironmentCredentials');
-			await serviceAccountsModel.updateEnvironmentCredentials(account, v2.credentials, v2.env);
-		},
-		deleteServiceEntryEnvironment: async () => {
-			const v2 = toolboxService.validate({ env }, 'accountService_deleteAccountEnvironment');
-			await serviceAccountsModel.deleteAccountEnvironment(account, v2.env);
-		},
-		deleteServiceEntry: async () => {
-			await serviceAccountsModel.deleteServiceEntry(serviceName);
+		deleteEnvironment: async (environment) => {
+			await serviceAccountsModel.deleteEnvironment(v.serviceName, environment);
 		}
 	};
 }
 
-module.exports = serviceAccountsService;
+module.exports = serviceAccountService;

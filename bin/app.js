@@ -6,7 +6,7 @@ const app		= express();
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const logger = require('../services/loggingService')(__filename);
-const config = require('../services/configurationService').getExpressConfiguration();
+const config = require('../services/configurationService')().getExpressConfiguration();
 // eslint-disable-next-line no-unused-vars
 const scheduler = require('../scheduler');
 

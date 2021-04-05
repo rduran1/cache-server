@@ -14,6 +14,7 @@ const storeTemplate = {
 		key: 'bin/server.key',
 		cert: 'bin/server.cert'
 	},
+	services: {},
 	loggingLevels: [
 		'error',
 		'warn',
@@ -37,7 +38,7 @@ model.getExpressConfiguration = () => {
 model.setExpressConfiguration = (config) => {
 	const clone = toolboxService.clone(store);
 	clone.express = config;
-	toolboxService.saveStoreToFile(storeFile, clone, true);
+	toolboxService.saveStoreToFile(storeFile, clone);
 	store.express = config;
 };
 
@@ -50,7 +51,7 @@ model.getServerConfiguration = () => {
 model.setServerConfiguration = (config) => {
 	const clone = toolboxService.clone(store);
 	clone.server = config;
-	toolboxService.saveStoreToFile(storeFile, clone, true);
+	toolboxService.saveStoreToFile(storeFile, clone);
 	store.express = config;
 };
 
@@ -59,8 +60,24 @@ model.getLoggingLevels = () => store.loggingLevels || [''];
 model.setLoggingLevels = (config) => {
 	const clone = toolboxService.clone(store);
 	clone.loggingLevels = config;
-	toolboxService.saveStoreToFile(storeFile, clone, true);
+	toolboxService.saveStoreToFile(storeFile, clone);
 	store.loggingLevels = config;
+};
+
+model.get = (serviceName, propertyName) => {
+	if (typeof store.services === 'undefined') throw new Error('Cannot find services configuration!');
+	if (typeof store.services[serviceName] === 'undefined') return undefined;
+	if (typeof propertyName === 'string') return store.services[serviceName][propertyName];
+	return store.services[serviceName];
+};
+
+model.set = (serviceName, config) => {
+	const clone = toolboxService.clone(store);
+	if (typeof clone.services === 'undefined') clone.services = {};
+	clone.services[serviceName] = config || {};
+	toolboxService.saveStoreToFile(storeFile, clone);
+	if (typeof store.services === 'undefined') store.services = {};
+	store.services = clone.services;
 };
 
 module.exports = model;
