@@ -20,7 +20,7 @@
 		]
 	},
 	{
-		"type": "subject",
+		"type": "accountId",
 		"description": "administrator",
 		"issuedTo": "admin@home.com",
 		"status": "active",
