@@ -8,6 +8,7 @@ const httpClientService = require('./httpClientService');
 const configurationService = require('./configurationService')(__filename);
 
 const environment = configurationService.get('environment');
+logger.debug(`hpsmIncidentService::environment value: ${environment}`);
 const accountInfo = accountsService.getCredentials(environment);
 const globalConfig = {
 	host: accountInfo.host,
