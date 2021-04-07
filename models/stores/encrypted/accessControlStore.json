@@ -1,0 +1,10 @@
+[
+	{
+		"alias": "root",
+		"issuedTo": "admin@company.com",
+		"accountId": "root",
+		"createDate": "Wed Apr 07 2021 10:54:27 GMT-0500 (Central Daylight Time)",
+		"status": "active",
+		"accessControlList": []
+	}
+]
