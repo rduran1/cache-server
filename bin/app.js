@@ -1,3 +1,4 @@
+const VERSION = '00.10.00';
 const path = require('path');
 const helmet = require('helmet');
 const express	= require('express');
@@ -10,7 +11,7 @@ const logger = require('../services/loggingService')(__filename);
 const config = require('../services/configurationService')().getExpressConfiguration();
 // const healthchecker = require('../services/healthCheckerService');
 
-logger.info('Initializing Application Server v0.10');
+logger.info(`Initializing Application Server v${VERSION}`);
 logger.info(`process.env.INSTALL_DIR value: "${process.env.INSTALL_DIR}"`);
 logger.info('Running boot sequence health check tests');
 // healthchecker.runTests(logger);
