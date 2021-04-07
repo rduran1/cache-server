@@ -10,7 +10,7 @@ schemas.toolboxService_truncateFile = Joi.object().keys({
 });
 
 schemas.toolboxService_initializeStore = Joi.object().keys({
-	modelFileName: Joi.string().max(120).required(),
+	modelFileName: Joi.string().max(120).regex(/Model.js$/).required(),
 	initValue: Joi.alternatives().try(
 		Joi.object(),
 		Joi.array()
@@ -19,7 +19,7 @@ schemas.toolboxService_initializeStore = Joi.object().keys({
 
 schemas.toolboxService_saveStoreToFile = Joi.object().keys({
 	fileName: Joi.string().max(120).required(),
-	store: Joi.object().required(),
+	store: Joi.array().required(),
 	withTabFormat: Joi.boolean().default(true)
 });
 
