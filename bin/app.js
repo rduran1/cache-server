@@ -30,7 +30,7 @@ app.use(session({
 	secret: config.sessionSecret,
 	resave: config.sessionResave,
 	rolling: config.sessionRolling,
-	saveUninitialized: config.sessionSaveUnitialized,
+	saveUninitialized: config.sessionSaveUninitialized,
 	cookie: {
 		secure: true,
 		httpOnly: true,
