@@ -10,85 +10,44 @@ const model = {};
 const mName = (basename(__filename).replace(/\.js$/i, ''));
 model.name = mName;
 
-model.getAccessControlList = (serviceName, env, subjectType, subject) => {
-	let found;
-	let clone = {};
-	if (env === 'default') {
-		found = store[serviceName].default.find((e) => e[subjectType] === subject);
+model.serviceEntryExists = (serviceName) => Object.keys(store).includes(serviceName);
+
+model.createDefaultServiceEntry = async (serviceName) => {
+	const clone = toolboxService.clone(store);
+	if (model.serviceEntryExists(serviceName)) {
+		if (typeof store[serviceName].default === 'object') return;
+		clone[serviceName].default = {};
 	} else {
-		found = store[serviceName][env].find((e) => e[subjectType] === subject);
+		clone[serviceName] = { default: {} };
 	}
-	if (found) clone = toolboxService.clone(found);
-	return clone.getAccessControlList;
+	await toolboxService.saveStoreToFile(storeFile, clone);
+	store[serviceName] = clone[serviceName];
 };
 
-model.accountExists = (serviceFileName) => {
-	const account = basename(serviceFileName).split('.')[0];
-	return Object.keys(store).includes(account);
+model.setCredentials = async (serviceName, environment, credentials) => {
+	const clone = toolboxService.clone(store);
+	clone[serviceName][environment] = credentials;
+	await toolboxService.saveStoreToFile(storeFile, clone);
+	store[serviceName][environment] = clone[serviceName][environment];
 };
 
-model.getAccountByName = (serviceFileName) => {
-	const account = basename(serviceFileName).split('.')[0];
-	if (!model.accountExists(serviceFileName)) throw new Error(`Account "${account}" does not exist in store`);
-	return account;
-};
-
-model.createAccount = (serviceFileName) => {
-	const account = basename(serviceFileName).split('.')[0];
-	const accountExists = Object.keys(store).includes(account);
-	if (accountExists) throw new Error(`Account "${account}" already exists in store`);
-	store[account] = {};
-	toolboxService.saveStoreToFile(storeFile, store);
-};
-
-model.getCredentials = (account, env) => {
-	if (env !== 'default') {
-		if (env in store[account]) return store[account][env];
-		throw new Error(`Environment "${env}" for "${account}" does not exist in store`);
+model.getCredentials = (serviceName, environment) => {
+	if (model.getEnvironments(serviceName).includes(environment)) {
+		return store[serviceName][environment];
 	}
-	if (typeof store[account].default !== 'object') throw new Error(`Default environment for "${account}" does not exist in store`);
-	return store[account].default;
+	throw new Error(`Environment "${environment}" for "${serviceName}" does not exist in serviceAccountsStore`);
 };
 
-model.createNewEnvironmentCredentials = async (account, credentials, env) => {
-	let storeModified = false;
-	model.getAccountByName(account);
-	if (typeof credentials !== 'object') throw new Error(`credentials must be of type 'object', got ${typeof credentials}`);
-	if (typeof env === 'string' && env.length > 1) {
-		if (typeof store[account][env] === 'object') throw new Error(`Cannot create environment '${env}', environment already exists`);
-		store[account][env] = credentials;
-		storeModified = true;
-	} else {
-		store[account].default = credentials;
-		storeModified = true;
-	}
-	if (storeModified) toolboxService.saveStoreToFile(storeFile, store);
+model.getEnvironments = (serviceName) => {
+	if (!model.serviceEntryExists(serviceName)) return [];
+	return Object.keys(store[serviceName]);
 };
 
-model.updateEnvironmentCredentials = async (account, credentials, env) => {
-	let storeModified = false;
-	model.getAccountByName(account);
-	if (typeof credentials !== 'object') throw new Error(`credentials must be of type 'object', got ${typeof credentials}`);
-	if (typeof env === 'string' && env.length > 1) {
-		store[account][env] = credentials;
-		storeModified = true;
-	} else {
-		store[account].default = credentials;
-		storeModified = true;
-	}
-	if (storeModified) toolboxService.saveStoreToFile(storeFile, store);
-};
-
-model.deleteAccountEnvironment = async (account, env) => {
-	model.getCredentials(account, env);
-	delete store[account][env];
-	toolboxService.saveStoreToFile(storeFile, store);
-};
-
-model.deleteAccount = async (account) => {
-	model.getAccountByName(account);
-	delete store[account];
-	toolboxService.saveStoreToFile(storeFile, store);
+model.deleteEnvironment = async (serviceName, environment) => {
+	const clone = toolboxService.clone(store);
+	delete clone[serviceName][environment];
+	await toolboxService.saveStoreToFile(storeFile, clone);
+	delete store[serviceName][environment];
 };
 
 module.exports = model;
