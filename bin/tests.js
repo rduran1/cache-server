@@ -1,8 +1,9 @@
 /* eslint-disable global-require */
 // eslint-disable-next-line object-curly-newline
+const path = require('path');
 const { test, testSummary: summary, servicesTestHeader, serviceTesting } = require('../services/toolboxService');
 
-process.env.INSTALL_DIR = 'C:/Users/rovin/Documents/Projects/cache-server';
+process.env.INSTALL_DIR = (path.join(__dirname, '..'));
 
 const credentials = {
 	host: 'defaultserver',
