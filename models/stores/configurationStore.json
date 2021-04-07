@@ -1,12 +1,12 @@
 {
 	"express": {
-		"staticDirectory": "static",
+		"staticDirectory": "public",
 		"viewsDirectory": "views",
 		"viewEngine": "ejs",
 		"bodyParserUrlencodedExtended": true, 
 		"bodyParserJsonSizeLimit": "50mb",
 		"bodyParserTextSizeLimit": "5b",
-		"sessionKey": "user_sid",
+		"useSAMLAuthentication": false,
 		"sessionSecret": "34nf0dpm6kb2hyd6k497fbh3kdbn3kdu",
 		"sessionResave": true,
 		"sessionRolling": true,
