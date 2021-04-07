@@ -16,6 +16,7 @@ Services:
 	4. Responsible for performing logging at the service level and catching and logging errors propagated from the model
 	5. Return a copy of the data and not a reference
 	6. Getter methods do not return errors, they only return requested data or undefined
+	7. Clone parameters to ensure that object references are not accidentally modified outside of function
 
 Controllers:
 	1. Handle request and response objects
