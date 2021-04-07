@@ -1,6 +1,7 @@
 const path = require('path');
 const helmet = require('helmet');
 const express	= require('express');
+const session = require('express-session');
 
 const app		= express();
 const bodyParser = require('body-parser');
@@ -8,7 +9,10 @@ const cookieParser = require('cookie-parser');
 const logger = require('../services/loggingService')(__filename);
 const config = require('../services/configurationService')().getExpressConfiguration();
 
-logger.debug(`process.env.INSTALL_DIR value: "${process.env.INSTALL_DIR}"`);
+logger.info('Initializing Application Server v0.10');
+logger.info(`process.env.INSTALL_DIR value: "${process.env.INSTALL_DIR}"`);
+logger.info('Running boot sequence unit tests');
+// tester.runInitTests();
 
 app.set('view engine', config.viewEngine);
 app.set('views', path.join(process.env.INSTALL_DIR, config.viewsDirectory));
@@ -19,6 +23,18 @@ app.use(bodyParser.urlencoded({ extended: config.bodyParserUrlencodedExtended })
 app.use(bodyParser.json({ limit: config.bodyParserJsonSizeLimit }));
 app.use(bodyParser.text({ limit: config.bodyParserTextSizeLimit }));
 app.use(helmet());
+app.use(session({
+	key: config.sessionKey,
+	secret: config.sessionSecret,
+	resave: config.sessionResave,
+	rolling: config.sessionRolling,
+	saveUninitialized: config.sessionSaveUnitialized,
+	cookie: {
+		secure: true,
+		httpOnly: true,
+		maxAge: config.appSessionMaxAge
+	}
+}));
 
 app.disable('x-powered-by');
 
