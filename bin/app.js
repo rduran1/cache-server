@@ -32,7 +32,7 @@ app.use(session({
 	cookie: {
 		secure: true,
 		httpOnly: true,
-		maxAge: config.appSessionMaxAge
+		maxAge: config.sessionMaxAge
 	}
 }));
 
