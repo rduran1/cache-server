@@ -8,11 +8,12 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const logger = require('../services/loggingService')(__filename);
 const config = require('../services/configurationService')().getExpressConfiguration();
+// const healthchecker = require('../services/healthCheckerService');
 
 logger.info('Initializing Application Server v0.10');
 logger.info(`process.env.INSTALL_DIR value: "${process.env.INSTALL_DIR}"`);
-logger.info('Running boot sequence unit tests');
-// tester.runInitTests();
+logger.info('Running boot sequence health check tests');
+// healthchecker.runTests(logger);
 
 app.set('view engine', config.viewEngine);
 app.set('views', path.join(process.env.INSTALL_DIR, config.viewsDirectory));
