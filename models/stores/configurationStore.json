@@ -2,9 +2,11 @@
 	"express": {
 		"staticDirectory": "static",
 		"viewsDirectory": "views",
+		"viewEngine": "ejs",
 		"bodyParserUrlencodedExtended": true, 
 		"bodyParserJsonSizeLimit": "50mb",
-		"bodyParserTextSizeLimit": "50mb"
+		"bodyParserTextSizeLimit": "5b",
+		"filterTokenFromUrl": true
 	},
   "server": {
 		"port": 3000,
