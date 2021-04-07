@@ -6,6 +6,12 @@
 		"bodyParserUrlencodedExtended": true, 
 		"bodyParserJsonSizeLimit": "50mb",
 		"bodyParserTextSizeLimit": "5b",
+		"sessionKey": "user_sid",
+		"sessionSecret": "34nf0dpm6kb2hyd6k497fbh3kdbn3kdu",
+		"sessionResave": true,
+		"sessionRolling": true,
+		"sessionSaveUninitialized": false,
+		"sessionMaxAge": 900000,
 		"filterTokenFromUrl": true
 	},
   "server": {
