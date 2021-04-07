@@ -20,6 +20,7 @@
         "no-tabs": ["off", { "allowIndentationTabs": true }],
 				"max-len": ["error", { "code": 155 }],
 				"comma-dangle": ["error", "never"],
-				"no-plusplus": ["error", { "allowForLoopAfterthoughts": true }]
+				"no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
+				"newline-per-chained-call": ["error", { "ignoreChainWithDepth": 8 }]
     }
 }
