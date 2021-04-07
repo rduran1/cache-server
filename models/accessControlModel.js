@@ -4,7 +4,7 @@ const toolboxService = require('../services/toolboxService');
 
 const randomByteSize = 24;
 
-const storeTemplate = {};
+const storeTemplate = [];
 
 const { store, storeFile } = toolboxService.initializeStore(__filename, storeTemplate);
 
