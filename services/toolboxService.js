@@ -121,8 +121,8 @@ toolboxService.cloneAndValidate = (config, schemaName) => {
 	logger.debug(`Entering ${callMsg}`);
 	try {
 		const configCopy = toolboxService.clone(config);
-		schemaService.validate(configCopy, schemaName);
-		return configCopy;
+		const validatedObject = schemaService.validate(configCopy, schemaName);
+		return validatedObject;
 	} catch (e) {
 		logger.debug(`Exiting ${callMsg}`);
 		throw (e);
