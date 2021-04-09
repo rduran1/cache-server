@@ -1,0 +1,92 @@
+body {
+  background-color: #1b262c;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00b7ff;
+}
+
+header {
+  width: 100%;
+}
+
+#active-app-header {
+  margin: 0px 0px 34px;
+  display: block;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+select {
+  border-radius: 4px;
+  background-color: #bbe1fa;
+  padding-left: 10px;
+  padding-right: 15px;
+  margin-left: 20px;
+  outline: none;
+  font-weight: bold;
+}
+
+select option {
+  font-weight: bold;
+}
+
+#app {
+  transition: 0.6s;
+  color: #bbe1fa;
+  padding: 0px 50px;
+}
+
+/* sidebar styling */
+.sidebar {
+  height: 100%;
+  width: 32px;
+  position: fixed;
+  z-index: 1;
+  top: 0px;
+  left: 0px;
+  background-color: #0f4c75;
+  overflow-x: hidden;
+  transition: 0.6s;
+  padding-top: 60px;
+}
+
+.sidebar-items a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 15px;
+  color: #bbe1fa;
+  display: block;
+  white-space: nowrap;
+}
+
+.icon {
+  float: left;
+  color: #bbe1fa;
+  padding-left: 8px;
+  padding-top: 6px;
+  font-size: 1rem;
+}
+
+.sidebar a:hover,
+.icon:hover {
+  color: white;
+  cursor: pointer;
+}
+
+#sidebar-toggle {
+  position: absolute;
+  top: 0px;
+  right: 6px;
+  font-size: 36px;
+  margin-left: 50px;
+  text-decoration: none;
+  transition: 0.6s;
+}
+
+.rotate45 {
+  -webkit-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+}

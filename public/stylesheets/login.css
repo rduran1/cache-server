@@ -1,0 +1,71 @@
+/* Dark -> Light
+#1b262c
+#0f4c75
+#3282b8
+#bbe1fa
+*/
+
+body {
+  margin: 150px;
+  background-color: #1b262c;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Bordered login form */
+form#login {
+  border: 3px solid #bbe1fa;
+  width: 300px;
+  margin: auto;
+  border-radius: 6px;
+  color: #bbe1fa;
+  background-color: #0f4c75;
+  box-shadow: 2px 2px 2px grey;
+}
+
+/* Full-width login form inputs */
+form#login input[type="text"],
+form#login input[type="password"] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #bbe1fa;
+  box-sizing: border-box;
+  border-radius: 6px;
+  background-color: #bbe1fa;
+  border: none;
+  outline: none;
+}
+
+/* Set style for button */
+button {
+  background-color: #3282b8;
+  color: #bbe1fa;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  font-size: medium;
+  border-radius: 6px;
+  outline: none;
+}
+
+/* Add a hover effect for button */
+button:hover {
+  opacity: 0.8;
+}
+
+/* Add padding to container */
+.container {
+  padding: 16px;
+}
+
+/* Style error message */
+#login-msg {
+  text-align: center;
+  padding-top: 16px;
+  color: #cd6262;
+  font-weight: bold;
+  font-size: 16px;
+}
