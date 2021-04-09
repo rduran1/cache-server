@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Application</title>
+		<link rel="stylesheet" href="/stylesheets/app-main.css">
+		<link rel="stylesheet" href="/stylesheets/bootstrap-icons.css">
+		<script src="/javascripts/vue.js"></script>
+		<script src="/javascripts/logs.vue"></script>
+	</head>
+	<body>
+		<div id="sidebar" class="sidebar">
+			<div>
+				<a href="#" id="sidebar-toggle" class="rotate45">&times;</a>
+			</div>
+			<div class="sidebar-items">
+				<div class="sidebar-item"><i class="bi bi-bar-chart-line icon"></i><a>Dashboard</a></div>
+				<div class="sidebar-item"><i class="bi bi-collection icon"></i><a>API Collections</a></div>
+				<div class="sidebar-item"><i class=" bi bi-display icon"></i><a>BigFix Monitoring</a></div>
+				<div class="sidebar-item"><i class="bi bi-pencil-square icon"></i><a>App Configuration</a></div>
+				<div class="sidebar-item"><i class="bi bi-file-lock icon"></i><a>Access Management</a></div>
+				<div class="sidebar-item"><i class="bi bi-card-list icon"></i><a>Management Summary</a></div>
+				<div class="sidebar-item"><i class="bi bi-life-preserver icon"></i><a>HPSM Incidents</a></div>
+				<div class="sidebar-item"><i class="bi bi-file-earmark icon"></i><a>Application Logs</a></div>
+				<br>
+				<div id="logout-item"><i class="bi bi-door-closed icon"></i><a>Logout</a></div>
+			</div>
+		</div>
+		<div id="app">
+			<header id="active-app-header">Dashboard</header>
+			<logs log-data=""></logs>
+		</div>
+		<script src="/javascripts/appMain.js"></script>
+	</body>
+</html>
