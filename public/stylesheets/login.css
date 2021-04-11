@@ -62,7 +62,8 @@ button:hover {
 }
 
 /* Style error message */
-#login-msg {
+#login-msg,
+#unsupported_browser_msg {
   text-align: center;
   padding-top: 16px;
   color: #cd6262;
