@@ -22,6 +22,7 @@ Controllers:
 	1. Handle request and response objects
 	2. Responsible for setting HTTP response code and message
 	3. Responsible for call one or more services to satisfy request
+	4. response.statusText should contain message meaningful to user as it will be displayed as a toast in a browser
 
 Routes:
 	1. Responsible for defining all possible routes
