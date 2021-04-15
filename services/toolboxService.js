@@ -24,7 +24,11 @@ function loggingService(fileName) {
 		const config = fs.readFileSync(pathToConfigFile, 'utf-8');
 		loggingLevel = JSON.parse(config).loggingLevels;
 	} catch (e) {
-		throw new Error(`Error reading ${pathToConfigFile}: ${e.message}`);
+		if (e.code === 'ENOENT') {
+			loggingLevel = ['error, warning, info'];
+		} else {
+			throw new Error(`Error reading ${pathToConfigFile}: ${e.message}`);
+		}
 	}
 	if (!Array.isArray(loggingLevel)) throw new TypeError(`"loggingLevels" is not an Array:  Typeof loggingLevels "${typeof loggingLevel}"`);
 	const baseName = path.basename(fileName).replace(/\.js$/i, '.log');
