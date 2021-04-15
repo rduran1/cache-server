@@ -15,13 +15,14 @@ accessController.isAllowed = async (req, res, next) => {
 	logger.debug(`${remoteAddress}: Entering isAllowed`);
 	logger.debug(`${remoteAddress}: isAllowed::req.method value: ${req.method}`);
 	logger.debug(`${remoteAddress}: isAllowed::req.originalUrl value: ${req.originalUrl}`);
+	logger.debug(`${remoteAddress}: isAllowed::req.path value: ${req.path}`);
 	logger.debug(`${remoteAddress}: isAllowed::req.query.token value: ${req.query.token}`);
 	logger.debug(`${remoteAddress}: isAllowed::req.body.token value: ${req.body.token}`);
-	logger.debug(`${remoteAddress}: isAllowed::req.session.userId value: ${req.session ? req.session.userId : undefined}`);
+	logger.debug(`${remoteAddress}: isAllowed::req.session.accountId value: ${req.session ? req.session.accountId : undefined}`);
 
 	const token = req.query.token || req.body.token;
 	const reqOriginalUrl = req.originalUrl;
-	const accountId = req.session ? req.session.userId : undefined;
+	const accountId = req.session ? req.session.accountId : undefined;
 	const method = request[req.method.toLowerCase()];
 
 	// Extract the resource from the URL
@@ -33,13 +34,21 @@ accessController.isAllowed = async (req, res, next) => {
 		logger.debug(`${remoteAddress}: Calling ${callmsg}`);
 		accessAllowed = await accessControlService.isAllowed(token, accountId, resource, method);
 	} catch (e) {
+		if (/Validation failure: "value" must contain at least one of \[token, accountId\]/.test(e.message)) {
+			logger.error(`${remoteAddress}: ${e.message}, responding with HTTP 500`);
+			res.statusMessage = 'a token or authenticated accountId is required';
+			res.status(400).send();
+			return logger.debug(`${remoteAddress}: Exiting isAllowed`);
+		}
 		if (/Schema definition for ".+?" does not exist in the schema model/.test(e.message)) {
 			logger.error(`${remoteAddress}: ${e.message}, responding with HTTP 500`);
-			res.status(500).send('A problem has been detected and reported to the administrator. Please try again later.');
+			res.statusMessage = 'A problem has been detected and reported to the administrator. Please try again later.';
+			res.status(500).send();
 			return logger.debug(`${remoteAddress}: Exiting isAllowed`);
 		}
 		logger.error(`${remoteAddress}: ${e.message}, responding with HTTP 400`);
-		res.status(400).send(e.message);
+		res.statusMessage = e.message;
+		res.status(400).send();
 		return logger.debug(`${remoteAddress}: Exiting isAllowed`);
 	}
 	const subject = token ? 'token based' : 'subject based';

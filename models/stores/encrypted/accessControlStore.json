@@ -5,6 +5,26 @@
 		"accountId": "root",
 		"createDate": "Wed Apr 07 2021 10:54:27 GMT-0500 (Central Daylight Time)",
 		"status": "active",
-		"accessControlList": []
+		"accessControlList": [
+			{
+				"loggingService": [
+					"read"
+				]
+			}
+		]
+	},
+	{
+		"alias": "rduran",
+		"issuedTo": "admin@company.com",
+		"accountId": "rduran",
+		"createDate": "Wed Apr 07 2021 10:54:27 GMT-0500 (Central Daylight Time)",
+		"status": "active",
+		"accessControlList": [
+			{
+				"api": [
+					"read"
+				]
+			}
+		]
 	}
 ]

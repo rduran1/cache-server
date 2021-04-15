@@ -1,4 +1,3 @@
-/* eslint-disable consistent-return */
 const incidentService = require('../services/hpsmIncidentService');
 const logger = require('../services/loggingService')(__filename);
 
@@ -81,10 +80,9 @@ incidentController.processPayload = async (req, res) => {
 	} catch (e) {
 		logger.error(`${remoteAddress}: Failed to process "${tag}": ${e.message}`);
 		res.status(400).send(e.message);
-		logger.info(`${remoteAddress}: Responded to client with HTTP 400`);
-		return undefined;
+		return logger.info(`${remoteAddress}: Responded to client with HTTP 400`);
 	}
-	logger.info(`${remoteAddress}: Successfully processed ${tag}, responded to client with HTTP 201`);
+	return logger.info(`${remoteAddress}: Successfully processed ${tag}, responded to client with HTTP 201`);
 };
 
 incidentController.getAssignmentGroups = async (req, res) => {

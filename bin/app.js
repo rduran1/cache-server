@@ -1,5 +1,6 @@
 const VERSION = '00.10.00';
 const path = require('path');
+const { randomBytes } = require('crypto');
 const helmet = require('helmet');
 const express	= require('express');
 const session = require('express-session');
@@ -7,8 +8,8 @@ const session = require('express-session');
 const app	= express();
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const logger = require('../services/loggingService')(__filename);
 const config = require('../services/configurationService')().getExpressConfiguration();
+const logger = require('../services/loggingService')(__filename);
 // TODO: const healthchecker = require('../services/healthCheckerService');
 
 logger.info(`Initializing Application Server v${VERSION}`);
@@ -38,7 +39,7 @@ app.use(bodyParser.text({ limit: config.bodyParserTextSizeLimit }));
 
 app.use(session({
 	key: 'user_sid',
-	secret: config.sessionSecret,
+	secret: randomBytes(32).toString('hex'),
 	resave: config.sessionResave,
 	rolling: config.sessionRolling,
 	saveUninitialized: config.sessionSaveUninitialized,
@@ -59,17 +60,18 @@ app.use(logIncomingRequest);
 const pc = require('../routes/appPreChecks');
 const appMain = require('../routes/appMain');
 const appLogin = require('../routes/appLogin');
+const api = require('../routes/api');
 
 app.get('/favicon.ico', (req, res) => res.sendStatus(204));
 app.get('/', (req, res) => res.redirect('/app'));
 app.use('/app', pc.supportedBrowserCheck, pc.directBrowserToClearStaleSessionCookie, pc.checkForActiveSession, appMain);
 app.use('/app/login', appLogin);
+app.use('/api', api);
 app.use('/', require('../routes/hpsm'));
 
 // Error handler for middleware
 app.use((e, req, res, next) => {
 	if (!e) return next();
-	// eslint-disable-next-line object-curly-newline
 	const { method, connection: { remoteAddress }, originalUrl, headers: { 'content-type': ct, 'content-length': cl } } = req;
 	let url = originalUrl;
 	if (config.filterTokenFromUrl) url = originalUrl.replace(/token=[0-9a-z]+/, 'token=[FILTERED]');

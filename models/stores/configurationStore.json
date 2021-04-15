@@ -2,24 +2,28 @@
 	"express": {
 		"staticDirectory": "public",
 		"viewsDirectory": "views",
-		"viewEngine": "ejs",
-		"bodyParserUrlencodedExtended": true, 
+		"bodyParserUrlencodedExtended": true,
 		"bodyParserJsonSizeLimit": "50mb",
-		"bodyParserTextSizeLimit": "5b",
+		"bodyParserTextSizeLimit": "50mb",
+		"filterTokenFromUrl": true,
+		"exitOnWriteToLogFailure": false,
+		"viewEngine": "ejs",
 		"useSAMLAuthentication": false,
-		"sessionSecret": "34nf0dpm6kb2hyd6k497fbh3kdbn3kdu",
 		"sessionResave": true,
 		"sessionRolling": true,
 		"sessionSaveUninitialized": false,
-		"sessionMaxAge": 900000,
-		"filterTokenFromUrl": true
+		"sessionMaxAge": 600000
 	},
-  "server": {
+	"server": {
 		"port": 3000,
 		"key": "bin/server.key",
-    "cert": "bin/server.cert"
+		"cert": "bin/server.cert"
 	},
-	"services": {
-	},
-	"loggingLevels": ["debug", "error","warn","info"]
+	"services": {},
+	"loggingLevels": [
+		"debug",
+		"error",
+		"warn",
+		"info"
+	]
 }

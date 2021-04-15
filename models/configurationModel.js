@@ -3,11 +3,19 @@ const toolboxService = require('../services/toolboxService');
 
 const storeTemplate = {
 	express: {
-		staticDirectory: 'static',
+		staticDirectory: 'public',
 		viewsDirectory: 'views',
 		bodyParserUrlencodedExtended: true,
 		bodyParserJsonSizeLimit: '50mb',
-		bodyParserTextSizeLimit: '50mb'
+		bodyParserTextSizeLimit: '50mb',
+		filterTokenFromUrl: true,
+		exitOnWriteToLogFailure: false,
+		viewEngine: 'ejs',
+		useSAMLAuthentication: false,
+		sessionResave: true,
+		sessionRolling: true,
+		sessionSaveUninitialized: false,
+		sessionMaxAge: 900000
 	},
 	server: {
 		port: 3000,
