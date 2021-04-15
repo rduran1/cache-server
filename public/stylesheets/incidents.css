@@ -1,0 +1,153 @@
+/* body {
+  font-family: "Arial", "Verdana", "Courier New";
+  font-size: 14px;
+  padding: 15px;
+  color: yellow;
+} */
+
+#incidents-list {
+  margin: 20px;
+}
+
+label {
+  font-weight: bold;
+}
+
+table {
+  width: 100%;
+  color: black;
+}
+
+tr {
+  background-color: #f3f0e6;
+}
+
+tr:hover {
+  background-color: #dfdaca;
+  cursor: pointer;
+}
+
+table > tr:last-child {
+  border-radius: 16px;
+}
+
+.th-start {
+  border-radius: 6px 0px 0px 0px;
+}
+
+.th-end {
+  border-radius: 0px 6px 0px 0px;
+}
+
+#incidents-table {
+  width: 1040px;
+  margin-top: 250px;
+}
+
+button {
+  border-radius: 5px;
+  border: 1px solid grey;
+  margin-top: 20px;
+  outline: none;
+  background-color: #f3f3f3;
+}
+
+button:hover {
+  background-color: #e3e3e3;
+  cursor: pointer;
+}
+
+button:active {
+  background-color: #c3c3c3;
+}
+
+textarea,
+input {
+  height: 13px;
+  font-size: 12px;
+  border-radius: 5px;
+  padding: 2px;
+  resize: none;
+  border: 1px solid grey;
+}
+
+textarea {
+  height: 4em;
+  font-family: "Arial", "Verdana", "Courier New";
+}
+
+textarea:focus,
+input:focus {
+  outline: none;
+  background-color: #ffff99;
+}
+
+input:read-only {
+  background-color: #e7e6e6;
+}
+
+.highlight-row {
+  background-color: #ffff99;
+}
+
+.left-margin {
+  margin-left: 20px;
+}
+
+.incident-form {
+  float: left;
+  margin-right: 20px;
+}
+
+.template-components {
+  display: grid;
+  grid-row-gap: 2px;
+  grid-template-columns: 150px;
+  color: #5d5b5b;
+}
+
+.template-component {
+  background-color: #fadf92;
+  border: 1px solid grey;
+  border-radius: 5px;
+  height: 15px;
+  padding: 5px;
+  font-weight: bold;
+}
+
+.template-component:hover,
+.searchable:hover {
+  cursor: pointer;
+}
+
+.searchable:hover {
+  background-color: #fadf92;
+}
+
+.template-component:active {
+  background-color: #c3c3c3;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+}
+
+.grid-headers {
+  display: grid;
+  grid-template-columns: 60px 775px;
+  grid-gap: 8px;
+  grid-column-gap: 30px;
+  margin-bottom: 30px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 130px 180px 125px 340px;
+  grid-gap: 8px;
+  grid-column-gap: 30px;
+}

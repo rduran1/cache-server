@@ -6,6 +6,7 @@
 */
 
 body {
+  /* zoom: 2; */
   background-color: #1b262c;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
@@ -14,15 +15,12 @@ a {
   color: #00b7ff;
 }
 
-header {
-  width: 100%;
-}
-
 #active-app-header {
   margin: 0px 0px 34px;
   display: block;
   font-size: 1.5em;
   font-weight: bold;
+  width: 100%;
 }
 
 select {
@@ -39,7 +37,7 @@ select option {
   font-weight: bold;
 }
 
-#app {
+#workspace {
   transition: 0.6s;
   color: #bbe1fa;
   padding: 0px 50px;
