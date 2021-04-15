@@ -4,7 +4,7 @@ const path = require('path');
 
 process.env.INSTALL_DIR = (path.join(__dirname, '..'));
 
-const app = require('./app');
+const app = require('./express');
 const logger = require('../services/loggingService')(__filename);
 const config = require('../services/configurationService')().getServerConfiguration();
 
