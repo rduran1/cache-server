@@ -1,22 +1,20 @@
-const express = require('express');
 const l = require('../services/loggingService')();
 const logger = require('../services/loggingService')(__filename);
-const accessController = require('../controllers/accessController');
 
-const router = express.Router();
+const controller = {};
 
-async function getLogFileNames(req, res) {
+controller.getLogFileNames = async (req, res) => {
 	try {
 		const logFileNames = await l.getLogFileNames();
 		res.send(JSON.stringify(logFileNames));
 	} catch (e) {
 		logger.error(e.stack);
 		res.statusMessage = `Failed to get log file names: ${e.message}`;
-		res.status(500).send();
+		res.status(500).end();
 	}
-}
+};
 
-async function getFileContent(req, res) {
+controller.getFileContent = async (req, res) => {
 	const logfileName = req.params.logname;
 	try {
 		const logfileContent = await l.getFileContent(logfileName);
@@ -29,9 +27,6 @@ async function getFileContent(req, res) {
 		res.statusMessage = sm;
 		res.status(500).end();
 	}
-}
+};
 
-router.get('/application-logs', accessController.isAllowed, getLogFileNames);
-router.get('/application-logs/:logname', accessController.isAllowed, getFileContent);
-
-module.exports = router;
+module.exports = controller;

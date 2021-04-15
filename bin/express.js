@@ -58,16 +58,12 @@ function logIncomingRequest(req, res, next) {
 }
 app.use(logIncomingRequest);
 
-const pc = require('../routes/appPreChecks');
-const appMain = require('../routes/appMain');
-const appLogin = require('../routes/appLogin');
-const api = require('../routes/api');
-
 app.get('/favicon.ico', (req, res) => res.sendStatus(204));
 app.get('/', (req, res) => res.redirect('/app'));
-app.use('/app', pc.supportedBrowserCheck, pc.directBrowserToClearStaleSessionCookie, pc.checkForActiveSession, appMain);
-app.use('/app/login', appLogin);
-app.use('/api', api);
+
+// Application router mount points
+app.use('/app', require('../routes/appRouter'));
+app.use('/api/application-logs', require('../routes/applicationLogsRouter'));
 app.use('/', require('../routes/hpsm'));
 
 // Error handler for middleware
