@@ -1,4 +1,4 @@
-const VERSION = '00.10.00';
+const VERSION = '01.00.00';
 const path = require('path');
 const { randomBytes } = require('crypto');
 const helmet = require('helmet');
@@ -14,12 +14,13 @@ const logger = require('../services/loggingService')(__filename);
 
 logger.info(`Initializing Application Server v${VERSION}`);
 logger.info(`process.env.INSTALL_DIR value: "${process.env.INSTALL_DIR}"`);
-logger.info('Running boot sequence health check tests');
+// logger.info('Running boot sequence health check tests');
 // TODO: healthchecker.runTests(logger); <- pass logger so hc can write to app.log
 
 app.set('view engine', config.viewEngine);
 app.set('views', path.join(process.env.INSTALL_DIR, config.viewsDirectory));
 
+// Allow unsafe eval: Required for vue template compiler to work
 app.use(
 	helmet({
 		contentSecurityPolicy: {
