@@ -64,7 +64,7 @@ app.get('/', (req, res) => res.redirect('/app'));
 // Application router mount points
 app.use('/app', require('../routes/appRouter'));
 app.use('/api/application-logs', require('../routes/applicationLogsRouter'));
-app.use('/', require('../routes/hpsm'));
+app.use('/api/hpsm-incidents', require('../routes/hpsmIncidentsRouter'));
 
 // Error handler for middleware
 app.use((e, req, res, next) => {

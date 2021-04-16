@@ -2,6 +2,8 @@
 /* eslint-disable object-shorthand */
 /* eslint-disable func-names */
 
+const BASE_URL = '/api/application-logs';
+
 Vue.component('application-logs', {
 	template: `
 		<div>
@@ -20,7 +22,7 @@ Vue.component('application-logs', {
 		};
 	},
 	created: async function created() {
-		const cfg = { apipath: '/api/application-logs', type: 'json' };
+		const cfg = { apipath: BASE_URL, type: 'json' };
 		try {
 			this.logFileNames = await apiFetch(cfg);
 			return;
@@ -30,7 +32,7 @@ Vue.component('application-logs', {
 	},
 	methods: {
 		getLogData: async function getLogData() {
-			const cfg = { apipath: `/api/application-logs/${this.selectedLogName}`, type: 'text' };
+			const cfg = { apipath: `${BASE_URL}/${this.selectedLogName}`, type: 'text' };
 			try {
 				this.logFileContent = await apiFetch(cfg);
 				return;
@@ -39,7 +41,7 @@ Vue.component('application-logs', {
 			}
 		},
 		getLogFileContent: async function getLogFileContent(logName) {
-			const cfg = { apipath: `/api/application-logs/${logName}`, type: 'text' };
+			const cfg = { apipath: `${BASE_URL}/${logName}`, type: 'text' };
 			try {
 				this.logFileContent = await apiFetch({ apipath: cfg.apipath });
 				return;

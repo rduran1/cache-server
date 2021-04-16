@@ -21,7 +21,12 @@
 		"status": "active",
 		"accessControlList": [
 			{
-				"api": [
+				"application-logs": [
+					"read"
+				]
+			},
+			{
+				"hpsm-incidents": [
 					"read"
 				]
 			}

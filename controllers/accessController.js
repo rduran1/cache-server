@@ -26,7 +26,7 @@ accessController.isAllowed = async (req, res, next) => {
 	const method = request[req.method.toLowerCase()];
 
 	// Extract the resource from the URL
-	const resource = /^\/(.+?)(\/|$|\?)/.test(reqOriginalUrl) ? /^\/(.+?)(\/|$|\?)/.exec(reqOriginalUrl)[1] : undefined;
+	const resource = /^\/api\/(.+?)(\/|$|\?)/.test(reqOriginalUrl) ? /^\/api\/(.+?)(\/|$|\?)/.exec(reqOriginalUrl)[1] : undefined;
 	logger.debug(`${remoteAddress}: isAllowed::resource value: ${resource}`);
 	let accessAllowed = false;
 	try {

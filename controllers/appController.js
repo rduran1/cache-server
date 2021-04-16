@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+// const bf = require('../services/bigfixService');
 // const logger = require('../services/loggingService')(__filename);
 
 const appController = {};
@@ -21,6 +22,8 @@ appController.authenticateUser = (req, res) => {
 
 	try {
 		// Insert authentication mechanism
+		// const { acountId: username, password } = req.body;
+		// bf.authenticate({ username, password });
 		const { accountId, password } = req.body;
 		if (accountId !== 'rduran') throw new Error(BAD_CREDENTIALS);
 		req.session.accountId = accountId;

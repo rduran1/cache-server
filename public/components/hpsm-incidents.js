@@ -2,6 +2,8 @@
 /* eslint-disable object-shorthand */
 /* eslint-disable func-names */
 
+const BASE_URL = '/api/hpsm-incidents';
+
 Vue.component('hpsm-incidents', {
 	template: `
 	<div>
@@ -40,7 +42,7 @@ Vue.component('hpsm-incidents', {
 	},
 	created: async function created() {
 		try {
-			this.incidents = await apiFetch({ apipath: '/incidents', type: 'json' });
+			this.incidents = await apiFetch({ apipath: BASE_URL, type: 'json' });
 		} catch (e) {
 			toast.error(`Failed to get list of incidents: ${e.message}`);
 		}
@@ -48,14 +50,14 @@ Vue.component('hpsm-incidents', {
 	methods: {
 		setSelectedIncident: async function setSelectedIncident(id) {
 			try {
-				this.currentIncident = await apiFetch({ apipath: `/incidents/${id}`, type: 'json' });
+				this.currentIncident = await apiFetch({ apipath: `${BASE_URL}/${id}`, type: 'json' });
 			} catch (e) {
 				toast.error(e.message);
 			}
 		},
 		refreshList: async function refreshList() {
 			try {
-				this.incidents = await apiFetch({ apipath: '/incidents', type: 'json' });
+				this.incidents = await apiFetch({ apipath: BASE_URL, type: 'json' });
 			} catch (e) {
 				toast.error(`Failed to refresh list of incidents: ${e.message}`);
 			}
@@ -63,7 +65,7 @@ Vue.component('hpsm-incidents', {
 		createIncident: async function createIncident(obj) {
 			const headers = { 'Content-type': 'application/json' };
 			try {
-				await apiFetch({ apipath: '/incidents', method: 'post', headers, body: obj });
+				await apiFetch({ apipath: BASE_URL, method: 'post', headers, body: obj });
 			} catch (e) {
 				toast.error(e.message);
 			}
@@ -73,7 +75,7 @@ Vue.component('hpsm-incidents', {
 		updateIncident: async function updateIncident(obj) {
 			const headers = { 'Content-type': 'application/json' };
 			try {
-				await apiFetch({ apipath: `/incidents/${obj.IncidentID}`, method: 'put', headers, body: obj });
+				await apiFetch({ apipath: `${BASE_URL}/${obj.IncidentID}`, method: 'put', headers, body: obj });
 			} catch (e) {
 				toast.error(e.message);
 			}
