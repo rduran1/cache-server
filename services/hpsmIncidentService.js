@@ -1,16 +1,17 @@
 /* eslint-disable no-return-await */
 const { readFileSync } = require('fs');
 const logger = require('./loggingService')(__filename);
-const accountsService = require('./serviceAccountService')(__filename);
+const serviceAccountService = require('./serviceAccountService')(__filename);
 const toolboxService = require('./toolboxService');
 
 const httpClientService = require('./httpClientService');
 const configurationService = require('./configurationService')(__filename);
 
 const environment = configurationService.get('environment');
-logger.debug(`hpsmIncidentService::environment value: ${environment}`);
-const accountInfo = accountsService.getCredentials(environment);
-const globalConfig = {
+logger.info(`hpsmIncidentService::environment value: "${environment}"`);
+const accountInfo = serviceAccountService.getCredentials(environment);
+toolboxService.validate(accountInfo, 'hpsmIncidentService_serviceAccount');
+const serviceAccount = {
 	host: accountInfo.host,
 	port: accountInfo.port,
 	auth: `${accountInfo.username}:${accountInfo.password}`,
@@ -18,9 +19,11 @@ const globalConfig = {
 	rejectUnauthorized: accountInfo.rejectUnauthorized
 };
 
-try {
-	if (typeof accountInfo.key === 'string') globalConfig.key = readFileSync(accountInfo.key).toString();
-	if (typeof accountInfo.cert === 'string') globalConfig.cert = readFileSync(accountInfo.cert).toString();
+try { // Used when client authentication is required for REST API call, passed to httpclient request config
+	if (typeof accountInfo.keyFileName === 'string') {
+		serviceAccount.key = readFileSync(accountInfo.keyFileName).toString();
+		serviceAccount.cert = readFileSync(accountInfo.certFileName).toString();
+	}
 } catch (e) {
 	throw new Error(`Cannot read key and or cert file from config: ${e.message}`);
 }
@@ -72,6 +75,22 @@ incidentService.getLogicalNameByComputerDisplayName = async (computerName) => {
 // End of Custom client service methods //
 // #################################### //
 
+const clientCall = async function clientCall(config) {
+	let response;
+	try {
+		response = await httpClientService.asyncRequest(config);
+	} catch (e) {
+		throw new Error(`Error contacting ${config.host}: ${e.message}`);
+	}
+	const emsg = [];
+	emsg.push(`HPSM server ${config.host} responded with HTTP ${response.message.statusCode} ${response.message.statusMessage}`);
+	if (response.data && response.data.ReturnCode) emsg.push(`ReturnCode: ${response.data.ReturnCode}`);
+	if (Array.isArray(response.data.Messages)) emsg.push(response.data.Messages.join(' '));
+	if (response.message.statusCode !== 200) throw new Error(emsg);
+	const data = JSON.parse(response.data);
+	return toolboxService.clone(data);
+};
+
 // Refresh models data with HPSM API service
 incidentService.syncModelState = async (model) => {
 	if (typeof model !== 'object') throw new Error('Parameter must be of type model object');
@@ -81,24 +100,11 @@ incidentService.syncModelState = async (model) => {
 	} catch (e) {
 		throw new Error('Model does not support syncModelState method');
 	}
-	const config = toolboxService.clone(globalConfig);
+	const config = toolboxService.clone(serviceAccount);
 	config.path = path;
 	config.method = 'GET';
-
-	let response;
-	try {
-		response = await httpClientService.asyncRequest(config);
-	} catch (e) {
-		throw new Error(`Error contacting ${config.host}: ${e.message}`);
-	}
-	if (response.message.statusCode === 200) {
-		const data = JSON.parse(response.data);
-		await model.save(data);
-	}
-	if (response.message.statusCode === 404) {
-		const data = JSON.parse(response.data);
-		throw new Error(`404 ReturnCode: ${data.ReturnCode} ${data.Messages.join(' ')}`);
-	}
+	const data = await clientCall(config);
+	await model.save(data);
 };
 
 incidentService.syncModels = async () => {
@@ -166,23 +172,6 @@ async function duplicateOpenIncidentDetection(incident) {
 	}
 }
 
-function checkForOutageEndTimeBeforeOutageStartTime(incident) {
-	if (!incident.OutageEndTime) return;
-	if (incident.IncidentID && !incident.OutageStartTime) throw new Error('OutageStartTime not provided');
-	const startTime = new Date(incident.OutageStartTime) - 0;
-	const endTime = new Date(incident.OutageEndTime) - 0;
-	if (startTime > endTime) throw new Error('OutageEndTime cannot occur before OutageStartTime');
-}
-
-function checkForOutageEndTimeOnResolveOrClose(incident) {
-	if (incident.Status === 'Resolved' && (typeof incident.OutageEndTime === 'undefined' || incident.OutageEndTime === '')) {
-		throw new Error('OutageEndTime is required when resolving incident');
-	}
-	if (incident.Status === 'Closed' && (typeof incident.OutageEndTime === 'undefined' || incident.OutageEndTime === '')) {
-		throw new Error('OutageEndTime is required when closing incident');
-	}
-}
-
 async function checkForValidAssignee(incident) {
 	// IncidentID means an update request, If AG or assignee are missing call HPSM to set values if necessary
 	if (typeof incident.IncidentID === 'string' && typeof incident.Assignee !== 'string') {
@@ -193,14 +182,6 @@ async function checkForValidAssignee(incident) {
 		}
 		// eslint-disable-next-line no-param-reassign
 		incident.Assignee = hpsmIncident.AssignmentGroup === incident.AssignmentGroup ? hpsmIncident.Assignee : '';
-	}
-	if (incident.Assignee === '' || typeof incident.Assignee === 'undefined') {
-		if (typeof incident.Status !== 'undefined' && incident.Status.toLowerCase() === 'resolved') {
-			throw new Error('Assignee is required when resolving incident');
-		}
-		if (typeof incident.Status !== 'undefined' && incident.Status.toLowerCase() === 'closed') {
-			throw new Error('Assignee is required when closing incident');
-		}
 	}
 	if (incident.Assignee === '' || typeof incident.Assignee === 'undefined') return;
 	const eligibleAssignees = await incidentService.getEligibleAssigneesByGroup(incident.AssignmentGroup);
@@ -228,65 +209,38 @@ async function validateFieldValues(incident) {
 	}
 	hpsmAreaCategorySubCategoryModel.validateCombinationTest(incident);
 	hpsmIncidentCauseCodesModel.validateCombinationTest(incident);
-	checkForOutageEndTimeBeforeOutageStartTime(incident);
-	checkForOutageEndTimeOnResolveOrClose(incident);
 	await checkForValidAssignee(incident);
 }
 
 incidentService.getEligibleAssigneesByGroup = async (groupName) => {
-	toolboxService.validate({ assignmentGroupName: groupName }, 'hpsmAssignmentGroupName');
+	toolboxService.validate({ assignmentGroupName: groupName }, 'hpsmIncidentService_assignmentGroupName');
 
 	const uri1 = `/SM/9/rest/OperatorAPI/?query=AssignmentGroups=%22${encodeURI(groupName.replace(/&/g, '%26'))}%22`;
 	const uri2 = encodeURI(' and EssOnly="false" and TemplateOperator="false"');
 
-	const config = toolboxService.clone(globalConfig);
+	const config = toolboxService.clone(serviceAccount);
 	config.path = `${uri1}${uri2}`;
 	config.method = 'GET';
 
-	let response;
-	try {
-		response = await httpClientService.asyncRequest(config);
-	} catch (e) {
-		throw new Error(`Error contacting ${config.host}: ${e.message}`);
-	}
-	if (response.message.statusCode === 200) {
-		response.data = JSON.parse(response.data);
-		if (response.data['@totalcount'] === 0) return [];
-		return response.data.content.map((e) => e.OperatorAPI.Name);
-	}
-	throw new Error(`${response.message.statusCode} ${response.message.statusMessage} ${JSON.stringify(response.data)}`);
+	const data = await clientCall(config);
+	if (data['@totalcount'] === 0) return [];
+	return data.content.map((e) => e.OperatorAPI.Name);
 };
 
 incidentService.getIncidentById = async (id) => {
-	toolboxService.validate({ IncidentID: id }, 'hpsmIncidentID');
-
-	const config = toolboxService.clone(globalConfig);
+	toolboxService.validate({ IncidentID: id }, 'hpsmIncidentService_incidentId');
+	const config = toolboxService.clone(serviceAccount);
 	config.path = `/SM/9/rest/incidents/${id}`;
 	config.method = 'GET';
-
-	let response;
-	try {
-		response = await httpClientService.asyncRequest(config);
-	} catch (e) {
-		throw new Error(`Error contacting ${config.host}: ${e.message}`);
-	}
-	let data;
-	if (response.message.statusCode === 200) {
-		data = JSON.parse(response.data).Incident;
-		await hpsmIncidentsModel.save(data);
-		return data;
-	}
-	if (response.message.statusCode === 404) {
-		data = JSON.parse(response.data);
-		throw new Error(`404 ReturnCode: ${data.ReturnCode} ${data.Messages.join(' ')}`);
-	}
-	throw new Error(`${response.message.statusCode} ${response.message.statusMessage} ${JSON.stringify(data)}`);
+	const data = await clientCall(config);
+	await hpsmIncidentsModel.save(data.Incident);
+	return data.Incident;
 };
 
 incidentService.createIncident = async (incident) => {
-	const newIncident = toolboxService.cloneAndValidate(incident, 'hpsmNewIncident');
+	const newIncident = toolboxService.cloneAndValidate(incident, 'hpsmIncidentService_incident');
 
-	const config = toolboxService.clone(globalConfig);
+	const config = toolboxService.clone(serviceAccount);
 	config.path = '/SM/9/rest/incidents';
 	config.method = 'POST';
 
@@ -294,24 +248,16 @@ incidentService.createIncident = async (incident) => {
 	await duplicateOpenIncidentDetection(newIncident);
 	config.body = JSON.stringify({ Incident: newIncident });
 
-	const response = await httpClientService.asyncRequest(config);
-	if (response.message.statusCode === 200) {
-		let data;
-		try {
-			data = JSON.parse(response.data);
-		} catch (e) {
-			throw new Error(`Received JSON data from HPSM server that was not well formed: ${e.message}`);
-		}
-		await hpsmIncidentsModel.save(data);
-		return data;
-	}
-	throw new Error(`HTTP ${response.message.statusCode} ${response.message.statusMessage} ${JSON.stringify(response.data)}`);
+	const data = await clientCall(config);
+	await hpsmIncidentsModel.save(data);
+	return data;
 };
 
 incidentService.updateIncident = async (incident) => {
-	toolboxService.validate({ IncidentID: incident.IncidentID }, 'hpsmIncidentID');
+	console.log(incident);
+	toolboxService.validate({ IncidentID: incident.IncidentID }, 'hpsmIncidentService_incidentId');
 
-	const config = toolboxService.clone(globalConfig);
+	const config = toolboxService.clone(serviceAccount);
 	config.path = `/SM/9/rest/incidents/${incident.IncidentID}`;
 	config.method = 'POST';
 
@@ -340,20 +286,16 @@ incidentService.updateIncident = async (incident) => {
 	const mergedIncident = {};
 	Object.assign(mergedIncident, retrievedIncident, incident);
 
-	toolboxService.validate(mergedIncident, 'hpsmExistingIncident');
+	toolboxService.validate(mergedIncident, 'hpsmIncidentService_incident');
 	await validateFieldValues(mergedIncident);
 	config.body = JSON.stringify({ Incident: mergedIncident });
 
 	if (mergedIncident.Status.toLowerCase() === 'resolved') config.path = `${config.path}/action/resolve`;
 	if (mergedIncident.Status.toLowerCase() === 'closed') config.path = `${config.path}/action/close`;
 
-	const response = await httpClientService.asyncRequest(config);
-	if (response.message.statusCode > 0) {
-		const data = JSON.parse(response.data);
-		response.message.returnCode = data.ReturnCode;
-		// read data.Messages (its an array of strings) for application response
-	}
-	return response;
+	const data = await clientCall(config);
+	await hpsmIncidentsModel.save(data);
+	return data;
 };
 
 module.exports = incidentService;
