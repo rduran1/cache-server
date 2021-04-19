@@ -221,7 +221,6 @@ incidentService.getEligibleAssigneesByGroup = async (groupName) => {
 	const config = toolboxService.clone(serviceAccount);
 	config.path = `${uri1}${uri2}`;
 	config.method = 'GET';
-
 	const data = await clientCall(config);
 	if (data['@totalcount'] === 0) return [];
 	return data.content.map((e) => e.OperatorAPI.Name);
@@ -254,7 +253,6 @@ incidentService.createIncident = async (incident) => {
 };
 
 incidentService.updateIncident = async (incident) => {
-	console.log(incident);
 	toolboxService.validate({ IncidentID: incident.IncidentID }, 'hpsmIncidentService_incidentId');
 
 	const config = toolboxService.clone(serviceAccount);
@@ -285,14 +283,11 @@ incidentService.updateIncident = async (incident) => {
 
 	const mergedIncident = {};
 	Object.assign(mergedIncident, retrievedIncident, incident);
-
 	toolboxService.validate(mergedIncident, 'hpsmIncidentService_incident');
 	await validateFieldValues(mergedIncident);
 	config.body = JSON.stringify({ Incident: mergedIncident });
-
 	if (mergedIncident.Status.toLowerCase() === 'resolved') config.path = `${config.path}/action/resolve`;
 	if (mergedIncident.Status.toLowerCase() === 'closed') config.path = `${config.path}/action/close`;
-
 	const data = await clientCall(config);
 	await hpsmIncidentsModel.save(data);
 	return data;
