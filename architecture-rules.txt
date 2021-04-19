@@ -20,9 +20,12 @@ Services:
 
 Controllers:
 	1. Handle request and response objects
-	2. Responsible for setting HTTP response code and message
-	3. Responsible for call one or more services to satisfy request
-	4. response.statusText should contain message meaningful to user as it will be displayed as a toast in a browser
+	2. Always logs the remoteAddress along with the log message
+	3. Extracts the necessary variables from the request to feed into a service call
+	4. Responsible for mapping service error messages to HTTP error codes
+	4. Responsible for setting HTTP response code, reason phrase and message
+	5. Responsible for call one or more services to satisfy request
+	6. translates caught service thrown error messages to meaningful user message to be displayed as a toast in the browser
 
 Routes:
 	1. Responsible for defining all possible routes
