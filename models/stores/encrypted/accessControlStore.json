@@ -27,7 +27,28 @@
 			},
 			{
 				"hpsm-incidents": [
+					"read",
+					"create"
+				]
+			}
+		]
+	},
+	{
+		"alias": "rduran-token",
+		"issuedTo": "admin@company.com",
+		"token": "asdf",
+		"createDate": "Wed Apr 07 2021 10:54:27 GMT-0500 (Central Daylight Time)",
+		"status": "active",
+		"accessControlList": [
+			{
+				"application-logs": [
 					"read"
+				]
+			},
+			{
+				"hpsm-incidents": [
+					"read",
+					"create"
 				]
 			}
 		]

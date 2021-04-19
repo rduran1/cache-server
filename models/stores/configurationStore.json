@@ -19,7 +19,11 @@
 		"key": "bin/server.key",
 		"cert": "bin/server.cert"
 	},
-	"services": {},
+	"services": {
+		"hpsmIncidentService": {
+			"environment": "dev"
+		}
+	},
 	"loggingLevels": [
 		"debug",
 		"error",
