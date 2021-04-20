@@ -86,7 +86,7 @@ const clientCall = async function clientCall(config) {
 	emsg.push(`HPSM server ${config.host} responded with HTTP ${response.message.statusCode} ${response.message.statusMessage}`);
 	if (response.data && response.data.ReturnCode) emsg.push(`ReturnCode: ${response.data.ReturnCode}`);
 	if (Array.isArray(response.data.Messages)) emsg.push(response.data.Messages.join(' '));
-	if (response.message.statusCode !== 200) throw new Error(emsg);
+	if (response.message.statusCode !== 200) throw new Error(emsg.join(' '));
 	const data = JSON.parse(response.data);
 	return toolboxService.clone(data);
 };

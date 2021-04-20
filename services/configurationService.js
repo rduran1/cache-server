@@ -8,7 +8,8 @@ const CONFIG_OBJECT_MERGE = true; // When true merges with existing object prope
 const staticMethods = {};
 
 function configurationService(serviceFileName) {
-	let callmsg = `configurationService(serviceFileName = "${serviceFileName}")`;
+	const params = (typeof serviceFileName === 'undefined' ? '' : `serviceFileName = "${serviceFileName}"`);
+	let callmsg = `configurationService(${params})`;
 	logger.debug(`Entering ${callmsg}`);
 	let v;
 	try {

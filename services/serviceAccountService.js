@@ -17,7 +17,6 @@ function serviceAccountService(serviceFileName) {
 		throw e;
 	}
 	v.serviceName = basename(v.serviceFileName).replace(/\.js$/i, '');
-	logger.debug(`serviceAccountService::v.serviceName value: ${v.serviceName}`);
 	if (!serviceAccountsModel.serviceEntryExists(v.serviceName)) {
 		try {
 			serviceAccountsModel.createDefaultServiceEntry(v.serviceName);
@@ -30,7 +29,7 @@ function serviceAccountService(serviceFileName) {
 	logger.debug(`Exiting ${callmsg}`);
 	return {
 		setCredentials: async (credentials, environment) => {
-			callmsg = `setCredentials(credentials = ${typeof credentials}, environment = ${environment})`;
+			callmsg = `setCredentials(credentials = ${typeof credentials}, environment = "${environment}")`;
 			logger.debug(`Entering ${callmsg}`);
 			let v2;
 			try {
@@ -41,7 +40,7 @@ function serviceAccountService(serviceFileName) {
 				throw e;
 			}
 			logger.debug(`setCredentials::credentials value: ${typeof v2.credentials}`);
-			logger.debug(`setCredentials::environment value: ${v2.environment}`);
+			logger.debug(`setCredentials::environment value: "${v2.environment}"`);
 			try {
 				await serviceAccountsModel.setCredentials(v.serviceName, v2.credentials, v2.environment);
 			} catch (e) {
@@ -51,7 +50,7 @@ function serviceAccountService(serviceFileName) {
 			}
 		},
 		getCredentials: (environment) => {
-			callmsg = `getCredentials(environment = ${environment})`;
+			callmsg = `serviceAccountService["${v.serviceName}"].getCredentials(environment = "${environment}")`;
 			logger.debug(`Entering ${callmsg}`);
 			let v2;
 			try {
@@ -71,7 +70,7 @@ function serviceAccountService(serviceFileName) {
 			return serviceAccountsModel.getEnvironments(v.serviceName);
 		},
 		deleteEnvironment: async (environment) => {
-			callmsg = `deleteEnvironment(environment = ${environment})`;
+			callmsg = `deleteEnvironment(environment = "${environment}")`;
 			logger.debug(`Entering ${callmsg}`);
 			try {
 				await serviceAccountsModel.deleteEnvironment(v.serviceName, environment);

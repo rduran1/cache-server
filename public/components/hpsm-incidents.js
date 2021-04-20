@@ -2,8 +2,6 @@
 /* eslint-disable object-shorthand */
 /* eslint-disable func-names */
 
-const BASE_URL = '/api/hpsm-incidents';
-
 Vue.component('hpsm-incidents', {
 	template: `
 	<div>
@@ -11,7 +9,7 @@ Vue.component('hpsm-incidents', {
 			:incidents="incidents" 
 			@set-selected-incident="setSelectedIncident"
 		></incidents-list>
-		<incident-form
+		<incident-form id="incident-form"
 			:selected-incident="currentIncident"
 			@create-incident="createIncident"
 			@update-incident="updateIncident"
@@ -21,6 +19,7 @@ Vue.component('hpsm-incidents', {
 	`,
 	data: function data() {
 		return {
+			BASE_URL: '/api/hpsm-incidents',
 			incidents: [],
 			currentIncident: {
 				Title: '',
@@ -42,7 +41,7 @@ Vue.component('hpsm-incidents', {
 	},
 	created: async function created() {
 		try {
-			this.incidents = await apiFetch({ apipath: BASE_URL, type: 'json' });
+			this.incidents = await apiFetch({ apipath: this.BASE_URL, type: 'json' });
 		} catch (e) {
 			toast.error(`Failed to get list of incidents: ${e.message}`);
 		}
@@ -50,14 +49,14 @@ Vue.component('hpsm-incidents', {
 	methods: {
 		setSelectedIncident: async function setSelectedIncident(id) {
 			try {
-				this.currentIncident = await apiFetch({ apipath: `${BASE_URL}/${id}`, type: 'json' });
+				this.currentIncident = await apiFetch({ apipath: `${this.BASE_URL}/${id}`, type: 'json' });
 			} catch (e) {
 				toast.error(e.message);
 			}
 		},
 		refreshList: async function refreshList() {
 			try {
-				this.incidents = await apiFetch({ apipath: BASE_URL, type: 'json' });
+				this.incidents = await apiFetch({ apipath: this.BASE_URL, type: 'json' });
 			} catch (e) {
 				toast.error(`Failed to refresh list of incidents: ${e.message}`);
 			}
@@ -65,7 +64,7 @@ Vue.component('hpsm-incidents', {
 		createIncident: async function createIncident(obj) {
 			const headers = { 'Content-type': 'application/json' };
 			try {
-				await apiFetch({ apipath: BASE_URL, method: 'post', headers, body: obj });
+				await apiFetch({ apipath: this.BASE_URL, method: 'post', headers, body: obj });
 			} catch (e) {
 				toast.error(e.message);
 			}
@@ -75,7 +74,7 @@ Vue.component('hpsm-incidents', {
 		updateIncident: async function updateIncident(obj) {
 			const headers = { 'Content-type': 'application/json' };
 			try {
-				await apiFetch({ apipath: `${BASE_URL}/${obj.IncidentID}`, method: 'put', headers, body: obj });
+				await apiFetch({ apipath: `${this.BASE_URL}/${obj.IncidentID}`, method: 'put', headers, body: obj });
 			} catch (e) {
 				toast.error(e.message);
 			}

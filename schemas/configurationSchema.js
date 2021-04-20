@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const { serviceFileName, environment } = require('./globals');
+const { serviceFileName, environment } = require('./globalSchema');
 
 const schemas = {};
 

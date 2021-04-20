@@ -10,7 +10,7 @@ Vue.component('incidents-list', {
 					<th class="col-width-ctl th-start">Case Number</th>
 					<th class="col-width-ctl">Status</th>
 					<th class="col-width-ctl">Category</th>
-					<th>Problem Statement</th>
+					<th class="th-end">Problem Statement</th>
 				</tr>
 				<tr @click="selectIncident" v-for="item in incidents">
 					<td class="col-width-ctl">

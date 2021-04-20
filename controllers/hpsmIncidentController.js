@@ -43,10 +43,7 @@ async function dispatcher(req, res, controllerMethodName, serviceMethodName, par
 			res.statusMessage = e.message;
 			return res.status(400).end();
 		}
-		if (
-			e.message.match(/^Error contacting /)
-			|| e.message.match(/Server does not appear to support HTTPS/)
-		) {
+		if (e.message.match(/Server does not appear to support HTTPS/)) {
 			res.statusMessage = e.message;
 			res.status(503).end();
 			return logger.info(`${remoteAddress}: Responded to client with HTTP 503`);

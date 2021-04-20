@@ -2,27 +2,27 @@ const express = require('express');
 
 const router = express.Router();
 const accessController = require('../controllers/accessController');
-const incidentController = require('../controllers/incidentController');
+const hpsmIncidentController = require('../controllers/hpsmIncidentController');
 
 // HPSM Incidents resources
-router.post('/', accessController.isAllowed, incidentController.createIncident);
-router.put('/', accessController.isAllowed, incidentController.updateIncident);
-router.get('/', accessController.isAllowed, incidentController.getAllIncidents);
-router.get('/query/:id', accessController.isAllowed, incidentController.getIncidentById);
-router.get('/groups', accessController.isAllowed, incidentController.getAssignmentGroups);
-router.get('/groups/:groupName', accessController.isAllowed, incidentController.getEligibleAssigneesByGroup);
-router.get('/aatypes', accessController.isAllowed, incidentController.getAutoAssignTypes);
-router.get('/closurecodes', accessController.isAllowed, incidentController.getClosureCodes);
-router.get('/statuses', accessController.isAllowed, incidentController.getStatuses);
-router.get('/causecodes', accessController.isAllowed, incidentController.getCauseCodes);
-router.get('/areacatsubcat', accessController.isAllowed, incidentController.getAreaCategorySubCategory);
-router.get('/primaryservices', accessController.isAllowed, incidentController.getPrimaryAffectedServices);
+router.post('/', accessController.isAllowed, hpsmIncidentController.createIncident);
+router.put('/', accessController.isAllowed, hpsmIncidentController.updateIncident);
+router.get('/', accessController.isAllowed, hpsmIncidentController.getAllIncidents);
+router.get('/query/:id', accessController.isAllowed, hpsmIncidentController.getIncidentById);
+router.get('/groups', accessController.isAllowed, hpsmIncidentController.getAssignmentGroups);
+router.get('/groups/:groupName', accessController.isAllowed, hpsmIncidentController.getEligibleAssigneesByGroup);
+router.get('/aatypes', accessController.isAllowed, hpsmIncidentController.getAutoAssignTypes);
+router.get('/closurecodes', accessController.isAllowed, hpsmIncidentController.getClosureCodes);
+router.get('/statuses', accessController.isAllowed, hpsmIncidentController.getStatuses);
+router.get('/causecodes', accessController.isAllowed, hpsmIncidentController.getCauseCodes);
+router.get('/areacatsubcat', accessController.isAllowed, hpsmIncidentController.getAreaCategorySubCategory);
+router.get('/primaryservices', accessController.isAllowed, hpsmIncidentController.getPrimaryAffectedServices);
 
 // HPSM computers resources
-router.get('/hpsmcomputers/:computerName', accessController.isAllowed, incidentController.getComputerProperties);
-router.get('/hpsmcomputers_json/:computerName', incidentController.getComputerProperties);
+router.get('/hpsmcomputers/:computerName', accessController.isAllowed, hpsmIncidentController.getComputerProperties);
+router.get('/hpsmcomputers_json/:computerName', hpsmIncidentController.getComputerProperties);
 
 // HPSM uploads resources
-router.post('/uploads/:contentTag', incidentController.processPayload);
+router.post('/uploads/:contentTag', hpsmIncidentController.processPayload);
 
 module.exports = router;

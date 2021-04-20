@@ -1,20 +1,37 @@
 const Joi = require('joi');
-// const { serviceFileName } = require('./globals');
+// const { serviceFileName } = require('./globalSchema');
 
 const schemas = {};
+
+schemas.hpsmIncidentService_serviceAccount = Joi.object().keys({
+	host: Joi.string().required(),
+	port: Joi.number().min(80).max(65534),
+	username: Joi.string().required(),
+	password: Joi.string().required(),
+	useTls: Joi.boolean().default(true),
+	rejectUnauthorized: Joi.boolean().default(false),
+	keyFileName: Joi.string(),
+	certFileName: Joi.string()
+})
+	.with('keyFileName', 'certFileName')
+	.with('certFileName', 'keyFileName');
 
 schemas.hpsmIncidentService_assignmentGroupName = Joi.object().keys({
 	assignmentGroupName: Joi.string().min(2).max(100).required()
 });
 
 schemas.hpsmIncidentService_incidentId = Joi.object().keys({
-	IncidentId: Joi.string().min(2).max(20)
+	IncidentID: Joi.string().min(2).max(20).required()
 });
 
 schemas.hpsmIncidentService_incident = Joi.object().keys({
 	Area: Joi.string().required(),
 	AssignmentGroup: Joi.string().required(),
-	Assignee: Joi.string(),
+	Assignee: Joi.when('Status', {
+		is: Joi.string().valid('Resolved', 'Closed'),
+		then: Joi.string().required(),
+		otherwise: Joi.string()
+	}),
 	Subcategory: Joi.string().required(),
 	AutoAssignType: Joi.string().required(),
 	AffectedCI: Joi.string().required(),
@@ -26,43 +43,26 @@ schemas.hpsmIncidentService_incident = Joi.object().keys({
 	Title: Joi.string().required(),
 	Urgency: Joi.string().required().valid('3', '4', '5'),
 	Status: Joi.string(),
-	JournalUpdates: Joi.string()
-});
-
-schemas.hpsmExistingIncident = Joi.object().keys({
-	Area: Joi.string(),
-	AssignmentGroup: Joi.string(),
-	Assignee: Joi.string(),
-	AutoAssignType: Joi.string(),
-	Subcategory: Joi.string().required(),
+	JournalUpdates: Joi.string(),
 	OutageStartTime: Joi.date().iso(),
-	OutageEndTime: Joi.date().iso(),
-	AffectedCI: Joi.string().required(),
+	OutageEndTime: Joi.when('Status', {
+		is: Joi.string().valid('Resolved', 'Closed'),
+		then: Joi.date().iso().greater(Joi.ref('OutageStartTime')).required(),
+		otherwise: Joi.date().iso().greater(Joi.ref('OutageStartTime'))
+	}),
 	Phase: Joi.string(),
 	Priority: Joi.string(),
-	JournalUpdates: Joi.string().required(),
-	Category: Joi.string().required().allow(''),
-	Contact: Joi.string().required(),
-	Description: Joi.string().required(),
-	Impact: Joi.string().required().valid('3', '4', '5'),
-	Service: Joi.string().required(),
-	Title: Joi.string().required(),
-	Urgency: Joi.string().required().valid('3', '4', '5'),
-	Status: Joi.string(),
-	IncidentID: Joi.string().required(),
+	IncidentID: Joi.string(),
 	CauseCode: Joi.string(),
 	Solution: Joi.string(),
 	ClosureCode: Joi.string()
-});
+})
+	.with('OutageEndTime', 'OutageStartTime');
 
-schemas.hpsmContacts = Joi.array().items(Joi.array().length(9).items(Joi.string().allow('')));
+schemas.hpsmIncidentService_contacts = Joi.array().items(Joi.array().length(9).items(Joi.string().allow('')));
 
-schemas.hpsmComputers = Joi.array().items(Joi.array().length(19).items(Joi.string().allow('')));
+schemas.hpsmIncidentService_computers = Joi.array().items(Joi.array().length(19).items(Joi.string().allow('')));
 
-schemas.hpsmPrimaryAffectedServices = Joi.array().items(Joi.array().length(6).items(Joi.string().allow('')));
-
-schemas.bigfixService_operator = Joi.object().keys({
-	opName: Joi.string().min(2).required()
-});
+schemas.hpsmIncidentService_primaryAffectedServices = Joi.array().items(Joi.array().length(6).items(Joi.string().allow('')));
 
 module.exports = schemas;
