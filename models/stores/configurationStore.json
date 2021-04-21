@@ -17,7 +17,9 @@
 	"server": {
 		"port": 3000,
 		"key": "bin/server.key",
-		"cert": "bin/server.cert"
+		"cert": "bin/server.cert",
+		"disableTls10": true,
+		"disableTls11": false
 	},
 	"services": {
 		"hpsmIncidentService": {

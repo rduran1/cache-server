@@ -1,6 +1,7 @@
 const { readFileSync } = require('fs');
 const https = require('https');
 const path = require('path');
+const { constants } = require('crypto');
 
 process.env.INSTALL_DIR = (path.join(__dirname, '..'));
 
@@ -25,6 +26,12 @@ const options = {
 	key: keyFile,
 	cert: certFile
 };
+
+let disableObsoleteTls;
+if (config.disableTls10) disableObsoleteTls = constants.SSL_OP_NO_TLSv1;
+// eslint-disable-next-line no-bitwise
+if (config.disableTls11) disableObsoleteTls = constants.SSL_OP_NO_TLSv1 | constants.SSL_OP_NO_TLSv1_1;
+if (disableObsoleteTls) options.secureOptions = disableObsoleteTls;
 
 const server = https.createServer(options, app);
 
