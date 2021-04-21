@@ -1,6 +1,6 @@
 const path = require('path');
 const { EOL } = require('os');
-const { appendFileSync, readFileSync, readFile, readdir } = require('fs');
+const { appendFileSync, readFileSync, readFile, readdir, existsSync, mkdirSync } = require('fs');
 
 let loggingLevel = [];
 let exitOnWriteToLogFailure = false;
@@ -38,6 +38,7 @@ function loggingService(fileName) {
 	if (typeof process.env.INSTALL_DIR === 'undefined') throw new Error('Environmental variable "INSTALL_DIR" is undefined');
 	const pathToConfigFile = path.join(process.env.INSTALL_DIR, 'models', 'stores', 'configurationStore.json');
 	const logFilesDirectory = path.join(process.env.INSTALL_DIR, 'logs');
+	if (!existsSync(logFilesDirectory)) mkdirSync(logFilesDirectory);
 	if (typeof fileName === 'undefined') {
 		return {
 			getLogFileNames: async () => {

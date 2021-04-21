@@ -217,6 +217,11 @@ toolboxService.initializeStore = (modelFileName, initValue) => {
 	}
 	const modelName = path.basename(v.modelFileName).split('.')[0];
 	let storeFile = '';
+	// Create paths if they dont exist
+	const storesDir = path.join(process.env.INSTALL_DIR, 'models', 'stores');
+	const encryptedDir = path.join(process.env.INSTALL_DIR, 'models', 'stores', 'encrypted');
+	if (!fs.existsSync(storesDir)) fs.mkdirSync(storesDir);
+	if (!fs.existsSync(encryptedDir)) fs.mkdirSync(encryptedDir);
 	if (secured.includes(modelName)) {
 		storeFile = path.join(process.env.INSTALL_DIR, 'models', 'stores', 'encrypted', modelName.replace(/Model$/, 'Store.json'));
 	} else {
