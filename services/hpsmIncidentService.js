@@ -4,6 +4,8 @@ const logger = require('./loggingService')(__filename);
 const serviceAccountService = require('./serviceAccountService')(__filename);
 const toolboxService = require('./toolboxService');
 
+// TODO: use serviceAccountService to register default environment
+
 const httpClientService = require('./httpClientService');
 const configurationService = require('./configurationService')(__filename);
 
