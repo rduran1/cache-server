@@ -35,8 +35,8 @@ accessController.isAllowed = async (req, res, next) => {
 		accessAllowed = await accessControlService.isAllowed(token, accountId, resource, method);
 	} catch (e) {
 		if (/Validation failure: "value" must contain at least one of \[token, accountId\]/.test(e.message)) {
-			logger.error(`${remoteAddress}: ${e.message}, responding with HTTP 500`);
-			res.statusMessage = 'a token or authenticated accountId is required';
+			logger.error(`${remoteAddress}: ${e.message}, responding with HTTP 400`);
+			res.statusMessage = 'A token or authenticated accountId is required';
 			res.status(400).send();
 			return logger.debug(`${remoteAddress}: Exiting isAllowed`);
 		}
