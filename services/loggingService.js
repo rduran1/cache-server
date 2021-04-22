@@ -10,7 +10,7 @@ function logit(fileName, level, msg) {
 	const padding = ' '.repeat(5 - level.length);
 	let emsg;
 	try {
-		emsg = `${Date()}: [${level}${padding}] ${msg}${EOL}`;
+		emsg = `${Date()}: [${level}${padding}] ${msg.replace(/\n/, EOL)}${EOL}`;
 		appendFileSync(fileName, `${emsg}`);
 	} catch (e) {
 		// eslint-disable-next-line no-console

@@ -12,7 +12,7 @@ const toolboxService = {};
 function logit(fileName, level, msg) {
 	if (!loggingLevel.includes(level)) return;
 	const padding = ' '.repeat(5 - level.length);
-	fs.appendFileSync(fileName, `${Date()}: [${level}${padding}] ${msg}${EOL}`);
+	fs.appendFileSync(fileName, `${Date()}: [${level}${padding}] ${msg.replace(/\n/g, EOL)}${EOL}`);
 }
 
 function loggingService(fileName) {
