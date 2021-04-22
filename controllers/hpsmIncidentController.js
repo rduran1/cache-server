@@ -15,7 +15,10 @@ async function dispatcher(req, res, controllerMethodName, serviceMethodName, par
 		logger.debug(`Calling hpsmIncidentService.${serviceMethodName}(${serviceParam})`);
 		const results = await incidentService[serviceMethodName](parameter);
 		res.send(results);
-		return logger.info(`${remoteAddress}: Responded with HTTP 200 and ${results.length} bytes of data`);
+		let payloadLength = 0;
+		if (typeof results === 'object') payloadLength = JSON.stringify(results).length;
+		if (typeof results === 'string') payloadLength = results.length;
+		return logger.info(`${remoteAddress}: Responded with HTTP 200 and ${payloadLength} bytes of data`);
 	} catch (e) {
 		logger.error(`${remoteAddress}: ${controllerMethodName} failed: ${e.stack}`);
 		if (
