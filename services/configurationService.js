@@ -22,6 +22,7 @@ function configurationService(serviceFileName) {
 	}
 	logger.debug(`Exiting ${callmsg}`);
 	if (typeof v.serviceFileName === 'undefined') return staticMethods;
+	configurationModel.set(v.serviceName);
 	return {
 		get: (propertyName) => {
 			callmsg = `configurationService["${v.serviceName}"].get(propertyName = "${propertyName}")`;

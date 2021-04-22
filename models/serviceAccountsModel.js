@@ -26,6 +26,7 @@ model.createDefaultServiceEntry = async (serviceName) => {
 
 model.setCredentials = async (serviceName, environment, credentials) => {
 	const clone = toolboxService.clone(store);
+	if (typeof clone[serviceName] === 'undefined') clone[serviceName] = {};
 	clone[serviceName][environment] = credentials;
 	await toolboxService.saveStoreToFile(storeFile, clone);
 	store[serviceName][environment] = clone[serviceName][environment];
@@ -35,7 +36,7 @@ model.getCredentials = (serviceName, environment) => {
 	if (model.getEnvironments(serviceName).includes(environment)) {
 		return store[serviceName][environment];
 	}
-	throw new Error(`Environment "${environment}" for "${serviceName}" does not exist in serviceAccountsStore`);
+	return undefined;
 };
 
 model.getEnvironments = (serviceName) => {

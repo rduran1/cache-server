@@ -19,7 +19,10 @@ schemas.toolboxService_initializeStore = Joi.object().keys({
 
 schemas.toolboxService_saveStoreToFile = Joi.object().keys({
 	fileName: Joi.string().max(120).required(),
-	store: Joi.array().required(),
+	store: Joi.alternatives().try(
+		Joi.object(),
+		Joi.array()
+	).required(),
 	withTabFormat: Joi.boolean().default(true)
 });
 

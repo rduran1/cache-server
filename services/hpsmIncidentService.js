@@ -4,14 +4,21 @@ const logger = require('./loggingService')(__filename);
 const serviceAccountService = require('./serviceAccountService')(__filename);
 const toolboxService = require('./toolboxService');
 
-// TODO: use serviceAccountService to register default environment
-
 const httpClientService = require('./httpClientService');
 const configurationService = require('./configurationService')(__filename);
 
-const environment = configurationService.get('environment');
+let environment = configurationService.get('environment');
+if (typeof environment === 'undefined') {
+	configurationService.set({ environment: 'default' });
+	environment = 'default';
+}
 logger.info(`hpsmIncidentService::environment value: "${environment}"`);
-const accountInfo = serviceAccountService.getCredentials(environment);
+let accountInfo = serviceAccountService.getCredentials(environment);
+if (typeof accountInfo === 'undefined' && environment === 'default') {
+	accountInfo = { host: 'defaultserver', port: 80, username: 'username', password: 'secret' };
+	serviceAccountService.setCredentials(accountInfo, 'default');
+}
+
 toolboxService.validate(accountInfo, 'hpsmIncidentService_serviceAccount');
 const serviceAccount = {
 	host: accountInfo.host,

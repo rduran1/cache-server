@@ -42,7 +42,7 @@ function serviceAccountService(serviceFileName) {
 			logger.debug(`setCredentials::credentials value: ${typeof v2.credentials}`);
 			logger.debug(`setCredentials::environment value: "${v2.environment}"`);
 			try {
-				await serviceAccountsModel.setCredentials(v.serviceName, v2.credentials, v2.environment);
+				await serviceAccountsModel.setCredentials(v.serviceName, v2.environment, v2.credentials);
 			} catch (e) {
 				logger.error(`${callmsg} ${e.message}`);
 				logger.debug(`Exiting ${callmsg}`);

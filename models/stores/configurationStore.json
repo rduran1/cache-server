@@ -12,7 +12,7 @@
 		"sessionResave": true,
 		"sessionRolling": true,
 		"sessionSaveUninitialized": false,
-		"sessionMaxAge": 600000
+		"sessionMaxAge": 900000
 	},
 	"server": {
 		"port": 3000,
@@ -23,13 +23,13 @@
 	},
 	"services": {
 		"hpsmIncidentService": {
-			"environment": "dev"
+			"environment": "default"
 		}
 	},
 	"loggingLevels": [
-		"debug",
 		"error",
 		"warn",
-		"info"
+		"info",
+		"debug"
 	]
 }

@@ -42,4 +42,6 @@ schemas.configurationService_get = Joi.object().keys({
 	propertyName: Joi.string()
 });
 
+schemas.configurationService_set = Joi.object();
+
 module.exports = schemas;

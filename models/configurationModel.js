@@ -20,13 +20,16 @@ const storeTemplate = {
 	server: {
 		port: 3000,
 		key: 'bin/server.key',
-		cert: 'bin/server.cert'
+		cert: 'bin/server.cert',
+		disableTls10: true,
+		disableTls11: false
 	},
 	services: {},
 	loggingLevels: [
 		'error',
 		'warn',
-		'info'
+		'info',
+		'debug'
 	]
 };
 
@@ -82,9 +85,9 @@ model.get = (serviceName, propertyName) => {
 model.set = (serviceName, config) => {
 	const clone = toolboxService.clone(store);
 	if (typeof clone.services === 'undefined') clone.services = {};
-	clone.services[serviceName] = config || {};
+	if (typeof clone.services[serviceName] === 'undefined') clone.services[serviceName] = {};
+	if (typeof config === 'object') Object.assign(clone.services[serviceName], config);
 	toolboxService.saveStoreToFile(storeFile, clone);
-	if (typeof store.services === 'undefined') store.services = {};
 	store.services = clone.services;
 };
 
