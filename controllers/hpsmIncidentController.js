@@ -63,6 +63,7 @@ async function dispatcher(req, res, controllerMethodName, serviceMethodName, par
 
 		if (e.message.match(/responded with HTTP 404 /)) {
 			res.statusMessage = 'Not Found';
+			if (controllerMethodName === 'getIncidentById') res.statusMessage = `HPSM could not find incident ${paramValue}`;
 			res.status(404).end();
 			return logger.info(`${remoteAddress}: Responded to client with HTTP 404`);
 		}
