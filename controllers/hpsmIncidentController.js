@@ -32,6 +32,7 @@ async function dispatcher(req, res, controllerMethodName, serviceMethodName, par
 			res.status(500).end();
 			return logger.info(`${remoteAddress}: Responded to client with HTTP 500`);
 		}
+
 		if (
 			e.message.match(/Validation failure(s)?:/)
 			|| e.message.match(/Request is a duplicate of/)
@@ -46,28 +47,32 @@ async function dispatcher(req, res, controllerMethodName, serviceMethodName, par
 			res.statusMessage = e.message;
 			return res.status(400).end();
 		}
+
 		if (e.message.match(/Server does not appear to support HTTPS/)) {
 			res.statusMessage = e.message;
 			res.status(503).end();
 			return logger.info(`${remoteAddress}: Responded to client with HTTP 503`);
 		}
-		if (
-			e.message.match(/clientRequest error: (.+?) \(/)
-		) {
+
+		if (e.message.match(/clientRequest error: (.+?) \(/)) {
 			const regMatch = e.message.match(/clientRequest error: (.+?) \(/);
 			res.statusMessage = `Failed to contact HPSM server: ${regMatch[1]}`;
 			res.status(503).end();
 			return logger.info(`${remoteAddress}: Responded to client with HTTP 503`);
 		}
+
 		if (e.message.match(/responded with HTTP 404 /)) {
-			res.status(404).send(e.message);
+			res.statusMessage = 'Not Found';
+			res.status(404).end();
 			return logger.info(`${remoteAddress}: Responded to client with HTTP 404`);
 		}
+
 		if (e.message.match(/responded with HTTP 401 Unauthorized/)) {
 			res.statusMessage = 'Service account is unauthorized to access the HPSM server';
 			res.status(401).send();
 			return logger.info(`${remoteAddress}: Responded to client with HTTP 401`);
 		}
+
 		res.statusMessage = 'Unknown error occurred, see hpsmIncidentController.log for details';
 		res.status(500).end();
 		return logger.info(`${remoteAddress}: Responded to client with HTTP 500`);
