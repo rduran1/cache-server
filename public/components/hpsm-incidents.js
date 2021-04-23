@@ -49,7 +49,7 @@ Vue.component('hpsm-incidents', {
 	methods: {
 		setSelectedIncident: async function setSelectedIncident(id) {
 			try {
-				this.currentIncident = await apiFetch({ apipath: `${this.BASE_URL}/${id}`, type: 'json' });
+				this.currentIncident = await apiFetch({ apipath: `${this.BASE_URL}/query/${id}`, type: 'json' });
 			} catch (e) {
 				toast.error(e.message);
 			}
