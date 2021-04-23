@@ -58,7 +58,7 @@ async function apiFetch(config) {
 	const fetchConfig = { apipath, method, headers, credentials: 'same-origin' };
 	if (body) fetchConfig.body = parsedBody;
 	const response = await fetch(apipath, fetchConfig);
-	if (response.status === 400 && response.statusText.includes('a token or authenticated accountId is required')) {
+	if (response.statusText.includes('token or authenticated accountId is required')) {
 		window.location = '/app/login';
 		return undefined;
 	}
