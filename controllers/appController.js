@@ -5,6 +5,7 @@ const bf = require('../services/bigfixService');
 const appController = {};
 
 const BAD_CREDENTIALS = 'Username or password is incorrect';
+const BIGFIX_ROOT_UNAVAIL = 'Bigfix Root Server unavailable to authenticate request';
 
 appController.presentMainPage = (req, res) => {
 	res.render('main');
@@ -27,9 +28,8 @@ appController.authenticateUser = async (req, res) => {
 		req.session.authkey = crypto.createHash('sha256').update(`${accountId}${password}`).digest('base64');
 		return res.redirect('/app');
 	} catch (e) {
-		let emsg = '';
-		if (/clientRequest error: connect ECONNREFUSED/.test(e.message)) emsg = 'Authenticating Bigfix Root Server unavailable';
-		emsg = e.message;
+		let emsg = e.message;
+		if (/clientRequest error: connect ECONNREFUSED/.test(e.message)) emsg = BIGFIX_ROOT_UNAVAIL;
 		return res.render('login', { msg: emsg });
 	}
 };
