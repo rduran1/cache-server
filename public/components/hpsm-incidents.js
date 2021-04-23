@@ -5,16 +5,16 @@
 Vue.component('hpsm-incidents', {
 	template: `
 	<div>
-		<incidents-list id="incidents-list"
-			:incidents="incidents" 
-			@set-selected-incident="setSelectedIncident"
-		></incidents-list>
 		<incident-form id="incident-form"
 			:selected-incident="currentIncident"
 			@create-incident="createIncident"
 			@update-incident="updateIncident"
 			@clear-incident-fields="clearIncidentFormFields"
 		></incident-form>
+		<incidents-list id="incidents-list"
+			:incidents="incidents" 
+			@set-selected-incident="setSelectedIncident"
+		></incidents-list>
 	</div>
 	`,
 	data: function data() {

@@ -36,7 +36,7 @@ Vue.component('incident-form', {
         <input id="UpdatedBy" :value="selectedIncident.UpdatedBy" readonly>
 
         <label for="UpdatedTime">Updated Time:</label>
-        <input id="UpdatedTime" :value="new Date(selectedIncident.UpdatedTime)" readonly>
+        <input id="UpdatedTime" :value="updatedTime" readonly>
 
         <label for="Service">Service:</label>
         <input id="Service" v-model="selectedIncident.Service">
@@ -66,7 +66,13 @@ Vue.component('incident-form', {
 	computed: {
 		openTime: function openTime() {
 			if (this.selectedIncident.OpenTime) {
-				return new Date(selectedIncident.OpenTime);
+				return new Date(this.selectedIncident.OpenTime);
+			}
+			return '';
+		},
+		updatedTime: function updatedTime() {
+			if (this.selectedIncident.UpdatedTime) {
+				return new Date(this.selectedIncident.UpdatedTime);
 			}
 			return '';
 		},
