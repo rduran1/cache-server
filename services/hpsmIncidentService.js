@@ -66,7 +66,8 @@ incidentService.saveToHpsmComputersModel = async (data) => {
 
 incidentService.saveToHpsmPrimaryAffectedServicesModel = async (data) => {
 	const arr = toolboxService.parseCsvToArray(data);
-	await hpsmPrimaryAffectedServicesModel.save(arr);
+	const validatedData = toolboxService.cloneAndValidate(arr, 'hpsmIncidentService_primaryAffectedServices');
+	await hpsmPrimaryAffectedServicesModel.save(validatedData);
 };
 
 incidentService.getIRSRespOrgGroupByComputerDisplayName = async (computerName) => {

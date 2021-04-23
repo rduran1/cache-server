@@ -23,13 +23,11 @@ model.includes = (value) => {
 };
 
 model.save = async (data) => {
-	if (typeof data !== 'object') throw new Error('Parameter passed to save method must be a JSON object');
-	const tempStore = toolboxService.cloneAndValidate(data, 'hpsmPrimaryAffectedServices');
-	await toolboxService.saveStoreToFile(storeFile, tempStore);
+	await toolboxService.saveStoreToFile(storeFile, data);
 	store.length = 0;
-	const len = tempStore.length;
+	const len = data.length;
 	for (let i; i < len; i++) {
-		store.push(tempStore[i]);
+		store.push(data[i]);
 	}
 };
 
