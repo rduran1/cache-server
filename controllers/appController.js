@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-// const bf = require('../services/bigfixService');
+const bf = require('../services/bigfixService');
 // const logger = require('../services/loggingService')(__filename);
 
 const appController = {};
@@ -16,16 +16,13 @@ appController.presentLoginPage = (req, res) => {
 	res.render('login', { msg: '' });
 };
 
-appController.authenticateUser = (req, res) => {
+appController.authenticateUser = async (req, res) => {
 	if (typeof req.body.accountId !== 'string') return res.render('login', { msg: BAD_CREDENTIALS });
 	if (typeof req.body.password !== 'string') return res.render('login', { msg: BAD_CREDENTIALS });
-
+	const { accountId, password } = req.body;
 	try {
-		// Insert authentication mechanism
-		// const { acountId: username, password } = req.body;
-		// bf.authenticate({ username, password });
-		const { accountId, password } = req.body;
-		if (accountId !== 'rduran') throw new Error(BAD_CREDENTIALS);
+		const authenticated = bf.authenticate({ username: accountId, password });
+		if (!authenticated) throw new Error(BAD_CREDENTIALS);
 		req.session.accountId = accountId;
 		req.session.authkey = crypto.createHash('sha256').update(`${accountId}${password}`).digest('base64');
 		return res.redirect('/app');

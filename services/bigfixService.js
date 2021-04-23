@@ -4,6 +4,13 @@ const { execFile } = require('child_process');
 const { createWriteStream, readFileSync, unlinkSync } = require('fs');
 const toolboxService = require('./toolboxService');
 const httpClientService = require('./httpClientService');
+const configurationService = require('./configurationService')(__filename);
+
+let authenticatingRootServer = configurationService.get('authenticatingRootServer');
+if (typeof environment === 'undefined') {
+	configurationService.set({ authenticatingRootServer: 'rootserver:52311' });
+	authenticatingRootServer = 'rootserver:52311';
+}
 
 const pipelineAsync = promisify(pipeline);
 
@@ -89,8 +96,11 @@ bigfixService.authenticate = async (config) => {
 	const configCopy = validateUserAndPassProvided(config);
 	configCopy.path = '/api/login';
 	configCopy.method = 'GET';
+	const [servername, port] = authenticatingRootServer.split(':');
+	configCopy.host = servername;
+	configCopy.port = port;
 	const response = await makeHttpRequest(configCopy);
-	return response;
+	return response.data === 'OK';
 };
 
 bigfixService.getOperator = async (config) => {
