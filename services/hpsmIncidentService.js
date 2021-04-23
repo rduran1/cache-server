@@ -56,7 +56,8 @@ const incidentService = {};
 // ########################################## //
 incidentService.saveToHpsmContactsModel = async (data) => {
 	const arr = toolboxService.parseCsvToArray(data);
-	await hpsmContactsModel.save(arr);
+	const validatedData = toolboxService.cloneAndValidate(arr, 'hpsmIncidentService_contacts');
+	await hpsmContactsModel.save(validatedData);
 };
 
 incidentService.saveToHpsmComputersModel = async (data) => {
