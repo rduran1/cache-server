@@ -6,7 +6,7 @@
 } */
 
 #incidents-list {
-  margin: 20px;
+  margin-bottom: 20px;
 }
 
 #incident-form label {
@@ -21,7 +21,7 @@ textarea {
 
 #incidents-list table {
   width: 100%;
-  /* color: black; */
+  color: #1b262c;
 }
 
 tr {
@@ -33,16 +33,16 @@ tr:hover {
   cursor: pointer;
 }
 
-table > tr:last-child {
-  border-radius: 16px;
+table tr:last-child td:last-child {
+  border-radius: 0px 0px 3px 0px;
 }
 
 .th-start {
-  border-radius: 6px;
+  border-radius: 3px 0px 0px 0px;
 }
 
 .th-end {
-  border-radius: 0px 6px 0px 0px;
+  border-radius: 0px 3px 0px 0px;
 }
 
 #incidents-table {
@@ -146,7 +146,8 @@ input:read-only {
 
 .grid-headers {
   display: grid;
-  grid-template-columns: 60px 775px;
+  /* grid-template-columns: 60px 775px; */
+  grid-template-columns: 1fr 9fr;
   grid-gap: 8px;
   grid-column-gap: 30px;
   margin-bottom: 30px;
@@ -154,7 +155,8 @@ input:read-only {
 
 .grid-container {
   display: grid;
-  grid-template-columns: 130px 180px 125px 340px;
+  /* grid-template-columns: 130px 180px 125px 340px; */
+  grid-template-columns: 1fr 2fr 2fr 4fr;
   grid-gap: 8px;
   grid-column-gap: 30px;
 }

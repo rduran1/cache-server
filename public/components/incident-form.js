@@ -20,20 +20,23 @@ Vue.component('incident-form', {
       </div>
 
       <div class="grid-container">
-        <label v-if="selectedIncident.IncidentID" for="IncidentID" class="nowrap">Incident ID:</label>
-        <input v-if="selectedIncident.IncidentID" id="IncidentID" :value="selectedIncident.IncidentID" readonly>
+        <label for="IncidentID" class="nowrap">Incident ID:</label>
+        <input id="IncidentID" :value="selectedIncident.IncidentID" readonly>
 
-        <label v-if="selectedIncident.IncidentID" for="OpenTime" class="nowrap">Open Time:</label>
-        <input v-if="selectedIncident.IncidentID" id="OpenTime" :value="new Date(selectedIncident.OpenTime)" readonly>
+				<label for="AssignmentGroup">Assignment Group:</label>
+        <input id="AssignmentGroup" v-model="selectedIncident.AssignmentGroup">
 
-        <label v-if="selectedIncident.IncidentID" for="OpenedBy">Opened By:</label>
-        <input v-if="selectedIncident.IncidentID" id="OpenedBy" :value="selectedIncident.OpenedBy" readonly>
+				<label for="OpenedBy">Opened By:</label>
+        <input id="OpenedBy" :value="selectedIncident.OpenedBy" readonly>
 
-        <label v-if="selectedIncident.IncidentID" for="UpdatedBy" class="nowrap">Updated By:</label>
-        <input v-if="selectedIncident.IncidentID" id="UpdatedBy" :value="selectedIncident.UpdatedBy" readonly>
+        <label for="OpenTime" class="nowrap">Open Time:</label>
+        <input id="OpenTime" :value="openTime" readonly>
 
-        <label v-if="selectedIncident.IncidentID" for="UpdatedTime">Updated Time:</label>
-        <input v-if="selectedIncident.IncidentID" id="UpdatedTime" :value="new Date(selectedIncident.UpdatedTime)" readonly>
+        <label for="UpdatedBy" class="nowrap">Updated By:</label>
+        <input id="UpdatedBy" :value="selectedIncident.UpdatedBy" readonly>
+
+        <label for="UpdatedTime">Updated Time:</label>
+        <input id="UpdatedTime" :value="new Date(selectedIncident.UpdatedTime)" readonly>
 
         <label for="Service">Service:</label>
         <input id="Service" v-model="selectedIncident.Service">
@@ -41,14 +44,11 @@ Vue.component('incident-form', {
         <label for="Contact">Contact:</label>
         <input id="Contact" v-model="selectedIncident.Contact">
 
+				<label for="Impact">Impact:</label>
+        <input id="Impact" v-model="selectedIncident.Impact">
+
         <label for="Status">Status:</label>
         <input id="Status" v-model="selectedIncident.Status">
-        
-        <label for="AssignmentGroup">Assignment Group:</label>
-        <input id="AssignmentGroup" v-model="selectedIncident.AssignmentGroup">
-
-        <label for="Impact">Impact:</label>
-        <input id="Impact" v-model="selectedIncident.Impact">
 
       </div>
       <button @click="submit" :disabled="buttonDisabled">{{ buttonLabel }}</button>
@@ -64,6 +64,12 @@ Vue.component('incident-form', {
 	],
 
 	computed: {
+		openTime: function openTime() {
+			if (this.selectedIncident.OpenTime) {
+				return new Date(selectedIncident.OpenTime);
+			}
+			return '';
+		},
 		buttonLabel: function buttonLabel() {
 			return this.selectedIncident.IncidentID ? 'Update' : 'Create';
 		},
