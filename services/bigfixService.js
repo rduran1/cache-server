@@ -62,9 +62,7 @@ async function makeHttpRequest(cfg) {
 				throw new Error(`Pipeline error: ${e.message}`);
 			}
 		} else {
-			if (typeof transforms === 'object') {
-				throw new Error('Output file parameter is required when using transforms');
-			}
+			if (typeof transforms === 'object') throw new Error('Output file parameter is required when using transforms');
 			const response = await httpClientService.asyncRequest(config);
 			return response;
 		}
@@ -100,7 +98,7 @@ bigfixService.authenticate = async (config) => {
 	configCopy.host = servername;
 	configCopy.port = port;
 	const response = await makeHttpRequest(configCopy);
-	return response.data === 'OK';
+	return response.data === 'ok';
 };
 
 bigfixService.getOperator = async (config) => {
