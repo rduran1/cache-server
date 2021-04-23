@@ -59,7 +59,7 @@ async function dispatcher(req, res, controllerMethodName, serviceMethodName, par
 			res.status(503).end();
 			return logger.info(`${remoteAddress}: Responded to client with HTTP 503`);
 		}
-		if (e.message.match(/^404 /)) {
+		if (e.message.match(/responded with HTTP 404 /)) {
 			res.status(404).send(e.message);
 			return logger.info(`${remoteAddress}: Responded to client with HTTP 404`);
 		}
