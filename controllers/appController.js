@@ -21,13 +21,16 @@ appController.authenticateUser = async (req, res) => {
 	if (typeof req.body.password !== 'string') return res.render('login', { msg: BAD_CREDENTIALS });
 	const { accountId, password } = req.body;
 	try {
-		const authenticated = bf.authenticate({ username: accountId, password });
+		const authenticated = await bf.authenticate({ username: accountId, password });
 		if (!authenticated) throw new Error(BAD_CREDENTIALS);
 		req.session.accountId = accountId;
 		req.session.authkey = crypto.createHash('sha256').update(`${accountId}${password}`).digest('base64');
 		return res.redirect('/app');
 	} catch (e) {
-		return res.render('login', { msg: e.message });
+		let emsg = '';
+		if (/clientRequest error: connect ECONNREFUSED/.test(e.message)) emsg = 'Authenticating Bigfix Root Server unavailable';
+		emsg = e.message;
+		return res.render('login', { msg: emsg });
 	}
 };
 

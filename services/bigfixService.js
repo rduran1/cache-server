@@ -7,7 +7,7 @@ const httpClientService = require('./httpClientService');
 const configurationService = require('./configurationService')(__filename);
 
 let authenticatingRootServer = configurationService.get('authenticatingRootServer');
-if (typeof environment === 'undefined') {
+if (typeof authenticatingRootServer === 'undefined') {
 	configurationService.set({ authenticatingRootServer: 'rootserver:52311' });
 	authenticatingRootServer = 'rootserver:52311';
 }
@@ -77,7 +77,7 @@ function validateUserAndPassProvided(config) {
 	if (typeof config === 'undefined') throw new Error('username and password parameters are required');
 	const configCopy = toolboxService.clone(config);
 	const { username, password } = configCopy;
-	toolboxService.validate({ username, password }, 'bigfixAuthentication');
+	toolboxService.validate({ username, password }, 'bigfixService_authentication');
 	configCopy.auth = `${username}:${password}`;
 	return configCopy;
 }
