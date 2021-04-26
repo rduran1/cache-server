@@ -24,6 +24,9 @@
 	"services": {
 		"hpsmIncidentService": {
 			"environment": "default"
+		},
+		"bigfixService": {
+			"authenticatingRootServer": "rootserver:52311"
 		}
 	},
 	"loggingLevels": [
