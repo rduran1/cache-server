@@ -89,17 +89,22 @@ incidentService.getLogicalNameByComputerDisplayName = async (computerName) => {
 
 const clientCall = async function clientCall(config) {
 	let response;
+	let data;
 	try {
 		response = await httpClientService.asyncRequest(config);
 	} catch (e) {
 		throw new Error(`Error contacting ${config.host}: ${e.message}`);
 	}
 	const emsg = [];
+	try {
+		if (typeof response.data === 'string') data = JSON.parse(response.data);
+	} catch (e) {
+		throw new Error(`Error parsing server data response as JSON: ${e.message}`);
+	}
 	emsg.push(`HPSM server ${config.host} responded with HTTP ${response.message.statusCode} ${response.message.statusMessage}`);
-	if (response.data && response.data.ReturnCode) emsg.push(`ReturnCode: ${response.data.ReturnCode}`);
-	if (Array.isArray(response.data.Messages)) emsg.push(response.data.Messages.join(' '));
+	if (data.ReturnCode) emsg.push(`ReturnCode: ${data.ReturnCode}`);
+	if (Array.isArray(data.Messages)) emsg.push(data.Messages.join(' '));
 	if (response.message.statusCode !== 200) throw new Error(emsg.join(' '));
-	const data = JSON.parse(response.data);
 	return toolboxService.clone(data);
 };
 
