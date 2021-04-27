@@ -48,6 +48,11 @@ async function dispatcher(req, res, controllerMethodName, serviceMethodName, par
 			return res.status(400).end();
 		}
 
+		if (e.message.match(/This incident was closed. You cannot close it again/)) {
+			res.statusMessage = 'This incident has already been closed';
+			return res.status(400).end();
+		}
+
 		if (e.message.match(/Server does not appear to support HTTPS/)) {
 			res.statusMessage = e.message;
 			res.status(503).end();
