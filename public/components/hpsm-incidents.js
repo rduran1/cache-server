@@ -49,10 +49,12 @@ Vue.component('hpsm-incidents', {
 	methods: {
 		setSelectedIncident: async function setSelectedIncident(id) {
 			try {
+				document.body.style.cursor = 'progress';
 				this.currentIncident = await apiFetch({ apipath: `${this.BASE_URL}/query/${id}`, type: 'json' });
 			} catch (e) {
 				toast.error(e.message);
 			}
+			document.body.style.cursor = 'default';
 		},
 		refreshList: async function refreshList() {
 			try {
