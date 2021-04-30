@@ -19,7 +19,7 @@ schemas.accessControlService_isAllowed = Joi.object().keys({
 
 schemas.accessControlService_createSubject = Joi.object().keys({
 	alias,
-	createDate: Joi.date().timestamp().default(Date()),
+	createDate: Joi.date().iso().default(Date()),
 	description,
 	issuedTo: issuedTo.required(),
 	status: status.default('active'),
