@@ -35,7 +35,7 @@ model.save = async (data) => {
 	await toolboxService.saveStoreToFile(storeFile, data);
 	store.length = 0;
 	const len = data.length;
-	for (let i; i < len; i++) {
+	for (let i = 0; i < len; i++) {
 		store.push(data[i]);
 	}
 };
