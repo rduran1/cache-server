@@ -7,6 +7,7 @@ schemaDefinitions.push(require('../schemas/hpsmIncidentSchema'));
 schemaDefinitions.push(require('../schemas/toolboxSchema'));
 schemaDefinitions.push(require('../schemas/httpClientSchema'));
 schemaDefinitions.push(require('../schemas/accessControlSchema'));
+schemaDefinitions.push(require('../schemas/collectionSchema'));
 
 const schemas = {};
 
