@@ -23,6 +23,6 @@ router.get('/hpsmcomputers/:computerName', accessController.isAllowed, hpsmIncid
 router.get('/hpsmcomputers_json/:computerName', hpsmIncidentController.getComputerProperties);
 
 // HPSM uploads resources
-router.post('/uploads/:contentTag', hpsmIncidentController.processPayload);
+router.post('/uploads/:contentTag', accessController.isAllowed, hpsmIncidentController.processPayload);
 
 module.exports = router;
