@@ -15,6 +15,7 @@ Supported Solution Features
 	14. For monitoring - Ability to say check condition later like alert if the issue continues more 2 hours exmpl.
 	15. control access by IP
 	16. Use sha value testing of files for changes
+	17. API service discovery route i.e. /api/service-list or /api/info
 	
 Models:
 	1. Can only be accessed through a service
