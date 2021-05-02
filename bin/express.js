@@ -91,4 +91,9 @@ app.use((e, req, res, next) => {
 	return res.status(500).send('Administrator notified of error, try again later');
 });
 
+app.use('/api', (req, res) => {
+	res.statusMessage = `API route /api${req.path} does not exist`;
+	res.status(404).end();
+});
+
 module.exports = app;
