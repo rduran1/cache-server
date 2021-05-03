@@ -16,6 +16,7 @@ Supported Solution Features
 	15. control access by IP
 	16. Use sha value testing of files for changes
 	17. API service discovery route i.e. /api/service-list or /api/info
+	18. Add component and service to send emails through application 
 	
 Models:
 	1. Can only be accessed through a service
@@ -58,3 +59,7 @@ Schema:
 Error Messages:
 	1. Error messages that are meaningful to a larger audience
 	2. Avoid superfluous error messages
+
+TODOS:
+	1. toolboxService.saveStoreToFile should have a sync and async option. Use sync on intializing, async otherwise
+	2. hpsmIncidentsStore needs unique identifier for each environment
