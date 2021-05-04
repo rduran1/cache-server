@@ -46,16 +46,28 @@ schemas.hpsmIncidentService_incident = Joi.object().keys({
 	JournalUpdates: Joi.string(),
 	OutageStartTime: Joi.date().iso(),
 	OutageEndTime: Joi.when('Status', {
-		is: Joi.string().valid('Resolved', 'Closed').exist(),
+		is: Joi.string().exist().valid('Resolved', 'Closed'),
 		then: Joi.date().iso().greater(Joi.ref('OutageStartTime')).required(),
 		otherwise: Joi.date().iso().greater(Joi.ref('OutageStartTime'))
 	}),
 	Phase: Joi.string(),
 	Priority: Joi.string(),
 	IncidentID: Joi.string(),
-	CauseCode: Joi.string(),
-	Solution: Joi.string(),
-	ClosureCode: Joi.string()
+	CauseCode: Joi.when('Status', {
+		is: Joi.string().exist().valid('Resolved', 'Closed'),
+		then: Joi.string().required(),
+		otherwise: Joi.string()
+	}),
+	Solution: Joi.when('Status', {
+		is: Joi.string().exist().valid('Resolved', 'Closed'),
+		then: Joi.string().required(),
+		otherwise: Joi.string()
+	}),
+	ClosureCode: Joi.when('Status', {
+		is: Joi.string().exist().valid('Closed'),
+		then: Joi.string().required(),
+		otherwise: Joi.string()
+	})
 })
 	.with('OutageEndTime', 'OutageStartTime');
 
