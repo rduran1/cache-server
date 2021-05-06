@@ -17,6 +17,8 @@ Supported Solution Features
 	16. Use sha value testing of files for changes
 	17. API service discovery route i.e. /api/service-list or /api/info
 	18. Add component and service to send emails through application 
+	19: hpsm-incidents -add link on table to open directly in hpsm
+	20: make hpsm-incidents dup detection on/off option and select fields to compare for dup
 	
 Models:
 	1. Can only be accessed through a service
@@ -38,6 +40,7 @@ Services:
 	5. Return a copy of the data and not a reference
 	6. Getter methods do not return errors, they only return requested data or undefined
 	7. Clone parameters to ensure that object references are not accidentally modified outside of function
+	8. When using the serviceAccountService, services are responsible for defining the schema (properties) for the service account
 
 Controllers:
 	1. Handle request and response objects
