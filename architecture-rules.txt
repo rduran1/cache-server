@@ -4,7 +4,7 @@ Supported Solution Features
 	3. AccessControls for application mount point and application route
 	4. Several authentication strategies
 	5. Uses redis for sessions and mongoDB for Stores
-	6. Clustering and Redundancy
+	6. Clustering and Redundancy (multicore use)
 	7. Data transfer service with encryption and compression (Replace Tectia)
 	8. Advance Monitoring capabilities (servers, diskspace, events, etc)
 	9. Team task/project manager
@@ -19,6 +19,8 @@ Supported Solution Features
 	18. Add component and service to send emails through application 
 	19: hpsm-incidents -add link on table to open directly in hpsm
 	20: make hpsm-incidents dup detection on/off option and select fields to compare for dup
+	21: collection-service add capability to trigger event based on string match
+	22. collection capability to set collection to blocked so nobody can read it
 	
 Models:
 	1. Can only be accessed through a service
