@@ -43,6 +43,7 @@ Services:
 	6. Getter methods do not return errors, they only return requested data or undefined
 	7. Clone parameters to ensure that object references are not accidentally modified outside of function
 	8. When using the serviceAccountService, services are responsible for defining the schema (properties) for the service account
+	9. Explicitly defined functions are private and being so, do not need to perform parameter validation but objects must still be cloned
 
 Controllers:
 	1. Handle request and response objects
