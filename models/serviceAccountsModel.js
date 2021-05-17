@@ -24,31 +24,29 @@ model.createDefaultServiceEntry = async (serviceName) => {
 	store[serviceName] = clone[serviceName];
 };
 
-model.setCredentials = async (serviceName, environment, credentials) => {
+model.set = async (serviceName, identifier, accountInfo) => {
 	const clone = toolboxService.clone(store);
-	if (typeof clone[serviceName] === 'undefined') clone[serviceName] = {};
-	clone[serviceName][environment] = credentials;
+	if (typeof clone[serviceName] !== 'object') clone[serviceName] = {};
+	clone[serviceName][identifier] = accountInfo;
 	await toolboxService.saveStoreToFile(storeFile, clone);
-	store[serviceName][environment] = clone[serviceName][environment];
+	store[serviceName][identifier] = clone[serviceName][identifier];
 };
 
-model.getCredentials = (serviceName, environment) => {
-	if (model.getEnvironments(serviceName).includes(environment)) {
-		return store[serviceName][environment];
+model.get = async (serviceName, identifier) => {
+	if (typeof store[serviceName] !== 'object') return undefined;
+	if (Object.keys(store[serviceName]).includes(identifier)) {
+		const clone = toolboxService.clone(store[serviceName][identifier]);
+		return clone;
 	}
 	return undefined;
 };
 
-model.getEnvironments = (serviceName) => {
-	if (!model.serviceEntryExists(serviceName)) return [];
-	return Object.keys(store[serviceName]);
-};
-
-model.deleteEnvironment = async (serviceName, environment) => {
+model.delete = async (serviceName, identifier) => {
 	const clone = toolboxService.clone(store);
-	delete clone[serviceName][environment];
+	if (typeof clone[serviceName] !== 'object') return undefined;
+	if (Object.keys(clone[serviceName]).includes(identifier)) delete clone[serviceName][identifier];
 	await toolboxService.saveStoreToFile(storeFile, clone);
-	delete store[serviceName][environment];
+	return delete store[serviceName][identifier];
 };
 
 module.exports = model;
