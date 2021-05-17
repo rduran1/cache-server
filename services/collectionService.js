@@ -141,20 +141,20 @@ const clientRequestHandler = (clientRequest, collectionName, processAsStream, bo
 			return reject(new Error(`httpIncomingMessage error: Server responded with HTTP ${statusCode} ${statusMessage}`));
 		}
 		let data = '';
-		httpIncomingMessage.on('data', (chunk) => {
-			if (!processAsStream) data += chunk.toString();
-		});
-		httpIncomingMessage.on('end', async () => {
-			if (!processAsStream) {
+		if (!processAsStream) {
+			httpIncomingMessage.on('data', (chunk) => {
+				data += chunk.toString();
+			});
+			httpIncomingMessage.on('end', async () => {
 				try {
 					collectionService.saveData(collectionName, data);
 					resolve();
 				} catch (e) {
 					return reject(e);
 				}
-			}
-			return undefined;
-		});
+				return undefined;
+			});
+		}
 		httpIncomingMessage.on('aborted', async (e) => reject(new Error(`httpIncomingMessage aborted: ${e.message}`)));
 		httpIncomingMessage.on('error', async (e) => reject(new Error(`httpIncomingMessage error: ${e.message}`)));
 		function destroySocket(collName) {
