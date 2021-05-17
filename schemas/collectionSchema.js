@@ -103,7 +103,8 @@ schemas.collectionService_getMetaData = Joi.object().keys({
 });
 
 schemas.collectionService_getDataStream = Joi.object().keys({
-	collectionName
+	collectionName,
+	ancillaryTransform: Joi.string()
 });
 
 schemas.collectionService_saveDataStream = Joi.object().keys({
