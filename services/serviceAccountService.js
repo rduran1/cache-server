@@ -28,57 +28,55 @@ function serviceAccountService(serviceFileName) {
 	}
 	logger.debug(`Exiting ${callmsg}`);
 	return {
-		setCredentials: async (credentials, environment) => {
-			callmsg = `setCredentials(credentials = ${typeof credentials}, environment = "${environment}")`;
+		set: async (identifier, accountInfo) => {
+			callmsg = `serviceAccountService["${v.serviceName}"].set(identifier = "${identifier}", accountInfo = ${typeof accountInfo})`;
 			logger.debug(`Entering ${callmsg}`);
 			let v2;
 			try {
-				v2 = toolboxService.validate({ credentials, environment }, 'serviceAccountService_setCredentials');
+				v2 = toolboxService.validate({ identifier, accountInfo }, 'serviceAccountService_set');
 			} catch (e) {
 				logger.error(`${callmsg} ${e.stack}`);
 				logger.debug(`Exiting ${callmsg}`);
 				throw e;
 			}
-			logger.debug(`setCredentials::credentials value: ${typeof v2.credentials}`);
-			logger.debug(`setCredentials::environment value: "${v2.environment}"`);
+			logger.debug(`set::identifier value: "${identifier}"`);
+			logger.debug(`set::accountInfo value: "${typeof accountInfo}"`);
 			try {
-				await serviceAccountsModel.setCredentials(v.serviceName, v2.environment, v2.credentials);
+				await serviceAccountsModel.set(v.serviceName, v2.identifier, v2.accountInfo);
 			} catch (e) {
 				logger.error(`${callmsg} ${e.message}`);
 				logger.debug(`Exiting ${callmsg}`);
 				throw e;
 			}
 		},
-		getCredentials: (environment) => {
-			callmsg = `serviceAccountService["${v.serviceName}"].getCredentials(environment = "${environment}")`;
+		get: async (identifier) => {
+			callmsg = `serviceAccountService["${v.serviceName}"].get(identifier = "${identifier}")`;
 			logger.debug(`Entering ${callmsg}`);
 			let v2;
 			try {
-				v2 = toolboxService.validate({ environment }, 'serviceAccountService_getCredentials');
+				v2 = toolboxService.validate({ identifier }, 'serviceAccountService_get');
 			} catch (e) {
 				logger.error(`${callmsg} ${e.stack}`);
 				logger.debug(`Exiting ${callmsg}`);
 				throw e;
 			}
 			logger.debug(`Exiting ${callmsg}`);
-			return serviceAccountsModel.getCredentials(v.serviceName, v2.environment);
+			const serviceAccount = await serviceAccountsModel.get(v.serviceName, v2.identifier);
+			return serviceAccount;
 		},
-		getEnvironments: () => {
-			callmsg = 'getEnvironments()';
+		delete: async (identifier) => {
+			callmsg = `serviceAccountService["${v.serviceName}"].delete(identifier = "${identifier}")`;
 			logger.debug(`Entering ${callmsg}`);
-			logger.debug('Exiting getEnvironments()');
-			return serviceAccountsModel.getEnvironments(v.serviceName);
-		},
-		deleteEnvironment: async (environment) => {
-			callmsg = `deleteEnvironment(environment = "${environment}")`;
-			logger.debug(`Entering ${callmsg}`);
+			let v2;
 			try {
-				await serviceAccountsModel.deleteEnvironment(v.serviceName, environment);
+				v2 = toolboxService.validate({ identifier }, 'serviceAccountService_delete');
 			} catch (e) {
 				logger.error(`${callmsg} ${e.stack}`);
 				logger.debug(`Exiting ${callmsg}`);
 				throw e;
 			}
+			logger.debug(`Exiting ${callmsg}`);
+			await serviceAccountsModel.delete(v.serviceName, v2.identifier);
 		}
 	};
 }
