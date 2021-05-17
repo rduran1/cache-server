@@ -43,6 +43,8 @@ function loggingService(fileName) {
 
 const logger = loggingService(__filename);
 
+toolboxService.sleep = (time) => new Promise((resolve) => setTimeout(resolve, time));
+
 toolboxService.truncateFile = (strFileName, len, strAppend) => new Promise((resolve, reject) => {
 	const callMsg = `truncateFile(strFileName = "${strFileName}", len = ${len}, strAppend = "${strAppend}")`;
 	logger.debug(`Entering ${callMsg}`);
