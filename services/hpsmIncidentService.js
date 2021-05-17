@@ -13,29 +13,32 @@ if (typeof environment === 'undefined') {
 	environment = 'default';
 }
 logger.info(`hpsmIncidentService::environment value: "${environment}"`);
-let accountInfo = serviceAccountService.getCredentials(environment);
-if (typeof accountInfo === 'undefined' && environment === 'default') {
-	accountInfo = { host: 'defaultserver', port: 80, username: 'username', password: 'secret' };
-	serviceAccountService.setCredentials(accountInfo, 'default');
-}
 
-toolboxService.validate(accountInfo, 'hpsmIncidentService_serviceAccount');
-const serviceAccount = {
-	host: accountInfo.host,
-	port: accountInfo.port,
-	auth: `${accountInfo.username}:${accountInfo.password}`,
-	useTls: accountInfo.useTls,
-	rejectUnauthorized: accountInfo.rejectUnauthorized
-};
-
-try { // Used when client authentication is required for REST API call, passed to httpclient request config
-	if (typeof accountInfo.keyFileName === 'string') {
-		serviceAccount.key = readFileSync(accountInfo.keyFileName).toString();
-		serviceAccount.cert = readFileSync(accountInfo.certFileName).toString();
+let serviceAccount;
+(async () => {
+	let accountInfo = await serviceAccountService.get(environment);
+	if (typeof accountInfo === 'undefined' && environment === 'default') {
+		accountInfo = { host: 'defaultserver', port: 80, username: 'username', password: 'secret' };
+		await serviceAccountService.set('default', accountInfo);
 	}
-} catch (e) {
-	throw new Error(`Cannot read key and or cert file from config: ${e.message}`);
-}
+	toolboxService.validate(accountInfo, 'hpsmIncidentService_serviceAccount');
+	serviceAccount = {
+		host: accountInfo.host,
+		port: accountInfo.port,
+		auth: `${accountInfo.username}:${accountInfo.password}`,
+		useTls: accountInfo.useTls,
+		rejectUnauthorized: accountInfo.rejectUnauthorized
+	};
+
+	try { // Used when client authentication is required for REST API call, passed to httpclient request config
+		if (typeof accountInfo.keyFileName === 'string') {
+			serviceAccount.key = readFileSync(accountInfo.keyFileName).toString();
+			serviceAccount.cert = readFileSync(accountInfo.certFileName).toString();
+		}
+	} catch (e) {
+		throw new Error(`Cannot read key and or cert file from config: ${e.message}`);
+	}
+})();
 
 // Load data models
 const hpsmAATypesModel = require('../models/hpsmAATypesModel');
