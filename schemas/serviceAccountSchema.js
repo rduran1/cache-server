@@ -1,5 +1,7 @@
 const Joi = require('joi');
-const { serviceFileName, environment, credentials } = require('./globalSchema');
+const { serviceFileName } = require('./globalSchema');
+
+const identifier = Joi.string().required();
 
 const schemas = {};
 
@@ -7,36 +9,17 @@ schemas.serviceAccountService = Joi.object().keys({
 	serviceFileName
 });
 
-schemas.servicesAccountService_getAccessByToken = Joi.object().keys({
-	token: Joi.string().token(),
-	env: environment
+schemas.serviceAccountService_set = Joi.object().keys({
+	identifier,
+	accountInfo: Joi.object().required()
 });
 
-schemas.servicesAccountService_setServiceEnvironment = Joi.object().keys({
-	newEnv: environment
+schemas.serviceAccountService_get = Joi.object().keys({
+	identifier
 });
 
-schemas.serviceAccountService_getCredentials = Joi.object().keys({
-	environment
-});
-
-schemas.serviceAccountService_setCredentials = Joi.object().keys({
-	environment,
-	credentials: Joi.object()
-});
-
-schemas.serviceAccountService_createNewEnvironmentCredentials = Joi.object().keys({
-	credentials,
-	env: environment
-});
-
-schemas.serviceAccountService_updateEnvironmentCredentials = Joi.object().keys({
-	credentials,
-	env: environment
-});
-
-schemas.serviceAccountService_deleteAccountEnvironment = Joi.object().keys({
-	env: environment
+schemas.serviceAccountService_delete = Joi.object().keys({
+	identifier
 });
 
 module.exports = schemas;
