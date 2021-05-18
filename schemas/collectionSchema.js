@@ -13,7 +13,7 @@ const description = Joi.string().max(150);
 const ttl = Joi.number();
 const minValidCacheSizeInBytes = Joi.number();
 const path = Joi.string();
-const body = Joi.string().max(5000);
+const body = Joi.alternatives().try(Joi.string().max(5000), Joi.object());
 const headerString = Joi.string();
 const processAsStream = Joi.boolean();
 
