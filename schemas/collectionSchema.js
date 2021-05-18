@@ -14,6 +14,7 @@ const ttl = Joi.number();
 const minValidCacheSizeInBytes = Joi.number();
 const path = Joi.string();
 const body = Joi.alternatives().try(Joi.string().max(5000), Joi.object());
+const bodyFile = Joi.string();
 const headerString = Joi.string();
 const processAsStream = Joi.boolean();
 
@@ -69,12 +70,14 @@ schemas.collectionService_createMetaData = Joi.object().keys({
 	serviceAccountName: serviceAccountName.required(),
 	path: path.required(),
 	body,
+	bodyFile,
 	incomingTransforms: Joi.string(),
 	outgoingTransforms: Joi.string(),
 	headerString,
 	processAsStream: processAsStream.default(true),
 	autoStart: Joi.boolean().default(true)
-});
+})
+	.xor('body', 'bodyFile');
 
 schemas.collectionService_updateMetaData = Joi.object().keys({
 	name: collectionName.required(),
@@ -84,6 +87,7 @@ schemas.collectionService_updateMetaData = Joi.object().keys({
 	serviceAccountName,
 	path,
 	body,
+	bodyFile,
 	lastErrorMessage: Joi.string().allow(''),
 	lastErrorTimestamp: Joi.date().iso(),
 	incomingTransforms: Joi.string(),
@@ -92,7 +96,8 @@ schemas.collectionService_updateMetaData = Joi.object().keys({
 	headerString,
 	processAsStream,
 	autoStart: Joi.boolean().default(true)
-});
+})
+	.xor('body', 'bodyFile');
 
 schemas.collectionService_deleteMetaData = Joi.object().keys({
 	collectionName

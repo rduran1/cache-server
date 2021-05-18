@@ -262,6 +262,18 @@ collectionService.createMetaData = async (config) => {
 	checkIfTransformsExist(v); // throws error if transforms requested do not exist
 	const collectionMetaDataName = v.name;
 	v.cacheFile = join(cacheDirectory, v.name);
+	/// ///////////////////////////////////////////////////////////
+	// Custom code for Bigfix relevance file
+	if (typeof v.bodyFile === 'string') {
+		try {
+			const relevance = fs.readFileSync(v.bodyFile);
+			v.body = { relevance, output: 'json' };
+		} catch (e) {
+			logger.error(`Failed to read bodyFile for "${v.name}" collection: ${e.message}`);
+			throw e;
+		}
+	}
+	// ////////////////////////////////////////////////////////////
 	delete v.name;
 	logger.info(`Creating meta data for "${collectionMetaDataName}" collection`);
 	await collectionsModel.setMetaData(collectionMetaDataName, v);
@@ -280,6 +292,18 @@ collectionService.updateMetaData = async (config) => {
 	checkIfTransformsExist(v);
 	Object.assign(metaData, v);
 	const collectionMetaDataName = v.name;
+	/// ///////////////////////////////////////////////////////////
+	// Custom code for Bigfix relevance file
+	if (typeof v.bodyFile === 'string') {
+		try {
+			const relevance = fs.readFileSync(v.bodyFile);
+			v.body = { relevance, output: 'json' };
+		} catch (e) {
+			logger.error(`Failed to read bodyFile for "${v.name}" collection: ${e.message}`);
+			throw e;
+		}
+	}
+	// ////////////////////////////////////////////////////////////
 	delete metaData.name;
 	logger.info(`Updating meta data for "${collectionMetaDataName}" collection`);
 	await collectionsModel.setMetaData(collectionMetaDataName, metaData);
