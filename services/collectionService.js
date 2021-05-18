@@ -1,4 +1,5 @@
 const fs = require('fs');
+const qs = require('querystring');
 const { join } = require('path');
 const Emitter = require('events').EventEmitter;
 const logger = require('./loggingService')(__filename);
@@ -30,7 +31,8 @@ function buildHttpRequestConfig(serviceAccount, collectionMetaData) {
 	if (typeof config.username === 'string') config.auth = `${config.username}:${config.password}`;
 	const { path, body } = collectionMetaData;
 	config.path = path;
-	config.body = body;
+	if (typeof body === 'object') config.body = qs.stringify(body);
+	if (typeof body === 'string') config.body = body;
 	config.returnClientRequest = true;
 	delete config.username;
 	delete config.password;
@@ -346,7 +348,7 @@ collectionService.refreshData = async (collectionName) => {
 		config = buildHttpRequestConfig(serviceAccount, metaData);
 		clientRequest = await httpClientService.asyncRequest(config);
 		logger.info(`Refreshing "${v.collectionName}" collection cache`);
-		await clientRequestHandler(clientRequest, v.collectionName, metaData.processAsStream, metaData.body);
+		await clientRequestHandler(clientRequest, v.collectionName, metaData.processAsStream, config.body);
 		logger.info(`Collection "${v.collectionName}" cache refresh completed successfully`);
 		setMetaDataStatus(v.collectionName, 'waiting');
 	} catch (e) {
