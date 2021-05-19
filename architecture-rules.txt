@@ -1,3 +1,6 @@
+BUGS
+	1 [collectionService] All the collection stores should update with the correct path when teh cacheDirectory is changed in config
+
 Supported Solution Features
 	1. Automatically defaults to using a self signed certificate if one is not provided
 	2. Disables TLS 1.0 and 1.1 by default
@@ -21,6 +24,7 @@ Supported Solution Features
 	20: make hpsm-incidents dup detection on/off option and select fields to compare for dup
 	21: collection-service add capability to trigger event based on string match
 	22. collection capability to set collection to blocked so nobody can read it
+	23. allow collection-service to save queries for future use
 	
 Models:
 	1. Can only be accessed through a service
