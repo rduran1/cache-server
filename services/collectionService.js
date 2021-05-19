@@ -266,7 +266,7 @@ collectionService.createMetaData = async (config) => {
 	// Custom code for Bigfix relevance file
 	if (typeof v.bodyFile === 'string') {
 		try {
-			const relevance = fs.readFileSync(v.bodyFile);
+			const relevance = fs.readFileSync(v.bodyFile, 'utf8');
 			v.body = { relevance, output: 'json' };
 		} catch (e) {
 			logger.error(`Failed to read bodyFile for "${v.name}" collection: ${e.message}`);
@@ -296,7 +296,7 @@ collectionService.updateMetaData = async (config) => {
 	// Custom code for Bigfix relevance file
 	if (typeof v.bodyFile === 'string') {
 		try {
-			const relevance = fs.readFileSync(v.bodyFile);
+			const relevance = fs.readFileSync(v.bodyFile, 'utf8');
 			v.body = { relevance, output: 'json' };
 		} catch (e) {
 			logger.error(`Failed to read bodyFile for "${v.name}" collection: ${e.message}`);
