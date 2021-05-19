@@ -24,8 +24,12 @@ accessControlService.isAllowed = async (token, accountId, resource, request) => 
 	let alias;
 	try {
 		const acmObj = await accessControlModel.getAccessControlList(subject, subjectType);
-		acl = acmObj.acl;
-		alias = acmObj.alias;
+		if (typeof acmObj === 'undefined') {
+			alias = `${subjectType} ${subject}`;
+		} else {
+			acl = acmObj.acl;
+			alias = acmObj.alias;
+		}
 	} catch (e) {
 		logger.error(e.stack);
 		logger.debug(`Exiting ${callmsg}`);
@@ -43,7 +47,7 @@ accessControlService.isAllowed = async (token, accountId, resource, request) => 
 		return false;
 	}
 	if (permissions[v.resource].includes(v.request)) {
-		logger.debug(`${alias} is authorized to ${v.request} ${v.resource}`);
+		logger.info(`${alias} is authorized to ${v.request} ${v.resource}`);
 		logger.debug(`Exiting ${callmsg}`);
 		return true;
 	}
