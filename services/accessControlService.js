@@ -18,34 +18,36 @@ accessControlService.isAllowed = async (token, accountId, resource, request) => 
 	}
 	const subject = v.token || v.accountId;
 	const subjectType = v.token ? 'token' : 'accountId';
-	const identifier = `${subjectType} "${subject}"`;
 	logger.debug(`isAllowed::subject value: ${subject}`);
 	logger.debug(`isAllowed::subjectType value: ${subjectType}`);
 	let acl;
+	let alias;
 	try {
-		acl = await accessControlModel.getAccessControlList(subject, subjectType);
+		const acmObj = await accessControlModel.getAccessControlList(subject, subjectType);
+		acl = acmObj.acl;
+		alias = acmObj.alias;
 	} catch (e) {
 		logger.error(e.stack);
 		logger.debug(`Exiting ${callmsg}`);
 		throw e;
 	}
 	if (typeof acl === 'undefined') {
-		logger.info(`ACL does not exist for ${identifier}, request to ${v.request} ${v.resource} denied`);
+		logger.info(`ACL does not exist for ${alias}, request to ${v.request} ${v.resource} denied`);
 		logger.debug(`Exiting ${callmsg}`);
 		return false;
 	}
 	const permissions = acl.find((e) => e[v.resource]); // returns an array of resources and access type granted to each
 	if (typeof permissions === 'undefined') {
-		logger.info(`${identifier} has not been granted access to ${v.resource}, request denied`);
+		logger.info(`${alias} has not been granted access to ${v.resource}, request denied`);
 		logger.debug(`Exiting ${callmsg}`);
 		return false;
 	}
 	if (permissions[v.resource].includes(v.request)) {
-		logger.debug(`${identifier} is authorized to ${v.request} ${v.resource}`);
+		logger.debug(`${alias} is authorized to ${v.request} ${v.resource}`);
 		logger.debug(`Exiting ${callmsg}`);
 		return true;
 	}
-	logger.info(`${identifier} is not authorized to ${v.request} ${v.resource}, request denied`);
+	logger.info(`${alias} is not authorized to ${v.request} ${v.resource}, request denied`);
 	logger.debug(`Exiting ${callmsg}`);
 	return false;
 };

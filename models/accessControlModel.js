@@ -13,9 +13,13 @@ const model = {};
 const mName = (basename(__filename).replace(/\.js$/i, ''));
 model.name = mName;
 
-model.getAccessControlList = (subject, subjectType) => {
+model.getAccessControlList = async (subject, subjectType) => {
 	const found = store.find((e) => e[subjectType] === subject && e.status === 'active');
-	if (found) return found.accessControlList;
+	if (found) {
+		const acl = found.accessControlList;
+		const { alias } = found;
+		return { acl, alias };
+	}
 	return undefined;
 };
 
