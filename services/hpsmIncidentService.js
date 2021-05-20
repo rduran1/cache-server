@@ -289,22 +289,45 @@ incidentService.updateIncident = async (incident) => {
 		retrievedIncident.Solution = retrievedIncident.Solution.join();
 	}
 
+	const update = toolboxService.clone(incident);
+
 	// Remove properties that are not used by HPSM when performing an update
 	delete retrievedIncident.JournalUpdates;
 	delete retrievedIncident.OpenTime;
+	delete update.OpenTime;
 	delete retrievedIncident.OpenedBy;
+	delete update.OpenedBy;
 	delete retrievedIncident.UpdatedBy;
+	delete update.UpdatedBy;
 	delete retrievedIncident.UpdatedTime;
+	delete update.UpdatedTime;
 	delete retrievedIncident.AlertStatus;
+	delete update.AlertStatus;
 	delete retrievedIncident.MajorIncident;
+	delete update.MajorIncident;
 	delete retrievedIncident['problem.type'];
 	delete retrievedIncident.ClosedBy;
+	delete update.ClosedBy;
 	delete retrievedIncident.ClosedTime;
+	delete update.ClosedTime;
+
+	const currentStatus = retrievedIncident.Status;
+	delete retrievedIncident.Status;
+	const currentPhase = retrievedIncident.Phase;
 
 	const mergedIncident = {};
-	Object.assign(mergedIncident, retrievedIncident, incident);
+	Object.assign(mergedIncident, retrievedIncident, update);
 	toolboxService.validate(mergedIncident, 'hpsmIncidentService_incident');
 	await validateFieldValues(mergedIncident);
+	// Throw error if closing an already closed incident
+	if (mergedIncident.Status.toLowerCase() === 'closed' && currentStatus.toLowerCase() === 'closed') {
+		throw new Error('This incident was closed. You cannot close again.');
+	}
+	// Do not submit Phase value on closing and do not close unless Phase is set to Review
+	if (mergedIncident.Status.toLowerCase() === 'closed') {
+		if (currentPhase !== 'Review') throw new Error('Incident must be resolved before closing');
+		delete mergedIncident.Phase;
+	}
 	config.body = JSON.stringify({ Incident: mergedIncident });
 	if (mergedIncident.Status.toLowerCase() === 'resolved') config.path = `${config.path}/action/resolve`;
 	if (mergedIncident.Status.toLowerCase() === 'closed') config.path = `${config.path}/action/close`;
