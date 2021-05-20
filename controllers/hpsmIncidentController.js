@@ -30,7 +30,7 @@ async function dispatcher(req, res, controllerMethodName, serviceMethodName, par
 		) {
 			res.statusMessage = e.message;
 			res.status(500).end();
-			return logger.info(`${remoteAddress}: Responded to client with HTTP 500`);
+			return logger.info(`${remoteAddress}: Responded to client with HTTP 500: ${res.statusMessage}`);
 		}
 
 		if (
@@ -43,45 +43,57 @@ async function dispatcher(req, res, controllerMethodName, serviceMethodName, par
 			|| e.message.match(/Assignee is invalid/)
 			|| e.message.match(/combination is invalid/)
 			|| e.message.match(/ is not a valid entry/)
+			|| e.message.match(/Incident must be resolved before closing/)
 		) {
 			res.statusMessage = e.message;
-			return res.status(400).end();
+			res.status(400).end();
+			return logger.info(`${remoteAddress}: Responded to client with HTTP 400: ${res.statusMessage}`);
 		}
 
-		if (e.message.match(/This incident was closed. You cannot close it again/)) {
+		// This message is truncated because for some reason HPSM server sometimes
+		// responds with "cannot" and sometimes with "cannnot" in the error message
+		if (e.message.match(/This incident was closed. You cann/)) {
 			res.statusMessage = 'This incident has already been closed';
-			return res.status(400).end();
+			res.status(400).end();
+			return logger.info(`${remoteAddress}: Responded to client with HTTP 400: ${res.statusMessage}`);
 		}
 
 		if (e.message.match(/Server does not appear to support HTTPS/)) {
 			res.statusMessage = e.message;
 			res.status(503).end();
-			return logger.info(`${remoteAddress}: Responded to client with HTTP 503`);
+			return logger.info(`${remoteAddress}: Responded to client with HTTP 503: ${res.statusMessage}`);
 		}
 
 		if (e.message.match(/clientRequest error: (.+?) \(/)) {
 			const regMatch = e.message.match(/clientRequest error: (.+?) \(/);
 			res.statusMessage = `Failed to contact HPSM server: ${regMatch[1]}`;
 			res.status(503).end();
-			return logger.info(`${remoteAddress}: Responded to client with HTTP 503`);
+			return logger.info(`${remoteAddress}: Responded to client with HTTP 503: ${res.statusMessage}`);
 		}
 
 		if (e.message.match(/responded with HTTP 404 /)) {
 			res.statusMessage = 'Not Found';
 			if (controllerMethodName === 'getIncidentById') res.statusMessage = `HPSM could not find incident ${paramValue}`;
 			res.status(404).end();
-			return logger.info(`${remoteAddress}: Responded to client with HTTP 404`);
+			return logger.info(`${remoteAddress}: Responded to client with HTTP 404: ${res.statusMessage}`);
 		}
 
 		if (e.message.match(/responded with HTTP 401 Unauthorized/)) {
 			res.statusMessage = 'Service account is unauthorized to access the HPSM server';
 			res.status(401).send();
-			return logger.info(`${remoteAddress}: Responded to client with HTTP 401`);
+			return logger.info(`${remoteAddress}: Responded to client with HTTP 401: ${res.statusMessage}`);
+		}
+
+		// HPSM returns a 500 HTTP when closing an incident if it is not properyly resolved first
+		if (e.message.match(/Record (.+?) has been closed by/)) {
+			res.statusMessage = 'incident closed incorrectly';
+			res.status(500).send();
+			return logger.info(`${remoteAddress}: Responded to client with HTTP 500: ${res.statusMessage}`);
 		}
 
 		res.statusMessage = 'Unknown error occurred, see hpsmIncidentController.log for details';
 		res.status(500).end();
-		return logger.info(`${remoteAddress}: Responded to client with HTTP 500`);
+		return logger.info(`${remoteAddress}: Responded to client with HTTP 500: ${res.statusMessage}`);
 	}
 }
 
