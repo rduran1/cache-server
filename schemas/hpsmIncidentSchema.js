@@ -42,7 +42,7 @@ schemas.hpsmIncidentService_incident = Joi.object().keys({
 	Service: Joi.string().required(),
 	Title: Joi.string().required(),
 	Urgency: Joi.string().required().valid('3', '4', '5'),
-	Status: Joi.string().invalid('Open'),
+	Status: Joi.string().required().invalid('Open'),
 	JournalUpdates: Joi.string(),
 	OutageStartTime: Joi.date().iso(),
 	OutageEndTime: Joi.when('Status', {
