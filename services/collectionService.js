@@ -330,6 +330,16 @@ collectionService.getMetaData = async (collectionName) => {
 	return metaData;
 };
 
+collectionService.getAllMetaData = async () => {
+	const metaData = await collectionsModel.getAllMetaData();
+	return metaData;
+};
+
+collectionService.getAllServiceAccounts = async () => {
+	const sa = await collectionsModel.getAllServiceAccounts();
+	return sa;
+};
+
 collectionService.getDataStream = async (collectionName, ancillaryTransform) => {
 	const v = validationLogWrapper({ collectionName, ancillaryTransform }, 'collectionService_getDataStream');
 	const metaData = await collectionsModel.getMetaData(v.collectionName);

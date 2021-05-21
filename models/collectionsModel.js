@@ -62,6 +62,11 @@ model.getMetaData = async (collectionName) => {
 	return undefined;
 };
 
+model.getAllMetaData = async () => {
+	const clone = toolboxService.clone(store);
+	return clone;
+};
+
 model.getAllCollectionNamesWithAutoStartTrue = async () => {
 	const autoStartableCollectors = [];
 	Object.keys(store).forEach((collectorName) => {
