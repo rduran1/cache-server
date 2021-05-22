@@ -166,7 +166,7 @@ collectionController.saveDataStream = async (req, res) => {
 collectionController.startCollection = async (req, res) => {
 	const { name } = req.params;
 	try {
-		await collectionService.startCollection(name);
+		await collectionService.startInterval(name);
 		res.status(200).send();
 		return logger.info('responded with HTTP 200');
 	} catch (e) {
@@ -179,7 +179,7 @@ collectionController.startCollection = async (req, res) => {
 collectionController.stopCollection = async (req, res) => {
 	const { name } = req.params;
 	try {
-		await collectionService.stopCollection(name);
+		await collectionService.stopInterval(name);
 		res.status(200).send();
 		return logger.info('responded with HTTP 200');
 	} catch (e) {
