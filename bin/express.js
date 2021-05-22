@@ -65,6 +65,7 @@ app.get('/', (req, res) => res.redirect('/app'));
 app.use('/app', require('../routes/appRouter'));
 app.use('/api/application-logs', require('../routes/applicationLogsRouter'));
 app.use('/api/hpsm-incidents', require('../routes/hpsmIncidentsRouter'));
+app.use('/api/collections', require('../routes/collectionRouter'));
 
 // Error handler for middleware
 app.use((e, req, res, next) => {
