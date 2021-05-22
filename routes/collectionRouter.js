@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const accessController = require('../controllers/accessController');
-const { stopCollection } = require('../controllers/collectionController');
 const collectionController = require('../controllers/collectionController');
 
 router.get('/all-metadata', accessController.isAllowed, collectionController.getAllMetaData);
@@ -15,7 +14,7 @@ router.post('/create-service-account/:name', accessController.isAllowed, collect
 router.put('/update-metadata/:name', accessController.isAllowed, collectionController.updateMetaData);
 router.put('/update-server-account/:name', accessController.isAllowed, collectionController.updateServiceAccount);
 router.put('/start/:name', accessController.isAllowed, collectionController.startCollection);
-router.put('/stop/:name', accessController.isAllowed, collectionController, stopCollection);
+router.put('/stop/:name', accessController.isAllowed, collectionController.stopCollection);
 
 router.delete('/delete-metadata/:name', accessController.isAllowed, collectionController.deleteMetaData);
 router.delete('/delete-service-account/:name', accessController.isAllowed, collectionController.deleteServiceAccount);
