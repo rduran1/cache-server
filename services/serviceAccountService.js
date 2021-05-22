@@ -49,6 +49,12 @@ function serviceAccountService(serviceFileName) {
 				throw e;
 			}
 		},
+		getAll: async () => {
+			callmsg = `serviceAccountService["${v.serviceName}"].getAll()`;
+			logger.debug(`Entering ${callmsg}`);
+			const serviceAccounts = await serviceAccountsModel.getAll(v.serviceName);
+			return serviceAccounts;
+		},
 		get: async (identifier) => {
 			callmsg = `serviceAccountService["${v.serviceName}"].get(identifier = "${identifier}")`;
 			logger.debug(`Entering ${callmsg}`);
