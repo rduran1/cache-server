@@ -32,6 +32,12 @@ model.set = async (serviceName, identifier, accountInfo) => {
 	store[serviceName][identifier] = clone[serviceName][identifier];
 };
 
+model.getAll = async (serviceName) => {
+	if (typeof store[serviceName] !== 'object') return undefined;
+	const clone = toolboxService.clone(store[serviceName]);
+	return clone;
+};
+
 model.get = async (serviceName, identifier) => {
 	if (typeof store[serviceName] !== 'object') return undefined;
 	if (Object.keys(store[serviceName]).includes(identifier)) {
