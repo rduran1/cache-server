@@ -242,6 +242,11 @@ collectionService.deleteServiceAccount = async (serviceAccountName) => {
 	logger.info(`Service account "${v.serviceAccountName}" successfully deleted`);
 };
 
+collectionService.getAllServiceAccounts = async () => {
+	const sa = await serviceAccountService.getAll();
+	return sa;
+};
+
 collectionService.getServiceAccount = async (serviceAccountName) => {
 	const v = validationLogWrapper({ serviceAccountName }, 'collectionService_getServiceAccount');
 	logger.debug(`Retrieving service account "${serviceAccountName}"`);
