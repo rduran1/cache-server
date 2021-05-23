@@ -50,13 +50,18 @@ collectionController.getDataSetByName = async (req, res) => {
 	const { name } = req.params;
 	try {
 		const { dataStream, transforms } = await collectionService.getDataStream(name);
+		collectionService.increaseStreamCount(name);
+		logger.info(`Streaming ${name}`);
 		if (transforms) await pipeline(dataStream, ...transforms, res);
 		if (!transforms) await pipeline(dataStream, res);
+		collectionService.decreaseStreamCount(name);
+		logger.info(`Streaming of ${name} successful`);
 		return logger.info('responded with HTTP 200');
 	} catch (e) {
+		collectionService.decreaseStreamCount(name);
 		res.statusMessage = e.message;
 		res.status(400).end();
-		return logger.info(`responded with HTTP 400: ${res.statusMessage}`);
+		return logger.info(`Streaming of ${name} failed: ${res.statusMessage}`);
 	}
 };
 

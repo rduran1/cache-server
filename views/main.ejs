@@ -11,6 +11,7 @@
 		<script src="/javascripts/vue.js"></script>
 		<script src="/javascripts/lib.js"></script>
 		<script src="/javascripts/toastr.js"></script>
+		<script src="/components/data-collections.js"></script>
 		<script src="/components/application-logs.js"></script>
 		<script src="/components/incident-form.js"></script>
 		<script src="/components/incident-list.js"></script>
@@ -37,6 +38,7 @@
 		<div id="workspace">
 			<header id="active-app-header">Dashboard</header>
 			<div id="app">
+				<data-collections v-show="Show_Data_Collections"></data-collections>
 				<hpsm-incidents v-show="Show_HPSM_Incidents"></hpsm-incidents>
 				<application-logs v-show="Show_Application_Logs"></application-logs>
 			</div>

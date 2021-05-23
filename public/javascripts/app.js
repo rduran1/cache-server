@@ -4,6 +4,7 @@
 const app = new Vue({
 	el: '#app',
 	data: {
+		Show_Data_Collections: false,
 		Show_Application_Logs: false,
 		Show_HPSM_Incidents: false
 	},
