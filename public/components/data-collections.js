@@ -67,6 +67,7 @@ Vue.component('data-collections', {
 				return;
 			}
 			for (let i = 0; i < colNames.length; i++) {
+				response[colNames[i]].name = colNames[i];
 				this.collections.push(response[colNames[i]]);
 			}
 		} catch (e) {
@@ -93,7 +94,7 @@ Vue.component('data-collections', {
 				type: 'json',
 				method: 'put'
 			};
-			await apiFetchNSyncModel(config);
+			await this.apiFetchNSyncModel(config);
 		},
 		setMetaData: async function setMetaData(config, setType) {
 			const model = 'metadata';
@@ -114,7 +115,7 @@ Vue.component('data-collections', {
 				body,
 				type: 'json'
 			};
-			await apiFetchNSyncModel(cfg);
+			await this.apiFetchNSyncModel(cfg);
 		},
 		deleteMetaData: async function deleteMetaData(name) {
 			const config = {
@@ -123,7 +124,7 @@ Vue.component('data-collections', {
 				method: 'delete',
 				type: 'json'
 			};
-			await apiFetchNSyncModel(config);
+			await this.apiFetchNSyncModel(config);
 		},
 		setServiceAccount: async function setServiceAccount(config, setType) {
 			let apipath = this.BASE_URL;
@@ -141,7 +142,7 @@ Vue.component('data-collections', {
 				method,
 				type: 'json'
 			};
-			await apiFetchNSyncModel(cfg);
+			await this.apiFetchNSyncModel(cfg);
 		},
 		deleteServiceAccount: async function deleteServiceAccount(name) {
 			const config = {
@@ -150,7 +151,7 @@ Vue.component('data-collections', {
 				method: 'delete',
 				type: 'json'
 			};
-			await apiFetchNSyncModel(config);
+			await this.apiFetchNSyncModel(config);
 		},
 		setToken: async function setToken(config, setType) {
 			let apipath = this.BASE_URL;
@@ -168,7 +169,7 @@ Vue.component('data-collections', {
 				method,
 				type: 'json'
 			};
-			await apiFetchNSyncModel(cfg);
+			await this.apiFetchNSyncModel(cfg);
 		},
 		deleteToken: async function deleteToken(name) {
 			const config = {
@@ -177,7 +178,7 @@ Vue.component('data-collections', {
 				method: 'delete',
 				type: 'json'
 			};
-			await apiFetchNSyncModel(config);
+			await this.apiFetchNSyncModel(config);
 		},
 		apiFetchNSyncModel: async function apiFetchNSyncModel(config) {
 			const cfg = config;
