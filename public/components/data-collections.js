@@ -10,10 +10,12 @@ Vue.component('data-collections', {
 		<button id="mat" :disabled="mat" @click=activate($event.currentTarget.id)>Manage Access Tokens</button>
 		<button id="mcs" :disabled="mcs" @click=activate($event.currentTarget.id)>Manage Collections</button>
 		<hr>
+		<div class="h-divider-med"/>
 		<collection-list 
 			v-if="mcs"
 			@set-collection-status=setCollectionStatus
-			:metadata="metadata"
+			:collections="collections"
+			:is-pending-server-response="isPendingServerResponse"
 		>collection list</collection-list>
 		
 		<collection-service-accounts
@@ -40,13 +42,14 @@ Vue.component('data-collections', {
 	data: function data() {
 		return {
 			BASE_URL: '/api/collections',
-			collections: {},
+			collections: [],
 			serviceAccounts: [
 				{ name: 'bigfix_dev_compliance' }, { name: 'EPO_service' }, { name: 'bigfix_dev_root' }
 			],
 			selectedServiceAccount: {
 				name: 'bigfix_dev_compliance'
 			},
+			isPendingServerResponse: false,
 			tokens: {},
 			msa: false,
 			mcm: false,
@@ -56,7 +59,16 @@ Vue.component('data-collections', {
 	},
 	created: async function created() {
 		try {
-			this.collections = await apiFetch({ apipath: `${this.BASE_URL}/all-metadata`, type: 'json' });
+			const response = await apiFetch({ apipath: `${this.BASE_URL}/all-metadata`, type: 'json' });
+			if (typeof response !== 'object') throw new Error('Server did not respond with a collection object');
+			const colNames = Object.keys(response);
+			if (colNames.length === 0) {
+				this.collections = [];
+				return;
+			}
+			for (let i = 0; i < colNames.length; i++) {
+				this.collections.push(response[colNames[i]]);
+			}
 		} catch (e) {
 			toast.error(`Failed to get list of collections: ${e.message}`);
 		}
@@ -73,7 +85,8 @@ Vue.component('data-collections', {
 			if (id === 'mcs') this.mcs = true;
 		},
 		// collections
-		setCollectionStatus: async function setCollectionStatus(name, status) {
+		setCollectionStatus: async function setCollectionStatus(cfg) {
+			const { name, status } = cfg;
 			const config = {
 				model: 'metadata',
 				apipath: `${this.BASE_URL}/${status}/${name}`,
@@ -143,10 +156,10 @@ Vue.component('data-collections', {
 			let apipath = this.BASE_URL;
 			let method = 'post';
 			if (setType === 'create') {
-				apipath = `${apipath}/create-service-account/${config.name}`;
+				apipath = `${apipath}/create-token/${config.name}`;
 			}
 			if (setType === 'update') {
-				apipath = `${apipath}/update-service-account/${config.name}`;
+				apipath = `${apipath}/update-token/${config.name}`;
 				method = 'put';
 			}
 			const cfg = {
@@ -160,7 +173,7 @@ Vue.component('data-collections', {
 		deleteToken: async function deleteToken(name) {
 			const config = {
 				model: 'tokens',
-				apipath: `${BASE_URL}/delete-service-account/${name}`,
+				apipath: `${BASE_URL}/delete-token/${name}`,
 				method: 'delete',
 				type: 'json'
 			};
@@ -172,6 +185,7 @@ Vue.component('data-collections', {
 			const { model } = cfg;
 			delete cfg.model;
 			try {
+				this.isPendingServerResponse = true;
 				document.body.style.cursor = 'progress';
 				await apiFetch(cfg);
 				cfg.method = 'get';
@@ -181,6 +195,7 @@ Vue.component('data-collections', {
 				toast.error(e.message);
 			}
 			document.body.style.cursor = 'default';
+			this.isPendingServerResponse = false;
 			return retval;
 		}
 	}

@@ -8,6 +8,60 @@ const pipeline = util.promisify(stream.pipeline);
 
 const collectionController = {};
 
+collectionController.getAllTokens = async (req, res) => {
+	try {
+		const tokens = await collectionService.getAllTokens();
+		res.send(tokens);
+	} catch (e) {
+		res.statusMessage = e.message;
+		res.status(400).send();
+	}
+};
+
+collectionController.getTokenByAlias = async (req, res) => {
+	const { alias } = req.params;
+	try {
+		const token = await collectionService.getTokenByAlias(alias);
+		res.send(token);
+	} catch (e) {
+		res.statusMessage = e.message;
+		res.status(400).send();
+	}
+};
+
+collectionController.createToken = async (req, res) => {
+	const config = req.body;
+	try {
+		await collectionService.createToken(config);
+		res.send();
+	} catch (e) {
+		res.statusMessage = e.message;
+		res.status(400).send();
+	}
+};
+
+collectionController.updateToken = async (req, res) => {
+	const config = req.body;
+	try {
+		await collectionService.updateToken(config);
+		res.send();
+	} catch (e) {
+		res.statusMessage = e.message;
+		res.status(400).send();
+	}
+};
+
+collectionController.deleteToken = async (req, res) => {
+	const { alias } = req.params;
+	try {
+		await collectionService.deleteToken(alias);
+		res.send();
+	} catch (e) {
+		res.statusMessage = e.message;
+		res.status(400).send();
+	}
+};
+
 collectionController.getAllMetaData = async (req, res) => {
 	const md = await collectionService.getAllMetaData();
 	res.status(200).send(md);
@@ -171,13 +225,11 @@ collectionController.saveDataStream = async (req, res) => {
 collectionController.startCollection = async (req, res) => {
 	const { name } = req.params;
 	try {
-		await collectionService.startInterval(name);
 		res.status(200).send();
+		await collectionService.startInterval(name);
 		return logger.info('responded with HTTP 200');
 	} catch (e) {
-		res.statusMessage = e.message;
-		res.status(400).end();
-		return logger.info(`responded with HTTP 400: ${res.statusMessage}`);
+		return logger.info(`Failed to start "${name} collection: ${e.stack}`);
 	}
 };
 
