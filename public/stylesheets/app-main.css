@@ -1,7 +1,7 @@
 :root {
   --br: 6px;
   --br4table: 6px;
-  --c1: #ddd;
+  --c1: #fff;
   --c2: #5c6773;
   --c3: #31373e;
   --c4: grey;
@@ -10,7 +10,6 @@
 }
 
 body {
-  zoom: 1.1;
   background-color: #1d1f20;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
@@ -49,7 +48,7 @@ label {
 input {
   height: 20px;
   font-size: 15px;
-  color: #fff;
+  color: var(--c1);
   padding: 5px;
   background-color: var(--c3);
   outline: none;
@@ -66,6 +65,7 @@ textarea {
   background-color: var(--c3);
   border: 1.5px solid var(--c4);
   resize: vertical;
+  color: var(--c1);
 }
 
 textarea:focus,
@@ -83,7 +83,7 @@ select {
   width: 340px;
   font-size: 15px;
   margin-left: 0;
-  color: #fff;
+  color: var(--c1);
   padding: 5px;
   background-color: var(--c3);
   border-radius: var(--br);
@@ -99,12 +99,6 @@ a {
   color: var(--c1);
   text-decoration: none;
 }
-
-/* input:read-only,
-textarea:read-only {
-  background-color: var(--c2);
-  border: 1.5px solid var(--c4);
-} */
 
 .nowrap {
   white-space: nowrap;
