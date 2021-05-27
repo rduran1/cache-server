@@ -14,7 +14,7 @@ Vue.component('data-collections', {
 		<collection-list 
 			v-if="mcs"
 			@set-collection-status=setCollectionStatus
-			:collections="collections"
+			:collections="metadata"
 			:is-pending-server-response="isPendingServerResponse"
 		>collection list</collection-list>
 		
@@ -42,7 +42,7 @@ Vue.component('data-collections', {
 	data: function data() {
 		return {
 			BASE_URL: '/api/collections',
-			collections: [],
+			metadata: [],
 			serviceAccounts: [
 				{ name: 'bigfix_dev_compliance' }, { name: 'EPO_service' }, { name: 'bigfix_dev_root' }
 			],
@@ -63,12 +63,12 @@ Vue.component('data-collections', {
 			if (typeof response !== 'object') throw new Error('Server did not respond with a collection object');
 			const colNames = Object.keys(response);
 			if (colNames.length === 0) {
-				this.collections = [];
+				this.metadata = [];
 				return;
 			}
 			for (let i = 0; i < colNames.length; i++) {
 				response[colNames[i]].name = colNames[i];
-				this.collections.push(response[colNames[i]]);
+				this.metadata.push(response[colNames[i]]);
 			}
 		} catch (e) {
 			toast.error(`Failed to get list of collections: ${e.message}`);
@@ -91,7 +91,7 @@ Vue.component('data-collections', {
 			const config = {
 				model: 'metadata',
 				apipath: `${this.BASE_URL}/${status}/${name}`,
-				type: 'json',
+				type: 'text',
 				method: 'put'
 			};
 			await this.apiFetchNSyncModel(config);
@@ -113,7 +113,7 @@ Vue.component('data-collections', {
 				apipath,
 				method,
 				body,
-				type: 'json'
+				type: 'text'
 			};
 			await this.apiFetchNSyncModel(cfg);
 		},
@@ -122,7 +122,7 @@ Vue.component('data-collections', {
 				model: 'metadata',
 				apipath: `${BASE_URL}/delete-metadata/${name}`,
 				method: 'delete',
-				type: 'json'
+				type: 'text'
 			};
 			await this.apiFetchNSyncModel(config);
 		},
@@ -140,7 +140,7 @@ Vue.component('data-collections', {
 				model: 'service-accounts',
 				apipath,
 				method,
-				type: 'json'
+				type: 'text'
 			};
 			await this.apiFetchNSyncModel(cfg);
 		},
@@ -149,7 +149,7 @@ Vue.component('data-collections', {
 				model: 'service-accounts',
 				apipath: `${BASE_URL}/delete-service-account/${name}`,
 				method: 'delete',
-				type: 'json'
+				type: 'text'
 			};
 			await this.apiFetchNSyncModel(config);
 		},
@@ -167,7 +167,7 @@ Vue.component('data-collections', {
 				model: 'token',
 				apipath,
 				method,
-				type: 'json'
+				type: 'text'
 			};
 			await this.apiFetchNSyncModel(cfg);
 		},
@@ -176,13 +176,12 @@ Vue.component('data-collections', {
 				model: 'tokens',
 				apipath: `${BASE_URL}/delete-token/${name}`,
 				method: 'delete',
-				type: 'json'
+				type: 'text'
 			};
 			await this.apiFetchNSyncModel(config);
 		},
 		apiFetchNSyncModel: async function apiFetchNSyncModel(config) {
 			const cfg = config;
-			let retval;
 			const { model } = cfg;
 			delete cfg.model;
 			try {
@@ -190,14 +189,23 @@ Vue.component('data-collections', {
 				document.body.style.cursor = 'progress';
 				await apiFetch(cfg);
 				cfg.method = 'get';
-				cfg.apipath = `${BASE_URL}/all-${cfg.model}`;
-				this[model] = await apiFetch();
+				cfg.apipath = `${this.BASE_URL}/all-${model}`;
+				cfg.type = 'json';
+				const response = await apiFetch(cfg);
+				const colNames = Object.keys(response);
+				if (colNames.length === 0) {
+					this.metadata = [];
+					return;
+				}
+				for (let i = 0; i < colNames.length; i++) {
+					response[colNames[i]].name = colNames[i];
+					this.metadata.push(response[colNames[i]]);
+				}
 			} catch (e) {
 				toast.error(e.message);
 			}
 			document.body.style.cursor = 'default';
 			this.isPendingServerResponse = false;
-			return retval;
 		}
 	}
 });
