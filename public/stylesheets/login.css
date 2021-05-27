@@ -1,25 +1,24 @@
 /* Dark -> Light
-#1b262c
-#0f4c75
-#3282b8
+#1b262c 212527
+#0f4c75	31373e
+#3282b8	3c444d
 #bbe1fa
 */
 
 body {
   margin: 150px;
-  background-color: #1b262c;
+  background-color: #171d21;
   font-family: Arial, Helvetica, sans-serif;
 }
 
 /* Bordered login form */
 form#login {
-  border: 3px solid #bbe1fa;
+  border: 3px solid rgb(168, 165, 165);
   width: 300px;
   margin: auto;
   border-radius: 6px;
-  color: #bbe1fa;
-  background-color: #0f4c75;
-  box-shadow: 2px 2px 2px grey;
+  color: #ddd;
+  background-color: #31373e;
 }
 
 /* Full-width login form inputs */
@@ -29,18 +28,19 @@ form#login input[type="password"] {
   padding: 12px 20px;
   margin: 8px 0;
   display: inline-block;
-  border: 1px solid #bbe1fa;
   box-sizing: border-box;
   border-radius: 6px;
-  background-color: #bbe1fa;
+  background-color: #2b3033;
+  color: #ddd;
+  font-size: 18px;
   border: none;
   outline: none;
 }
 
 /* Set style for button */
 button {
-  background-color: #3282b8;
-  color: #bbe1fa;
+  background-color: #5c6773;
+  color: #ddd;
   padding: 14px 20px;
   margin: 8px 0;
   border: none;

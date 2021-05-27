@@ -4,22 +4,54 @@
 
 Vue.component('data-collections', {
 	template: `
-	<div>
-		<collection-list> </collection-list>
-		<service-account-form> </service-account-form>
-		<metadata-form> </metadata-form>
-		<token-form> <token-form>
+	<div class='data-collections'>
+		<button id="msa" :disabled="msa" @click=activate($event.currentTarget.id)>Manage Service Accounts</button>
+		<button id="mcm" :disabled="mcm" @click=activate($event.currentTarget.id)>Manage Collection Metadata</button>
+		<button id="mat" :disabled="mat" @click=activate($event.currentTarget.id)>Manage Access Tokens</button>
+		<button id="mcs" :disabled="mcs" @click=activate($event.currentTarget.id)>Manage Collections</button>
+		<hr>
+		<collection-list 
+			v-if="mcs"
+			@set-collection-status=setCollectionStatus
+			:metadata="metadata"
+		>collection list</collection-list>
+		
+		<collection-service-accounts
+			v-if="msa"
+			@set-service-account=setServiceAccount
+			@delete-service-account=deleteServiceAccount
+			:service-accounts=serviceAccounts
+			:selected-service-account=selectedServiceAccount
+		>service accounts</collection-service-accounts>
+
+		<collection-metadata
+			v-if="mcm"
+			@set=setServiceAccount
+			@delete=deleteServiceAccount
+		>metadata</collection-metadata>
+
+		<collection-tokens
+			v-if="mat"
+			@set=setServiceAccount
+			@delete=deleteServiceAccount
+		>tokens</collection-tokens>
 	</div>
 	`,
 	data: function data() {
 		return {
 			BASE_URL: '/api/collections',
 			collections: {},
-			currentIncident: {
-				Title: '',
-				Description: '',
-				IncidentID: ''
-			}
+			serviceAccounts: [
+				{ name: 'bigfix_dev_compliance' }, { name: 'EPO_service' }, { name: 'bigfix_dev_root' }
+			],
+			selectedServiceAccount: {
+				name: 'bigfix_dev_compliance'
+			},
+			tokens: {},
+			msa: false,
+			mcm: false,
+			mat: false,
+			mcs: true
 		};
 	},
 	created: async function created() {
@@ -30,6 +62,16 @@ Vue.component('data-collections', {
 		}
 	},
 	methods: {
+		activate: function activate(id) {
+			this.msa = false;
+			this.mcm = false;
+			this.mat = false;
+			this.mcs = false;
+			if (id === 'msa') this.msa = true;
+			if (id === 'mcm') this.mcm = true;
+			if (id === 'mat') this.mat = true;
+			if (id === 'mcs') this.mcs = true;
+		},
 		// collections
 		setCollectionStatus: async function setCollectionStatus(name, status) {
 			const config = {

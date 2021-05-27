@@ -6,7 +6,7 @@ Vue.component('application-logs', {
 	template: `
 		<div>
 			Select Log File to View:
-			<select v-model:select="selectedLogName" @change="getLogData">
+			<select id="applications-logs-select" v-model:select="selectedLogName" @change="getLogData">
 				<option v-for="log in logFileNames" :value="log">{{ log }}</option>
 			</select>
 			<pre>{{ logFileContent }}</pre>
@@ -34,7 +34,6 @@ Vue.component('application-logs', {
 			const cfg = { apipath: `${this.BASE_URL}/${this.selectedLogName}`, type: 'text' };
 			try {
 				this.logFileContent = await apiFetch(cfg);
-				return;
 			} catch (e) {
 				toast.error(e.message);
 			}

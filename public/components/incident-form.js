@@ -7,24 +7,35 @@ Vue.component('incident-form', {
     <div>
       <div class="grid-headers">
         <label for="Title">Title:</label>
-        <input id="Title" v-model="selectedIncident.Title">
+        <input id="Title" :value="selectedIncident.Title" readonly>
         
         <label for="Description">Description:</label>
-        <textarea id="Description" v-model="selectedIncident.Description"></textarea>
+        <textarea id="Description" :value="description" readonly></textarea>
 
-        <label v-if="selectedIncident.IncidentID" for="Update">Update:</label>
-        <textarea v-if="selectedIncident.IncidentID" id="Update" v-model="selectedIncident.Update"></textarea>
+        <label for="Update">Journal Updates:</label>
+        <textarea id="Update" :value="journalUpdates" readonly></textarea>
 
-        <label v-if="selectedIncident.IncidentID" for="Solution">Solution:</label>
-        <textarea v-if="selectedIncident.IncidentID" id="Solution" v-model="selectedIncident.Solution"></textarea>
+        <label for="Solution">Solution:</label>
+        <textarea id="Solution" :value="solution" readonly></textarea>
       </div>
 
       <div class="grid-container">
-        <label for="IncidentID" class="nowrap">Incident ID:</label>
-        <input id="IncidentID" :value="selectedIncident.IncidentID" readonly>
+        <label for="IncidentID">Incident ID:</label>
+        <input 
+					id="IncidentID"
+					v-on:keyup="lookupIncident"
+					@click="clear"
+					v-model="selectedIncident.IncidentID" :readonly="isReadOnly"
+				>
+
+				<label for="Status">Status:</label>
+        <input id="Status" :value="selectedIncident.Status" readonly>
+
+				<label for="Assignee">Assignee:</label>
+        <input id="Assignee" :value="selectedIncident.Assignee" readonly>
 
 				<label for="AssignmentGroup">Assignment Group:</label>
-        <input id="AssignmentGroup" v-model="selectedIncident.AssignmentGroup">
+        <input id="AssignmentGroup" :value="selectedIncident.AssignmentGroup" readonly>
 
 				<label for="OpenedBy">Opened By:</label>
         <input id="OpenedBy" :value="selectedIncident.OpenedBy" readonly>
@@ -38,31 +49,21 @@ Vue.component('incident-form', {
         <label for="UpdatedTime">Updated Time:</label>
         <input id="UpdatedTime" :value="updatedTime" readonly>
 
-        <label for="Service">Service:</label>
-        <input id="Service" v-model="selectedIncident.Service">
+        <label for="Impact">Impact:</label>
+        <input id="Impact" :value="selectedIncident.Impact" readonly>
 
         <label for="Contact">Contact:</label>
-        <input id="Contact" v-model="selectedIncident.Contact">
-
-				<label for="Impact">Impact:</label>
-        <input id="Impact" v-model="selectedIncident.Impact">
-
-        <label for="Status">Status:</label>
-        <input id="Status" v-model="selectedIncident.Status">
+        <input id="Contact" :value="selectedIncident.Contact" readonly>
 
       </div>
-      <button @click="submit" :disabled="buttonDisabled">{{ buttonLabel }}</button>
-      <button @click="clear">Clear Fields</button>
     </div>
   `,
 	data: function () {
 		return {};
 	},
-
 	props: [
 		'selectedIncident'
 	],
-
 	computed: {
 		openTime: function openTime() {
 			if (this.selectedIncident.OpenTime) {
@@ -76,33 +77,33 @@ Vue.component('incident-form', {
 			}
 			return '';
 		},
-		buttonLabel: function buttonLabel() {
-			return this.selectedIncident.IncidentID ? 'Update' : 'Create';
+		isReadOnly: function isReadOnly() {
+			return this.selectedIncident.Title.length > 0;
 		},
-		buttonDisabled: function buttonDisabled() {
-			if (this.selectedIncident.Title.length < 1) return true;
-			if (this.selectedIncident.Description.length < 1) return true;
-			if (this.selectedIncident.Service.length < 1) return true;
-			if (this.selectedIncident.Contact.length < 1) return true;
-			if (this.selectedIncident.Status.length < 1) return true;
-			if (this.selectedIncident.AssignmentGroup.length < 1) return true;
-			return false;
+		description: function description() {
+			return this.arrayToString('Description');
+		},
+		journalUpdates: function journalUpdates() {
+			return this.arrayToString('JournalUpdates');
+		},
+		solution: function solution() {
+			return this.arrayToString('Solution');
 		}
 	},
-
 	methods: {
-		submit: function submit() {
-			if (this.buttonLabel === 'Update') return this.update();
-			return this.create();
-		},
-		update: function update() {
-			return this.$emit('update-incident', this.selectedIncident);
-		},
-		create: function create() {
-			return this.$emit('create-incident', this.selectedIncident);
+		arrayToString: function _arrayToString(propertyName) {
+			if (typeof this.selectedIncident !== 'object') return '';
+			if (typeof this.selectedIncident[propertyName] !== 'object') return '';
+			return this.selectedIncident[propertyName].join('\n');
 		},
 		clear: function clear() {
-			return this.$emit('clear-incident-fields');
+			return this.$emit('clear-selected-incident');
+		},
+		lookupIncident: function lookupIncident(event) {
+			if (event.keyCode === 13) {
+				if (this.selectedIncident.IncidentID.length < 3) return;
+				this.$emit('lookup-incident', this.selectedIncident.IncidentID);
+			}
 		}
 	}
 });

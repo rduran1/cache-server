@@ -6,22 +6,26 @@ Vue.component('hpsm-incidents', {
 	template: `
 	<div>
 		<incident-form id="incident-form"
-			:selected-incident="currentIncident"
-			@create-incident="createIncident"
-			@update-incident="updateIncident"
-			@clear-incident-fields="clearIncidentFormFields"
+			:selected-incident="selectedIncident"
+			@clear-selected-incident="clearSelectedIncident"
+			@lookup-incident="lookupIncident"
 		></incident-form>
+		<div class="h-divider-med"/>
 		<incidents-list id="incidents-list"
 			:incidents="incidents" 
+			:sm-server="SM_SERVER"
 			@set-selected-incident="setSelectedIncident"
+			v-show=showIncidentsList
 		></incidents-list>
+		<div v-if=!showIncidentsList>No Incidents To Display</div>
 	</div>
 	`,
 	data: function data() {
 		return {
 			BASE_URL: '/api/hpsm-incidents',
+			SM_SERVER: 'https://www.onportal.com',
 			incidents: [],
-			currentIncident: {
+			selectedIncident: {
 				Title: '',
 				Description: '',
 				IncidentID: '',
@@ -35,6 +39,7 @@ Vue.component('hpsm-incidents', {
 				Contact: '',
 				Status: '',
 				AssignmentGroup: '',
+				Assignee: '',
 				Impact: ''
 			}
 		};
@@ -46,11 +51,16 @@ Vue.component('hpsm-incidents', {
 			toast.error(`Failed to get list of incidents: ${e.message}`);
 		}
 	},
+	computed: {
+		showIncidentsList: function showIncidentsList() {
+			return this.incidents.length > 0;
+		}
+	},
 	methods: {
 		setSelectedIncident: async function setSelectedIncident(id) {
 			try {
 				document.body.style.cursor = 'progress';
-				this.currentIncident = await apiFetch({ apipath: `${this.BASE_URL}/query/${id}`, type: 'json' });
+				this.selectedIncident = await apiFetch({ apipath: `${this.BASE_URL}/query/${id}`, type: 'json' });
 			} catch (e) {
 				toast.error(e.message);
 			}
@@ -63,31 +73,15 @@ Vue.component('hpsm-incidents', {
 				toast.error(`Failed to refresh list of incidents: ${e.message}`);
 			}
 		},
-		createIncident: async function createIncident(obj) {
-			const headers = { 'Content-type': 'application/json' };
-			try {
-				await apiFetch({ apipath: this.BASE_URL, method: 'post', headers, body: obj });
-			} catch (e) {
-				toast.error(e.message);
-			}
-			this.clearIncidentFormFields();
+		lookupIncident: async function lookupIncident(id) {
+			await this.setSelectedIncident(id);
 			await this.refreshList();
 		},
-		updateIncident: async function updateIncident(obj) {
-			const headers = { 'Content-type': 'application/json' };
-			try {
-				await apiFetch({ apipath: `${this.BASE_URL}/${obj.IncidentID}`, method: 'put', headers, body: obj });
-			} catch (e) {
-				toast.error(e.message);
-			}
-			this.clearIncidentFormFields();
-			await this.refreshList();
-		},
-		clearIncidentFormFields: function clearIncidentFormFields() {
-			const fields = Object.keys(this.currentIncident);
+		clearSelectedIncident: function clearSelectedIncident() {
+			const fields = Object.keys(this.selectedIncident);
 			fields.forEach((propertyName) => {
-				if (typeof this.currentIncident[propertyName] === 'string') this.currentIncident[propertyName] = '';
-				if (Array.isArray(this.currentIncident[propertyName])) this.currentIncident[propertyName] = [];
+				if (typeof this.selectedIncident[propertyName] === 'string') this.selectedIncident[propertyName] = '';
+				if (Array.isArray(this.selectedIncident[propertyName])) this.selectedIncident[propertyName] = [];
 			});
 		}
 	}
