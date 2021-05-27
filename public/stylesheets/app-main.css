@@ -57,6 +57,7 @@ input {
 }
 
 textarea {
+  font-size: 15px;
   height: 4em;
   font-family: "Arial", "Verdana", "Courier New";
   border-radius: var(--br);
