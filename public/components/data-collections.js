@@ -57,7 +57,7 @@ Vue.component('data-collections', {
 			mcs: true
 		};
 	},
-	created: async function created() {
+	refreshMetaDataStore: async function refreshMetaDataStore() {
 		try {
 			const response = await apiFetch({ apipath: `${this.BASE_URL}/all-metadata`, type: 'json' });
 			if (typeof response !== 'object') throw new Error('Server did not respond with a collection object');
@@ -73,6 +73,12 @@ Vue.component('data-collections', {
 		} catch (e) {
 			toast.error(`Failed to get list of collections: ${e.message}`);
 		}
+	},
+	created: async function created() {
+		await refreshMetaDataStore();
+		socket.on('refresh metadata', () => {
+			refreshMetaDataStore();
+		});
 	},
 	methods: {
 		activate: function activate(id) {
@@ -189,6 +195,7 @@ Vue.component('data-collections', {
 				document.body.style.cursor = 'progress';
 				await apiFetch(cfg);
 				cfg.method = 'get';
+				await sleep(1000);
 				cfg.apipath = `${this.BASE_URL}/all-${model}`;
 				cfg.type = 'json';
 				const response = await apiFetch(cfg);
@@ -197,6 +204,7 @@ Vue.component('data-collections', {
 					this.metadata = [];
 					return;
 				}
+				this.metadata.length = 0;
 				for (let i = 0; i < colNames.length; i++) {
 					response[colNames[i]].name = colNames[i];
 					this.metadata.push(response[colNames[i]]);
