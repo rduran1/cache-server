@@ -63,9 +63,8 @@ function clearIntervalTimer(collectionName) {
 		logger.debug(`Clearing interval timer for "${collectionName}"`);
 		clearInterval(collectionService.timers[collectionName]);
 		delete collectionService.timers[collectionName];
-		return;
 	}
-	logger.error(`Request to clear interval timer for "${collectionName}" failed, timer for collection does not exist`);
+	// logger.error(`Request to clear interval timer for "${collectionName}" failed, timer for collection does not exist`);
 }
 
 function setMetaDataStatus(collectionName, status, errorMsg) {
@@ -126,7 +125,7 @@ const clientRequestHandler = (clientRequest, collectionName, processAsStream, bo
 		return reject(new Error(`clientRequest error: ${e.message} (${eInfo.join(' ')})`));
 	});
 
-	clientRequest.on('abort', async (e) => reject(new Error(`clientRequest aborted: ${e.message}`)));
+	clientRequest.on('abort', async () => reject(new Error('clientRequest aborted')));
 
 	clientRequest.on('timeout', async () => {
 		clientRequest.destroy();
@@ -157,11 +156,12 @@ const clientRequestHandler = (clientRequest, collectionName, processAsStream, bo
 				return undefined;
 			});
 		}
-		httpIncomingMessage.on('aborted', async (e) => reject(new Error(`httpIncomingMessage aborted: ${e.message}`)));
+		httpIncomingMessage.on('aborted', async () => reject(new Error('httpIncomingMessage aborted')));
 		httpIncomingMessage.on('error', async (e) => reject(new Error(`httpIncomingMessage error: ${e.message}`)));
 		function destroySocket(collName) {
 			if (collName !== collectionName) return;
 			if (!httpIncomingMessage.complete) httpIncomingMessage.destroy();
+			// Should reject here
 		}
 		em.addListener('stopCollectionProcess', destroySocket);
 		if (processAsStream) {
@@ -402,11 +402,11 @@ collectionService.refreshData = async (collectionName) => {
 
 collectionService.stopInterval = async (collectionName) => {
 	const v = validationLogWrapper({ collectionName }, 'collectionService_stopInterval');
-	if (typeof collectionService.timers[v.collectionName] === 'undefined') return;
+	// if (typeof collectionService.timers[v.collectionName] === 'undefined') return;
 	logger.info(`Stopping collection interval for "${collectionName}"`);
 	clearIntervalTimer(v.collectionName);
-	em.emit('stopCollectionProcess', v.collectionName);
 	setMetaDataStatus(v.collectionName, 'stopped');
+	em.emit('stopCollectionProcess', v.collectionName);
 	logger.info(`Collection interval for "${collectionName}" successfully stopped`);
 };
 

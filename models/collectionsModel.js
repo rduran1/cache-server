@@ -64,6 +64,10 @@ model.getMetaData = async (collectionName) => {
 
 model.getAllMetaData = async () => {
 	const clone = toolboxService.clone(store);
+	const keyNames = Object.keys(clone);
+	for (let i = 0; i < keyNames.length; i++) {
+		if (typeof clone[keyNames[i]].status === 'undefined') clone[keyNames[i]].status = 'stopped';
+	}
 	return clone;
 };
 
@@ -106,6 +110,10 @@ model.saveDataStream = async (collectionName, dataStream, transforms) => {
 			await pipeline(dataStream, writeStream);
 		}
 		checkForDeletionInProgress(collectionName);
+		if (store[collectionName].status === 'stopped') {
+			if (fs.existsSync(`${metaData.cacheFile}.tmp`)) fs.unlinkSync(`${metaData.cacheFile}.tmp`);
+			return;
+		}
 	} catch (e) {
 		if (fs.existsSync(`${metaData.cacheFile}.tmp`)) fs.unlinkSync(`${metaData.cacheFile}.tmp`);
 		throw new Error(`Pipeline error: ${e.message}`);
@@ -120,7 +128,7 @@ model.saveDataStream = async (collectionName, dataStream, transforms) => {
 		// eslint-disable-next-line no-await-in-loop
 		await toolboxService.sleep(100);
 	}
-	return fs.renameSync(`${metaData.cacheFile}.tmp`, metaData.cacheFile);
+	fs.renameSync(`${metaData.cacheFile}.tmp`, metaData.cacheFile);
 };
 
 model.getDataStream = async (collectionName) => {
