@@ -389,6 +389,9 @@ collectionService.refreshData = async (collectionName) => {
 		clientRequest = await httpClientService.asyncRequest(config);
 		logger.info(`Refreshing "${v.collectionName}" collection cache`);
 		await clientRequestHandler(clientRequest, v.collectionName, metaData.processAsStream, config.body);
+		// Check if collector was stopped
+		metaData = await collectionService.getMetaData(v.collectionName);
+		if (metaData.status === 'stopped') return;
 		logger.info(`Collection "${v.collectionName}" cache refresh completed successfully`);
 		setMetaDataStatus(v.collectionName, 'waiting');
 	} catch (e) {
