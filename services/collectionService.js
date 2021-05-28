@@ -156,7 +156,8 @@ const clientRequestHandler = (clientRequest, collectionName, processAsStream, bo
 				return undefined;
 			});
 		}
-		httpIncomingMessage.on('aborted', async () => reject(new Error('httpIncomingMessage aborted')));
+		httpIncomingMessage.on('aborted', async () => logger.info('httpIncomingMessage aborted'));
+
 		httpIncomingMessage.on('error', async (e) => reject(new Error(`httpIncomingMessage error: ${e.message}`)));
 		function destroySocket(collName) {
 			if (collName !== collectionName) return;
