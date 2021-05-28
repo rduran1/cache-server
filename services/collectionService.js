@@ -422,6 +422,9 @@ collectionService.startInterval = async (collectionName) => {
 	logger.info(`Starting collection interval for "${collectionName}"`);
 	setMetaDataStatus(v.collectionName, 'starting', '');
 	await collectionService.refreshData(v.collectionName);
+	// Check if collector was stopped while refreshing
+	const metaData = await collectionService.getMetaData(v.collectionName);
+	if (metaData.status === 'stopped') return;
 	await setIntervalTimer(v.collectionName);
 	logger.info(`Collection interval for "${collectionName}" successfully started`);
 };
