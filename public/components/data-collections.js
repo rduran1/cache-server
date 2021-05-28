@@ -57,30 +57,31 @@ Vue.component('data-collections', {
 			mcs: true
 		};
 	},
-	refreshMetaDataStore: async function refreshMetaDataStore() {
-		try {
-			const response = await apiFetch({ apipath: `${this.BASE_URL}/all-metadata`, type: 'json' });
-			if (typeof response !== 'object') throw new Error('Server did not respond with a collection object');
-			const colNames = Object.keys(response);
-			if (colNames.length === 0) {
-				this.metadata = [];
-				return;
-			}
-			for (let i = 0; i < colNames.length; i++) {
-				response[colNames[i]].name = colNames[i];
-				this.metadata.push(response[colNames[i]]);
-			}
-		} catch (e) {
-			toast.error(`Failed to get list of collections: ${e.message}`);
-		}
-	},
 	created: async function created() {
-		await refreshMetaDataStore();
+		await this.refreshMetaDataStore();
 		socket.on('refresh metadata', () => {
-			refreshMetaDataStore();
+			this.refreshMetaDataStore();
 		});
 	},
 	methods: {
+		refreshMetaDataStore: async function refreshMetaDataStore() {
+			try {
+				const response = await apiFetch({ apipath: `${this.BASE_URL}/all-metadata`, type: 'json' });
+				if (typeof response !== 'object') throw new Error('Server did not respond with a collection object');
+				const colNames = Object.keys(response);
+				if (colNames.length === 0) {
+					this.metadata = [];
+					return;
+				}
+				this.metadata.length = 0;
+				for (let i = 0; i < colNames.length; i++) {
+					response[colNames[i]].name = colNames[i];
+					this.metadata.push(response[colNames[i]]);
+				}
+			} catch (e) {
+				toast.error(`Failed to get list of collections: ${e.message}`);
+			}
+		},
 		activate: function activate(id) {
 			this.msa = false;
 			this.mcm = false;
