@@ -2,6 +2,8 @@ const { readFileSync } = require('fs');
 const https = require('https');
 const path = require('path');
 const { constants } = require('crypto');
+const socketio = require('socket.io');
+const notifier = require('notifier');
 
 process.env.INSTALL_DIR = (path.join(__dirname, '..'));
 
@@ -34,6 +36,16 @@ if (config.disableTls11) disableObsoleteTls = constants.SSL_OP_NO_TLSv1 | consta
 if (disableObsoleteTls) options.secureOptions = disableObsoleteTls;
 
 const server = https.createServer(options, app);
+
+const io = socketio(server);
+io.on('connection', (socket) => {
+	notifier.on('refresh-metadata', () => {
+		socket.emit('refresh metadata');
+	});
+	notifier.on('error', (msg) => {
+		socket.emit('error', msg);
+	});
+});
 
 function onError(error) {
 	if (error.syscall !== 'listen') {
