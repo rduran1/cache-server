@@ -7,6 +7,7 @@
 		<link rel="stylesheet" href="/stylesheets/toastr.css">
 		<link rel="stylesheet" href="/stylesheets/bootstrap-icons.css">
 		<script src="/javascripts/jquery.min.js"></script>
+		<script src="/javascripts/socket.io.min.js"></script>
 		<script src="/javascripts/vue.js"></script>
 		<script src="/javascripts/lib.js"></script>
 		<script src="/javascripts/toastr.js"></script>
@@ -39,6 +40,7 @@
 		</div>
 		<div id="workspace">
 			<header id="active-app-header">Dashboard</header>
+			<div class="h-divider-lg"></div>
 			<div id="app">
 				<data-collections v-show="Show_Data_Collections"></data-collections>
 				<hpsm-incidents v-show="Show_HPSM_Incidents"></hpsm-incidents>
