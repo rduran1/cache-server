@@ -15,7 +15,7 @@ Vue.component('collection-service-accounts', {
 				<div id="title">Service Account Details</div>
 					<div class="service-account-details-grid">
 						<label class="first-row" for="name">Service Name:</label>
-						<input class="first-row" id="name" v-model=selectedServiceAccount.name :readonly="serviceNameFieldReadOnly"/>
+						<input class="first-row" id="name" v-model=selectedServiceAccount.name :readonly="serviceAccountUpdateMode"/>
 						<label for="host">Host Name:</label>
 						<input id="host" v-model=selectedServiceAccount.host></input>
 						<label for="port">Port Number:</label>
@@ -48,30 +48,27 @@ Vue.component('collection-service-accounts', {
     </div>
   `,
 	data: function () {
-		return {
-			serviceNameFieldReadOnly: false
-		};
+		return {};
 	},
 
 	props: [
 		'serviceAccounts',
-		'selectedServiceAccount'
+		'selectedServiceAccount',
+		'serviceAccountUpdateMode'
 	],
 
 	computed: {
 		buttonName: function buttonName() {
-			if (this.serviceNameFieldReadOnly) return 'Update';
+			if (this.serviceAccountUpdateMode) return 'Update';
 			return 'Create';
 		}
 	},
 
 	methods: {
 		clearSelectedService: function clearSelectedService() {
-			this.serviceNameFieldReadOnly = false;
 			this.$emit('clear-selected-service-account');
 		},
 		getServiceDetails: function getServiceDetails(name) {
-			this.serviceNameFieldReadOnly = true;
 			this.$emit('get-service-account', name);
 		},
 		createOrUpdateService: function createOrUpdateService() {

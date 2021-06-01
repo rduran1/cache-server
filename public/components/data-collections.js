@@ -25,6 +25,7 @@ Vue.component('data-collections', {
 			@get-service-account=getServiceAccount
 			@delete-service-account=deleteServiceAccount
 			:service-accounts=serviceAccounts
+			:service-account-update-mode=serviceAccountUpdateMode
 			:selected-service-account=selectedServiceAccount
 		>service accounts</collection-service-accounts>
 
@@ -46,6 +47,7 @@ Vue.component('data-collections', {
 			BASE_URL: '/api/collections',
 			metadata: [],
 			serviceAccounts: [],
+			serviceAccountUpdateMode: false,
 			selectedServiceAccount: {},
 			isPendingServerResponse: false,
 			tokens: [],
@@ -157,12 +159,14 @@ Vue.component('data-collections', {
 			const apipath = `${this.BASE_URL}/service-account/${name}`;
 			this.selectedServiceAccount = await apiFetch({ apipath, type: 'json' });
 			this.selectedServiceAccount.name = name;
+			this.serviceAccountUpdateMode = true;
 		},
 		clearSelectedServiceAccount: async function clearSelectedServiceAccount() {
 			const keyNames = Object.keys(this.selectedServiceAccount);
 			keyNames.forEach((kn) => {
 				this.selectedServiceAccount[kn] = '';
 			});
+			this.serviceAccountUpdateMode = false;
 		},
 		deleteServiceAccount: async function deleteServiceAccount(name) {
 			const config = {
