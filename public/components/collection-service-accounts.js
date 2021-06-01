@@ -38,8 +38,9 @@ Vue.component('collection-service-accounts', {
 						</select>
 						<div/>
 						<div>
-							<button>{{ buttonName }}</button>
+							<button @click="createOrUpdateService">{{ buttonName }}</button>
 							<button @click="clearSelectedService">Clear</button>
+							<button v-if="buttonName === 'Update'" @click="deleteService(selectedServiceAccount.name)">Delete</button>
 						</div>
 					</div>
 				</div>
@@ -73,11 +74,10 @@ Vue.component('collection-service-accounts', {
 			this.serviceNameFieldReadOnly = true;
 			this.$emit('get-service-account', name);
 		},
-		createService: function createService(obj) {
-			this.$emit('set-service-account', obj, 'create');
-		},
-		updateService: function updateService(obj) {
-			this.$emit('set-service-account', obj, 'update');
+		createOrUpdateService: function createOrUpdateService() {
+			if (this.buttonName === 'Update') return this.$emit('set-service-account', this.selectedServiceAccount, 'update');
+			if (this.buttonName === 'Create') return this.$emit('set-service-account', this.selectedServiceAccount, 'create');
+			return undefined;
 		},
 		deleteService: function deleteService(name) {
 			this.$emit('delete-service-account', name);
