@@ -17,3 +17,16 @@ const app = new Vue({
 		toastr.options.timeOut = 0;
 	}
 });
+
+const socket = io();
+socket.on('error', (msg) => {
+	toast.error(msg);
+});
+
+setInterval(async () => {
+	try {
+		await apiFetch({ apipath: '/api/session-check' });
+	} catch (e) {
+		toast.error(e.message);
+	}
+}, 1800000);

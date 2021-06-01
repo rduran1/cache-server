@@ -67,6 +67,14 @@ app.use('/api/application-logs', require('../routes/applicationLogsRouter'));
 app.use('/api/hpsm-incidents', require('../routes/hpsmIncidentsRouter'));
 app.use('/api/collections', require('../routes/collectionRouter'));
 
+app.use('/api/session-check', (req, res) => {
+	const msg = 'token or authenticated accountId is required';
+	if (typeof res.session === 'undefined' || typeof req.session.accountId === 'undefined') {
+		res.statusMessage = msg;
+		res.end();
+	}
+});
+
 // Error handler for middleware
 app.use((e, req, res, next) => {
 	if (!e) return next();
