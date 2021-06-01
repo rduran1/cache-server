@@ -153,6 +153,10 @@ Vue.component('data-collections', {
 				body: config,
 				headers: { 'Content-Type': 'application/json' }
 			};
+			if (config.username === '' && config.password === '') {
+				delete cfg.body.username;
+				delete cfg.body.password;
+			}
 			await this.apiFetchNSyncModel(cfg);
 		},
 		getServiceAccount: async function getServiceAccount(name) {
@@ -176,6 +180,7 @@ Vue.component('data-collections', {
 				method: 'delete'
 			};
 			await this.apiFetchNSyncModel(config);
+			this.clearSelectedServiceAccount();
 		},
 		setToken: async function setToken(config, setType) {
 			let method;
