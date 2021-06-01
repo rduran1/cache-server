@@ -45,12 +45,8 @@ Vue.component('data-collections', {
 		return {
 			BASE_URL: '/api/collections',
 			metadata: [],
-			serviceAccounts: [
-				{ name: 'bigfix_dev_compliance' }, { name: 'EPO_service' }, { name: 'bigfix_dev_root' }
-			],
-			selectedServiceAccount: {
-				name: 'bigfix_dev_compliance'
-			},
+			serviceAccounts: [],
+			selectedServiceAccount: {},
 			isPendingServerResponse: false,
 			tokens: [],
 			msa: false,
@@ -60,8 +56,9 @@ Vue.component('data-collections', {
 		};
 	},
 	created: async function created() {
-		await this.refreshLocalStore('all-metadata', 'metadata');
-		await this.refreshLocalStore('all-service-accounts', 'serviceAccounts');
+		this.refreshLocalStore('all-metadata', 'metadata');
+		this.refreshLocalStore('all-service-accounts', 'serviceAccounts');
+		// this.refreshLocalStore('all-tokens', 'tokens');
 		socket.on('refresh metadata', () => this.refreshLocalStore('all-metadata', 'metadata'));
 		socket.on('refresh service-accounts', () => this.refreshLocalStore('all-service-accounts', 'serviceAccounts'));
 		socket.on('refresh tokens', () => this.refreshLocalStore('all-tokens', 'tokens'));
@@ -82,7 +79,7 @@ Vue.component('data-collections', {
 					this[dataProp].push(response[colNames[i]]);
 				}
 			} catch (e) {
-				toast.error(`Failed to get data from server: ${e.message}`);
+				toast.error(`Failed to load local dataset: ${e.message}`);
 			}
 		},
 		activate: function activate(id) {
@@ -99,65 +96,67 @@ Vue.component('data-collections', {
 		setCollectionStatus: async function setCollectionStatus(cfg) {
 			const { name, status } = cfg;
 			const config = {
-				model: 'metadata',
+				uri: 'all-metadata',
+				dataProp: 'metadata',
 				apipath: `${this.BASE_URL}/${status}/${name}`,
-				type: 'text',
 				method: 'put'
 			};
 			await this.apiFetchNSyncModel(config);
 		},
 		setMetaData: async function setMetaData(config, setType) {
-			const model = 'metadata';
-			let apipath = this.BASE_URL;
-			let method = 'post';
-			const body = config;
+			let apipath;
+			let method;
 			if (setType === 'create') {
-				apipath = `${apipath}/create-metadata/${config.name}`;
+				apipath = `${this.BASE_URL}/create-metadata/${config.name}`;
+				method = 'post';
 			}
 			if (setType === 'update') {
 				apipath = `${apipath}/update-metadata/${config.name}`;
 				method = 'put';
 			}
 			const cfg = {
-				model,
+				uri: 'all-metadata',
+				dataProp: 'metadata',
 				apipath,
 				method,
-				body,
-				type: 'text'
+				body: config
 			};
 			await this.apiFetchNSyncModel(cfg);
 		},
 		deleteMetaData: async function deleteMetaData(name) {
 			const config = {
-				model: 'metadata',
-				apipath: `${BASE_URL}/delete-metadata/${name}`,
-				method: 'delete',
-				type: 'text'
+				uri: 'all-metadata',
+				dataProp: 'metadata',
+				apipath: `${this.BASE_URL}/delete-metadata/${name}`,
+				method: 'delete'
 			};
 			await this.apiFetchNSyncModel(config);
 		},
 		setServiceAccount: async function setServiceAccount(config, setType) {
-			let apipath = this.BASE_URL;
-			let method = 'post';
+			let apipath;
+			let method;
 			if (setType === 'create') {
-				apipath = `${apipath}/create-service-account/${config.name}`;
+				apipath = `${this.BASE_URL}/create-service-account/${config.name}`;
+				method = 'post';
 			}
 			if (setType === 'update') {
-				apipath = `${apipath}/update-service-account/${config.name}`;
+				apipath = `${this.BASE_URL}/update-service-account/${config.name}`;
 				method = 'put';
 			}
 			const cfg = {
-				model: 'service-accounts',
+				uri: 'all-service-accounts',
+				dataProp: 'serviceAccounts',
 				apipath,
 				method,
-				type: 'text'
+				body: config,
+				headers: { 'Content-Type': 'application/json' }
 			};
 			await this.apiFetchNSyncModel(cfg);
 		},
 		getServiceAccount: async function getServiceAccount(name) {
-			let apipath = this.BASE_URL;
-			apipath = `${apipath}/service-account/${name}`;
+			const apipath = `${this.BASE_URL}/service-account/${name}`;
 			this.selectedServiceAccount = await apiFetch({ apipath, type: 'json' });
+			this.selectedServiceAccount.name = name;
 		},
 		clearSelectedServiceAccount: async function clearSelectedServiceAccount() {
 			const keyNames = Object.keys(this.selectedServiceAccount);
@@ -167,63 +166,53 @@ Vue.component('data-collections', {
 		},
 		deleteServiceAccount: async function deleteServiceAccount(name) {
 			const config = {
-				model: 'service-accounts',
-				apipath: `${BASE_URL}/delete-service-account/${name}`,
-				method: 'delete',
-				type: 'text'
+				uri: 'all-service-accounts',
+				dataProp: 'serviceAccounts',
+				apipath: `${this.BASE_URL}/delete-service-account/${name}`,
+				method: 'delete'
 			};
 			await this.apiFetchNSyncModel(config);
 		},
 		setToken: async function setToken(config, setType) {
-			let apipath = this.BASE_URL;
-			let method = 'post';
+			let method;
 			if (setType === 'create') {
-				apipath = `${apipath}/create-token/${config.name}`;
+				apipath = `${this.BASE_URL}/create-token/${config.name}`;
+				method = 'post';
 			}
 			if (setType === 'update') {
-				apipath = `${apipath}/update-token/${config.name}`;
+				apipath = `${this.BASE_URL}/update-token/${config.name}`;
 				method = 'put';
 			}
 			const cfg = {
-				model: 'token',
+				uri: 'all-tokens',
+				dataProp: 'tokens',
 				apipath,
-				method,
-				type: 'text'
+				method
 			};
 			await this.apiFetchNSyncModel(cfg);
 		},
 		deleteToken: async function deleteToken(name) {
 			const config = {
-				model: 'tokens',
-				apipath: `${BASE_URL}/delete-token/${name}`,
-				method: 'delete',
-				type: 'text'
+				uri: 'all-tokens',
+				dataProp: 'tokens',
+				apipath: `${this.BASE_URL}/delete-token/${name}`,
+				method: 'delete'
 			};
 			await this.apiFetchNSyncModel(config);
 		},
 		apiFetchNSyncModel: async function apiFetchNSyncModel(config) {
-			const cfg = config;
-			const { model } = cfg;
-			delete cfg.model;
+			const cfg = JSON.parse(JSON.stringify(config));
+			const { uri, dataProp } = cfg;
+			delete cfg.uri;
+			delete cfg.dataProp;
 			try {
 				this.isPendingServerResponse = true;
 				document.body.style.cursor = 'progress';
-				await apiFetch(cfg);
+				await apiFetch(config);
 				cfg.method = 'get';
+				delete cfg.body; // get requests cant have a body
 				await sleep(1000);
-				cfg.apipath = `${this.BASE_URL}/all-${model}`;
-				cfg.type = 'json';
-				const response = await apiFetch(cfg);
-				const colNames = Object.keys(response);
-				if (colNames.length === 0) {
-					this.metadata = [];
-					return;
-				}
-				this.metadata.length = 0;
-				for (let i = 0; i < colNames.length; i++) {
-					response[colNames[i]].name = colNames[i];
-					this.metadata.push(response[colNames[i]]);
-				}
+				this.refreshLocalStore(uri, dataProp);
 			} catch (e) {
 				toast.error(e.message);
 			}
