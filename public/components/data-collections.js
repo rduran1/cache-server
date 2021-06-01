@@ -51,7 +51,7 @@ Vue.component('data-collections', {
 				name: 'bigfix_dev_compliance'
 			},
 			isPendingServerResponse: false,
-			tokens: {},
+			tokens: [],
 			msa: false,
 			mcm: false,
 			mat: false,
@@ -59,25 +59,26 @@ Vue.component('data-collections', {
 		};
 	},
 	created: async function created() {
-		await this.refreshLocalStore('all-metadata');
-		socket.on('refresh metadata', () => this.refreshLocalStore('all-metadata'));
-		socket.on('refresh service-accounts', () => this.refreshLocalStore('all-service-accounts'));
-		socket.on('refresh tokens', () => this.refreshLocalStore('all-tokens'));
+		await this.refreshLocalStore('all-metadata', 'metadata');
+		await this.refreshLocalStore('all-service-accounts', 'serviceAccounts');
+		socket.on('refresh metadata', () => this.refreshLocalStore('all-metadata', 'metadata'));
+		socket.on('refresh service-accounts', () => this.refreshLocalStore('all-service-accounts', 'serviceAccounts'));
+		socket.on('refresh tokens', () => this.refreshLocalStore('all-tokens', 'tokens'));
 	},
 	methods: {
-		refreshLocalStore: async function refreshLocalStore(storeUri) {
+		refreshLocalStore: async function refreshLocalStore(storeUri, dataProp) {
 			try {
 				const response = await apiFetch({ apipath: `${this.BASE_URL}/${storeUri}`, type: 'json' });
 				if (typeof response !== 'object') throw new Error('Server did not respond with a object');
 				const colNames = Object.keys(response);
 				if (colNames.length === 0) {
-					this.metadata = [];
+					this[dataProp] = [];
 					return;
 				}
-				this.metadata.length = 0;
+				this[dataProp].length = 0;
 				for (let i = 0; i < colNames.length; i++) {
 					response[colNames[i]].name = colNames[i];
-					this.metadata.push(response[colNames[i]]);
+					this[dataProp].push(response[colNames[i]]);
 				}
 			} catch (e) {
 				toast.error(`Failed to get data from server: ${e.message}`);
