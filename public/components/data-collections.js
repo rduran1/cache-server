@@ -22,6 +22,7 @@ Vue.component('data-collections', {
 			v-if="msa"
 			@clear-selected-service-account=clearSelectedServiceAccount
 			@set-service-account=setServiceAccount
+			@get-service-account=getServiceAccount
 			@delete-service-account=deleteServiceAccount
 			:service-accounts=serviceAccounts
 			:selected-service-account=selectedServiceAccount
@@ -152,6 +153,11 @@ Vue.component('data-collections', {
 				type: 'text'
 			};
 			await this.apiFetchNSyncModel(cfg);
+		},
+		getServiceAccount: async function getServiceAccount(name) {
+			let apipath = this.BASE_URL;
+			apipath = `${apipath}/service-account/${name}`;
+			this.selectedServiceAccount = await apiFetch({ apipath, type: 'json' });
 		},
 		clearSelectedServiceAccount: async function clearSelectedServiceAccount() {
 			const keyNames = Object.keys(this.selectedServiceAccount);
