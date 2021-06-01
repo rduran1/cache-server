@@ -50,6 +50,10 @@ function logout() {
 	window.location = '/app/login';
 }
 
+function sleep(time) {
+	return new Promise((resolve) => setTimeout(resolve, time));
+}
+
 async function apiFetch(config) {
 	const cfg = typeof config === 'object' && !Array.isArray(config) ? config : {};
 	const { apipath = '/', method = 'GET', type = 'text', headers, body } = cfg;
