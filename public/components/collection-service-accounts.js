@@ -7,38 +7,39 @@ Vue.component('collection-service-accounts', {
     <div class="grid-container">
 			<div>
 				<div id="title">Service Accounts</div>
-				<ul border=1>
-					<li v-for="serviceAccount in serviceAccounts">{{serviceAccount.name}}</li>
+				<ul>
+					<li @click="getServiceDetails(serviceAccount.name)" v-for="serviceAccount in serviceAccounts">{{serviceAccount.name}}</li>
 				</ul>
 			</div>
 			<div>
 				<div id="title">Service Account Details</div>
 					<div class="service-account-details-grid">
 						<label class="first-row" for="name">Service Name:</label>
-						<input class="first-row" id="name" :value=selectedServiceAccount.name />
+						<input class="first-row" id="name" v-model=selectedServiceAccount.name :readonly="serviceNameFieldReadOnly"/>
 						<label for="host">Host Name:</label>
-						<input id="host"></input>
+						<input id="host" v-model=selectedServiceAccount.host></input>
 						<label for="port">Port Number:</label>
-						<input id="port"></input>
+						<input id="port" v-model=selectedServiceAccount.port></input>
 						<label for="username">User Name:</label>
-						<input id="username"></input>
+						<input id="username" v-model=selectedServiceAccount.username></input>
 						<label for="password">Password:</label>
-						<input id="password" type="password"></input>
+						<input id="password" type="password" v-model=selectedServiceAccount.password></input>
 						<label for="reject-unauthorized">Reject Unauthorized:</label>
-						<select id="reject-unauthorized">
+						<select id="reject-unauthorized" v-model=selectedServiceAccount.rejectUnauthorized>
 							<option>True</option>
 							<option>False</option>
 						</select>
 						<label for="timeout">HTTP Timeout:</label>
-						<input id="timeout"></input>
+						<input id="timeout" v-model=selectedServiceAccount.timeout></input>
 						<label for="method">HTTP Method:</label>
-						<select id="method">
+						<select id="method" v-model=selectedServiceAccount.method>
 							<option>GET</option>
 							<option>POST</option>
 						</select>
 						<div/>
 						<div>
-							<button>Create</button><button>Clear</button>
+							<button>{{ buttonName }}</button>
+							<button @click="clearSelectedService">Clear</button>
 						</div>
 					</div>
 				</div>
@@ -47,7 +48,7 @@ Vue.component('collection-service-accounts', {
   `,
 	data: function () {
 		return {
-			name: ''
+			serviceNameFieldReadOnly: false
 		};
 	},
 
@@ -56,7 +57,30 @@ Vue.component('collection-service-accounts', {
 		'selectedServiceAccount'
 	],
 
-	methods: {
+	computed: {
+		buttonName: function buttonName() {
+			if (this.serviceNameFieldReadOnly) return 'Update';
+			return 'Create';
+		}
+	},
 
+	methods: {
+		clearSelectedService: function clearSelectedService() {
+			this.serviceNameFieldReadOnly = false;
+			this.$emit('clear-selected-service-account');
+		},
+		getServiceDetails: function getServiceDetails(name) {
+			this.serviceNameFieldReadOnly = true;
+			this.$emit('get-service-account', name);
+		},
+		createService: function createService(obj) {
+			this.$emit('set-service-account', obj, 'create');
+		},
+		updateService: function updateService(obj) {
+			this.$emit('set-service-account', obj, 'update');
+		},
+		deleteService: function deleteService(name) {
+			this.$emit('delete-service-account', name);
+		}
 	}
 });

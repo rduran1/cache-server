@@ -20,6 +20,7 @@ Vue.component('data-collections', {
 		
 		<collection-service-accounts
 			v-if="msa"
+			@clear-selected-service-account=clearSelectedServiceAccount
 			@set-service-account=setServiceAccount
 			@delete-service-account=deleteServiceAccount
 			:service-accounts=serviceAccounts
@@ -58,16 +59,16 @@ Vue.component('data-collections', {
 		};
 	},
 	created: async function created() {
-		await this.refreshMetaDataStore();
-		socket.on('refresh metadata', () => {
-			this.refreshMetaDataStore();
-		});
+		await this.refreshLocalStore('all-metadata');
+		socket.on('refresh metadata', () => this.refreshLocalStore('all-metadata'));
+		socket.on('refresh service-accounts', () => this.refreshLocalStore('all-service-accounts'));
+		socket.on('refresh tokens', () => this.refreshLocalStore('all-tokens'));
 	},
 	methods: {
-		refreshMetaDataStore: async function refreshMetaDataStore() {
+		refreshLocalStore: async function refreshLocalStore(storeUri) {
 			try {
-				const response = await apiFetch({ apipath: `${this.BASE_URL}/all-metadata`, type: 'json' });
-				if (typeof response !== 'object') throw new Error('Server did not respond with a collection object');
+				const response = await apiFetch({ apipath: `${this.BASE_URL}/${storeUri}`, type: 'json' });
+				if (typeof response !== 'object') throw new Error('Server did not respond with a object');
 				const colNames = Object.keys(response);
 				if (colNames.length === 0) {
 					this.metadata = [];
@@ -79,7 +80,7 @@ Vue.component('data-collections', {
 					this.metadata.push(response[colNames[i]]);
 				}
 			} catch (e) {
-				toast.error(`Failed to get list of collections: ${e.message}`);
+				toast.error(`Failed to get data from server: ${e.message}`);
 			}
 		},
 		activate: function activate(id) {
@@ -150,6 +151,12 @@ Vue.component('data-collections', {
 				type: 'text'
 			};
 			await this.apiFetchNSyncModel(cfg);
+		},
+		clearSelectedServiceAccount: async function clearSelectedServiceAccount() {
+			const keyNames = Object.keys(this.selectedServiceAccount);
+			keyNames.forEach((kn) => {
+				this.selectedServiceAccount[kn] = '';
+			});
 		},
 		deleteServiceAccount: async function deleteServiceAccount(name) {
 			const config = {
