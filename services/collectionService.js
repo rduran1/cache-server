@@ -2,6 +2,7 @@ const fs = require('fs');
 const qs = require('querystring');
 const { join } = require('path');
 const Emitter = require('events').EventEmitter;
+const notifier = require('notifier');
 const logger = require('./loggingService')(__filename);
 const toolboxService = require('./toolboxService');
 const transformService = require('./transformService');
@@ -426,6 +427,7 @@ collectionService.startInterval = async (collectionName) => {
 	const metaData = await collectionService.getMetaData(v.collectionName);
 	if (metaData.status === 'stopped') return;
 	await setIntervalTimer(v.collectionName);
+	notifier.emit('refresh-metadata');
 	logger.info(`Collection interval for "${collectionName}" successfully started`);
 };
 
