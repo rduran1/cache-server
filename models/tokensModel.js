@@ -44,7 +44,7 @@ model.getToken = async (tokenName) => {
 
 model.getAllTokens = async () => {
 	const clone = toolboxService.clone(store);
-	return clone;
+	return clone.filter((o) => o.status !== 'deleted');
 };
 
 model.createToken = async (config) => {
@@ -69,7 +69,7 @@ model.updateToken = async (config) => {
 
 model.deleteToken = async (tokenName) => {
 	const clone = toolboxService.clone(store);
-	let token = clone.find((e) => e.tokenName === tokenName);
+	let token = clone.find((e) => (e.tokenName === tokenName && e.status !== 'deleted'));
 	if (typeof token !== 'object') return;
 	if (typeof token === 'object') token.status = 'deleted';
 	await toolboxService.saveStoreToFile(storeFile, clone);
