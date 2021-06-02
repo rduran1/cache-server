@@ -39,7 +39,6 @@ Vue.component('collection-tokens', {
 									:id="item"
 									:value="item"
 									:checked="isChecked(item)"
-									@click="updateSelectedCollectionsArray()"
 									ref="collectionCheckboxesRef"
 								/>
 							</div>
@@ -86,11 +85,6 @@ Vue.component('collection-tokens', {
 	},
 
 	methods: {
-		updateSelectedCollectionsArray: function updateSelectedCollectionsArray() {
-			this.selectedCollections.length = 0;
-			const s = this.$refs.collectionCheckboxesRef.filter((e) => e.checked);
-			s.map((e) => this.selectedCollections.push(e.value));
-		},
 		isChecked: function isChecked(collectionName) {
 			if (typeof this.selectedToken !== 'object' || typeof this.selectedToken.collections !== 'object') return false;
 			return this.selectedToken.collections.includes(collectionName);
@@ -99,12 +93,17 @@ Vue.component('collection-tokens', {
 			this.filteredCollectionList = this.collectionNames.filter((name) => name.includes(this.filterString));
 		},
 		clearSelectedToken: function clearSelectedToken() {
+			this.selectedCollections.length = 0;
 			this.$emit('clear-selected-token');
 		},
 		getToken: function getToken(name) {
+			this.selectedCollections.length = 0;
 			this.$emit('get-token', name);
 		},
 		createOrUpdateToken: function createOrUpdateToken() {
+			this.selectedCollections.length = 0;
+			const s = this.$refs.collectionCheckboxesRef.filter((e) => e.checked);
+			s.map((e) => this.selectedCollections.push(e.value));
 			const clone = JSON.parse(JSON.stringify(this.selectedToken));
 			clone.collections = this.selectedCollections;
 			delete clone.value;
