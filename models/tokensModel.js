@@ -34,7 +34,7 @@ model.isTokenAuthorizedToAccessCollection = async (tokenName, collectionName) =>
 };
 
 model.getToken = async (tokenName) => {
-	const token = store.find((e) => e.tokenName === tokenName);
+	const token = store.find((e) => e.tokenName === tokenName && e.status !== 'deleted');
 	if (typeof token === 'object') {
 		const clone = toolboxService.clone(token);
 		return clone;
@@ -59,11 +59,11 @@ model.createToken = async (config) => {
 
 model.updateToken = async (config) => {
 	const clone = toolboxService.clone(store);
-	let token = clone.find((e) => e.tokenName === config.tokenName);
+	let token = clone.find((e) => (e.tokenName === config.tokenName && e.status !== 'deleted'));
 	if (typeof token !== 'object') return;
 	Object.assign(token, config);
 	await toolboxService.saveStoreToFile(storeFile, clone);
-	token = store.find((e) => e.tokenName === config.tokenName);
+	token = store.find((e) => (e.tokenName === config.tokenName && e.status !== 'deleted'));
 	Object.assign(token, config);
 };
 
@@ -73,7 +73,7 @@ model.deleteToken = async (tokenName) => {
 	if (typeof token !== 'object') return;
 	if (typeof token === 'object') token.status = 'deleted';
 	await toolboxService.saveStoreToFile(storeFile, clone);
-	token = store.find((e) => e.tokenName === tokenName);
+	token = store.find((e) => (e.tokenName === tokenName && e.status !== 'deleted'));
 	token.status = 'deleted';
 };
 
