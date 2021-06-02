@@ -42,7 +42,7 @@ Vue.component('data-collections', {
 			@get-token=getToken
 			@delete-token=deleteToken
 			:tokens=tokens
-			:token-update-mode:tokenUpdateMode
+			:token-update-mode=tokenUpdateMode
 			:selected-token=selectedToken
 			:metadata=metadata
 		>tokens</collection-tokens>
@@ -189,6 +189,19 @@ Vue.component('data-collections', {
 			};
 			await this.apiFetchNSyncModel(config);
 			this.clearSelectedServiceAccount();
+		},
+		clearSelectedToken: function clearSelectedToken() {
+			const keyNames = Object.keys(this.selectedToken);
+			keyNames.forEach((kn) => {
+				this.selectedToken[kn] = '';
+			});
+			this.tokenUpdateMode = false;
+		},
+		getToken: async function getToken(name) {
+			const apipath = `${this.BASE_URL}/token/${name}`;
+			this.selectedToken = await apiFetch({ apipath, type: 'json' });
+			this.selectedToken.tokenName = name;
+			this.tokenUpdateMode = true;
 		},
 		setToken: async function setToken(config, setType) {
 			let method;
