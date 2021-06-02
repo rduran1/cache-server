@@ -209,10 +209,9 @@ Vue.component('data-collections', {
 			if (setType === 'create') {
 				apipath = `${this.BASE_URL}/create-token`;
 				method = 'post';
-				// headers: { 'Content-Type': 'application/json' }
 			}
 			if (setType === 'update') {
-				apipath = `${this.BASE_URL}/update-token/${config.name}`;
+				apipath = `${this.BASE_URL}/update-token/${config.tokenName}`;
 				method = 'put';
 			}
 			const cfg = {
@@ -220,7 +219,8 @@ Vue.component('data-collections', {
 				dataProp: 'tokens',
 				apipath,
 				method,
-				body: config
+				body: config,
+				headers: { 'Content-Type': 'application/json' }
 			};
 			await this.apiFetchNSyncModel(cfg);
 		},
@@ -232,6 +232,7 @@ Vue.component('data-collections', {
 				method: 'delete'
 			};
 			await this.apiFetchNSyncModel(config);
+			this.clearSelectedToken();
 		},
 		apiFetchNSyncModel: async function apiFetchNSyncModel(config) {
 			const cfg = JSON.parse(JSON.stringify(config));
