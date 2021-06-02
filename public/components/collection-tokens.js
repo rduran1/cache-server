@@ -35,11 +35,11 @@ Vue.component('collection-tokens', {
 							<div v-for="(item, idx) in filteredCollectionList">
 								<label class="collection-label"> {{ item }} </label>
 								<input class="collection-checkbox"
-									@click="updateSelectedDatasets(item)"
 									type="checkbox"
 									:id="item"
 									:value="item"
 									:checked="false"
+									v-model="selectedCollections"
 								/>
 							</div>
 						</div>
@@ -57,8 +57,13 @@ Vue.component('collection-tokens', {
 	data: function () {
 		return {
 			filterString: '',
-			filteredCollectionList: []
+			filteredCollectionList: [],
+			selectedCollections: []
 		};
+	},
+
+	created: function created() {
+		this.filterCollectionsList = this.collectionNames;
 	},
 
 	props: [
@@ -90,8 +95,11 @@ Vue.component('collection-tokens', {
 			this.$emit('get-token', name);
 		},
 		createOrUpdateToken: function createOrUpdateToken() {
-			if (this.buttonName === 'Update') return this.$emit('set-token', this.selectedToken, 'update');
-			if (this.buttonName === 'Create') return this.$emit('set-token', this.selectedToken, 'create');
+			const clone = JSON.parse(JSON.stringify(this.selectedToken));
+			clone.collections = this.selectedCollections;
+
+			if (this.buttonName === 'Update') return this.$emit('set-token', clone, 'update');
+			if (this.buttonName === 'Create') return this.$emit('set-token', clone, 'create');
 			return undefined;
 		},
 		deleteToken: function deleteToken(name) {
