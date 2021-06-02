@@ -38,7 +38,7 @@ Vue.component('collection-tokens', {
 									type="checkbox"
 									:id="item"
 									:value="item"
-									:checked="false"
+									:checked="isChecked(item)"
 									v-model="selectedCollections"
 								/>
 							</div>
@@ -85,6 +85,9 @@ Vue.component('collection-tokens', {
 	},
 
 	methods: {
+		isChecked: function isChecked(collectionName) {
+			selectedToken.collections.include(collectionName);
+		},
 		filterCollectionsList: function filterCollectionsList() {
 			this.filteredCollectionList = this.collectionNames.filter((name) => name.includes(this.filterString));
 		},
