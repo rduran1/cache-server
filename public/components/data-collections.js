@@ -37,8 +37,14 @@ Vue.component('data-collections', {
 
 		<collection-tokens
 			v-if="mat"
-			@set=setServiceAccount
-			@delete=deleteServiceAccount
+			@clear-selected-token=clearSelectedToken
+			@set-token=setToken
+			@get-token=getToken
+			@delete-token=deleteToken
+			:tokens=tokens
+			:token-update-mode:tokenUpdateMode
+			:selected-token=selectedToken
+			:metadata=metadata
 		>tokens</collection-tokens>
 	</div>
 	`,
@@ -48,7 +54,9 @@ Vue.component('data-collections', {
 			metadata: [],
 			serviceAccounts: [],
 			serviceAccountUpdateMode: false,
+			tokenUpdateMode: false,
 			selectedServiceAccount: {},
+			selectedToken: {},
 			isPendingServerResponse: false,
 			tokens: [],
 			msa: false,
@@ -60,7 +68,7 @@ Vue.component('data-collections', {
 	created: async function created() {
 		this.refreshLocalStore('all-metadata', 'metadata');
 		this.refreshLocalStore('all-service-accounts', 'serviceAccounts');
-		// this.refreshLocalStore('all-tokens', 'tokens');
+		this.refreshLocalStore('all-tokens', 'tokens');
 		socket.on('refresh metadata', () => this.refreshLocalStore('all-metadata', 'metadata'));
 		socket.on('refresh service-accounts', () => this.refreshLocalStore('all-service-accounts', 'serviceAccounts'));
 		socket.on('refresh tokens', () => this.refreshLocalStore('all-tokens', 'tokens'));
