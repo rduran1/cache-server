@@ -39,7 +39,8 @@ Vue.component('collection-tokens', {
 									:id="item"
 									:value="item"
 									:checked="isChecked(item)"
-									@click="updateSelectedCollectionsArray(item)"
+									@click="updateSelectedCollectionsArray()"
+									ref="collectionCheckboxesRef"
 								/>
 							</div>
 						</div>
@@ -85,9 +86,10 @@ Vue.component('collection-tokens', {
 	},
 
 	methods: {
-		updateSelectedCollectionsArray: function updateSelectedCollectionsArray(item) {
-			// selectedCollections
-			console.log(item);
+		updateSelectedCollectionsArray: function updateSelectedCollectionsArray() {
+			this.selectedCollections.length = 0;
+			const s = this.$refs.collectionCheckboxesRef.filter((e) => e.checked);
+			s.map((e) => this.selectedCollections.push(e.value));
 		},
 		isChecked: function isChecked(collectionName) {
 			if (typeof this.selectedToken !== 'object' || typeof this.selectedToken.collections !== 'object') return false;

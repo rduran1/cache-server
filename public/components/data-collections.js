@@ -223,6 +223,7 @@ Vue.component('data-collections', {
 				headers: { 'Content-Type': 'application/json' }
 			};
 			await this.apiFetchNSyncModel(cfg);
+			this.clearSelectedToken();
 		},
 		deleteToken: async function deleteToken(name) {
 			const config = {
