@@ -86,7 +86,8 @@ Vue.component('collection-tokens', {
 
 	methods: {
 		isChecked: function isChecked(collectionName) {
-			selectedToken.collections.include(collectionName);
+			if (typeof this.selectedToken !== 'object' || typeof this.selectedToken.collections !== 'object') return false;
+			return this.selectedToken.collections.includes(collectionName);
 		},
 		filterCollectionsList: function filterCollectionsList() {
 			this.filteredCollectionList = this.collectionNames.filter((name) => name.includes(this.filterString));
@@ -100,12 +101,9 @@ Vue.component('collection-tokens', {
 		createOrUpdateToken: function createOrUpdateToken() {
 			const clone = JSON.parse(JSON.stringify(this.selectedToken));
 			clone.collections = this.selectedCollections;
-
-			if (this.buttonName === 'Update') {
-				delete clone.value;
-				delete clone.dateIssued;
-				return this.$emit('set-token', clone, 'update');
-			}
+			delete clone.value;
+			delete clone.dateIssued;
+			if (this.buttonName === 'Update') return this.$emit('set-token', clone, 'update');
 			if (this.buttonName === 'Create') return this.$emit('set-token', clone, 'create');
 			return undefined;
 		},
