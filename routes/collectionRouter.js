@@ -8,7 +8,7 @@ router.get('/all-tokens', accessController.isAllowed, collectionController.getAl
 
 router.get('/metadata/:name', accessController.isAllowed, collectionController.getMetaDataByName);
 router.get('/service-account/:name', accessController.isAllowed, collectionController.getServiceAccountByName);
-router.get('/token/:alias', accessController.isAllowed, collectionController.getTokenByAlias);
+router.get('/token/:name', accessController.isAllowed, collectionController.getToken);
 
 router.get('/dataset/:name', accessController.isAllowed, collectionController.getDataSetByName);
 
@@ -17,15 +17,15 @@ router.post('/create-service-account/:name', accessController.isAllowed, collect
 router.post('/create-token', accessController.isAllowed, collectionController.createToken);
 
 router.put('/update-metadata/:name', accessController.isAllowed, collectionController.updateMetaData);
-router.put('/update-server-account/:name', accessController.isAllowed, collectionController.updateServiceAccount);
-router.put('/update-token/:alias', accessController.isAllowed, collectionController.updateToken);
+router.put('/update-service-account/:name', accessController.isAllowed, collectionController.updateServiceAccount);
+router.put('/update-token/:name', accessController.isAllowed, collectionController.updateToken);
 
 router.put('/start/:name', accessController.isAllowed, collectionController.startCollection);
 router.put('/stop/:name', accessController.isAllowed, collectionController.stopCollection);
 
 router.delete('/delete-metadata/:name', accessController.isAllowed, collectionController.deleteMetaData);
 router.delete('/delete-service-account/:name', accessController.isAllowed, collectionController.deleteServiceAccount);
-router.delete('delete-token/:alias', accessController.isAllowed, collectionController.deleteToken);
+router.delete('delete-token/:name', accessController.isAllowed, collectionController.deleteToken);
 
 router.post('/dataset/:name', accessController.isAllowed, collectionController.saveDataStream);
 

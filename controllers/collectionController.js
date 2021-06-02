@@ -18,10 +18,10 @@ collectionController.getAllTokens = async (req, res) => {
 	}
 };
 
-collectionController.getTokenByAlias = async (req, res) => {
-	const { alias } = req.params;
+collectionController.getToken = async (req, res) => {
+	const { name } = req.params;
 	try {
-		const token = await collectionService.getTokenByAlias(alias);
+		const token = await collectionService.getToken(name);
 		res.send(token);
 	} catch (e) {
 		res.statusMessage = e.message;
@@ -41,7 +41,9 @@ collectionController.createToken = async (req, res) => {
 };
 
 collectionController.updateToken = async (req, res) => {
+	const { name } = req.params;
 	const config = req.body;
+	config.tokenName = name;
 	try {
 		await collectionService.updateToken(config);
 		res.send();
@@ -52,9 +54,9 @@ collectionController.updateToken = async (req, res) => {
 };
 
 collectionController.deleteToken = async (req, res) => {
-	const { alias } = req.params;
+	const { name } = req.params;
 	try {
-		await collectionService.deleteToken(alias);
+		await collectionService.deleteToken(name);
 		res.send();
 	} catch (e) {
 		res.statusMessage = e.message;

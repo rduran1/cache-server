@@ -10,6 +10,7 @@ const httpClientService = require('./httpClientService');
 const configurationService = require('./configurationService')(__filename);
 const serviceAccountService = require('./serviceAccountService')(__filename);
 const collectionsModel = require('../models/collectionsModel');
+const tokensModel = require('../models/tokensModel');
 
 const em = new Emitter();
 
@@ -185,6 +186,45 @@ const clientRequestHandler = (clientRequest, collectionName, processAsStream, bo
 	}
 });
 
+collectionService.createToken = async (config) => {
+	const v = validationLogWrapper(config, 'collectionService_createToken');
+	const token = await tokensModel.getToken(v.tokenName);
+	if (typeof token === 'object') throw new Error(`Token name "${v.tokenName}" already exists`);
+	await tokensModel.createToken(v);
+};
+
+collectionService.getToken = async (tokenName) => {
+	const v = validationLogWrapper({ tokenName }, 'collectionService_getToken');
+	const token = await tokensModel.getToken(v.tokenName);
+	if (typeof token !== 'object') throw new Error(`Token name "${v.tokenName}" does not exist`);
+	return token;
+};
+
+collectionService.getAllTokens = async () => {
+	const tokens = await tokensModel.getAllTokens();
+	return tokens;
+};
+
+collectionService.updateToken = async (config) => {
+	const v = validationLogWrapper(config, 'collectionService_updateToken');
+	const token = await tokensModel.getToken(v.tokenName);
+	if (typeof token !== 'object') throw new Error(`Token name "${v.tokenName}" does not exist`);
+	await tokensModel.updateToken(v);
+};
+
+collectionService.deleteToken = async (tokenName) => {
+	const v = validationLogWrapper({ tokenName }, 'collectionService_deleteToken');
+	const token = await tokensModel.getToken(v.tokenName);
+	if (typeof token !== 'object') throw new Error(`Token name "${v.tokenName}" does not exist`);
+	await tokensModel.deleteToken(v.tokenName);
+};
+
+collectionService.isTokenAuthorizedToAccessCollection = async (tokenName, collectionName) => {
+	const v = validationLogWrapper({ tokenName, collectionName }, 'collectionService_isTokenAuthorizedToAccessCollection');
+	const result = await tokensModel.isTokenAuthorizedToAccessCollection(v.tokenName, v.collectionName);
+	return result;
+};
+
 collectionService.increaseStreamCount = (collectionName) => {
 	const v = validationLogWrapper({ collectionName }, 'collectionService_increaseStreamCount');
 	collectionsModel.increaseStreamCount(v.collectionName);
@@ -343,7 +383,8 @@ collectionService.getAllMetaData = async () => {
 };
 
 collectionService.getAllServiceAccounts = async () => {
-	const sa = await collectionsModel.getAllServiceAccounts();
+	// const sa = await collectionsModel.getAllServiceAccounts();
+	const sa = await serviceAccountService.getAll();
 	return sa;
 };
 
