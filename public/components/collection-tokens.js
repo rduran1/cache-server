@@ -39,7 +39,7 @@ Vue.component('collection-tokens', {
 									:id="item"
 									:value="item"
 									:checked="isChecked(item)"
-									v-model="selectedCollections"
+									@click="updateSelectedCollectionsArray(item)"
 								/>
 							</div>
 						</div>
@@ -85,6 +85,10 @@ Vue.component('collection-tokens', {
 	},
 
 	methods: {
+		updateSelectedCollectionsArray: function updateSelectedCollectionsArray(item) {
+			// selectedCollections
+			console.log(item);
+		},
 		isChecked: function isChecked(collectionName) {
 			if (typeof this.selectedToken !== 'object' || typeof this.selectedToken.collections !== 'object') return false;
 			return this.selectedToken.collections.includes(collectionName);
