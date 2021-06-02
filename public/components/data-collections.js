@@ -204,10 +204,12 @@ Vue.component('data-collections', {
 			this.tokenUpdateMode = true;
 		},
 		setToken: async function setToken(config, setType) {
+			let apipath;
 			let method;
 			if (setType === 'create') {
-				apipath = `${this.BASE_URL}/create-token/${config.name}`;
+				apipath = `${this.BASE_URL}/create-token`;
 				method = 'post';
+				// headers: { 'Content-Type': 'application/json' }
 			}
 			if (setType === 'update') {
 				apipath = `${this.BASE_URL}/update-token/${config.name}`;
@@ -217,7 +219,8 @@ Vue.component('data-collections', {
 				uri: 'all-tokens',
 				dataProp: 'tokens',
 				apipath,
-				method
+				method,
+				body: config
 			};
 			await this.apiFetchNSyncModel(cfg);
 		},
