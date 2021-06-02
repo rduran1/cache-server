@@ -19,7 +19,7 @@ Vue.component('collection-tokens', {
 						<label for="description">Description:</label>
 						<input id="description" v-model=selectedToken.description></input>
 						<label for="issued-to">Issued To:</label>
-						<input id="issued-to" v-model=selectedToken.issuedTo :readonly="tokenUpdateMode"></input>
+						<input id="issued-to" v-model=selectedToken.issuedTo></input>
 						<label v-if="tokenUpdateMode" for="date-issued">Date Issued:</label>
 						<input v-if="tokenUpdateMode" id="date-issued" :value=selectedToken.dateIssued readonly></input>
 						<label v-if="tokenUpdateMode" for="value">Value:</label>
@@ -63,7 +63,7 @@ Vue.component('collection-tokens', {
 	},
 
 	created: function created() {
-		this.filterCollectionsList = this.collectionNames;
+		this.filteredCollectionList = this.collectionNames;
 	},
 
 	props: [
@@ -98,7 +98,11 @@ Vue.component('collection-tokens', {
 			const clone = JSON.parse(JSON.stringify(this.selectedToken));
 			clone.collections = this.selectedCollections;
 
-			if (this.buttonName === 'Update') return this.$emit('set-token', clone, 'update');
+			if (this.buttonName === 'Update') {
+				delete clone.value;
+				delete clone.dateIssued;
+				return this.$emit('set-token', clone, 'update');
+			}
 			if (this.buttonName === 'Create') return this.$emit('set-token', clone, 'create');
 			return undefined;
 		},
