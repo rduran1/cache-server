@@ -19,27 +19,31 @@ Vue.component('collection-tokens', {
 						<label for="description">Description:</label>
 						<input id="description" v-model=selectedToken.description></input>
 						<label for="issued-to">Issued To:</label>
-						<input id="issued-to" v-model=selectedToken.issuedTo></input>
-						<label for="date-issued">Date Issued:</label>
-						<input id="date-issued" v-model=selectedToken.dateIssued></input>
-						<label for="value">Value:</label>
-						<input id="value" v-model=selectedToken.value></input>
-						<label for="collections">Token has access to the following selected collections:</label>
-
+						<input id="issued-to" v-model=selectedToken.issuedTo :readonly="tokenUpdateMode"></input>
+						<label v-if="tokenUpdateMode" for="date-issued">Date Issued:</label>
+						<input v-if="tokenUpdateMode" id="date-issued" :value=selectedToken.dateIssued readonly></input>
+						<label v-if="tokenUpdateMode" for="value">Value:</label>
+						<input v-if="tokenUpdateMode" id="value" v-model=selectedToken.value></input>
+						<p class="nowrap">Token has access to the following selected collections:</p>
+						<div></div>
+						<label>Filter:</label>
 						<div>
-							<input @keyup="filterCollectionsList" v-model="filterString">
+							<input class="collection-filter" @keyup="filterCollectionsList" v-model="filterString">
 						</div>
-						<div v-for"(item, idx) in filteredCollectionList">
-							<label> {{ item }} </label>
-							<input
-								@click="updateSelectedDatasets(item)"
-								type="checkbox"
-								:id="item"
-								:value="item"
-								:checked="false"
-							/>
+						<div></div>
+						<div>
+							<div v-for="(item, idx) in filteredCollectionList">
+								<label class="collection-label"> {{ item }} </label>
+								<input class="collection-checkbox"
+									@click="updateSelectedDatasets(item)"
+									type="checkbox"
+									:id="item"
+									:value="item"
+									:checked="false"
+								/>
+							</div>
 						</div>
-
+						<div></div>
 						<div>
 							<button @click="createOrUpdateToken">{{ buttonName }}</button>
 							<button @click="clearSelectedToken">Clear</button>
@@ -70,7 +74,7 @@ Vue.component('collection-tokens', {
 			return 'Create';
 		},
 		collectionNames: function collectionNames() {
-			const names = metadata.map((col) => col.name);
+			const names = this.metadata.map((col) => col.name);
 			return names;
 		}
 	},
