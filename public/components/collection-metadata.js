@@ -112,11 +112,16 @@ Vue.component('collection-metadata', {
 				return val;
 			}
 		},
-		relevance: function relevance() {
-			if (typeof this.selectedMetadata.body === 'object') {
-				if (typeof this.selectedMetadata.body.relevance === 'string') return this.selectedMetadata.body.relevance;
+		relevance: {
+			get() {
+				if (typeof this.selectedMetadata.body === 'object') {
+					if (typeof this.selectedMetadata.body.relevance === 'string') return this.selectedMetadata.body.relevance;
+				}
+				return undefined;
+			},
+			set(val) {
+				return val;
 			}
-			return undefined;
 		}
 	},
 
@@ -128,10 +133,13 @@ Vue.component('collection-metadata', {
 			this.$emit('get-metadata', name);
 		},
 		createOrUpdateMetadata: function createOrUpdateMetadata() {
-			delete this.selectedMetadata.status;
-			delete this.selectedMetadata.streamingCount;
-			if (this.buttonName === 'Update') return this.$emit('set-metadata', this.selectedMetadata, 'update');
-			if (this.buttonName === 'Create') return this.$emit('set-metadata', this.selectedMetadata, 'create');
+			const clone = JSON.parse(JSON.stringify(this.selectedMetadata));
+			delete clone.status;
+			delete clone.streamingCount;
+			if (typeof this.outputType === 'string') clone.body.output = this.outputType;
+			if (typeof this.relevance === 'string') clone.body.relevance = this.relevance;
+			if (this.buttonName === 'Update') return this.$emit('set-metadata', clone, 'update');
+			if (this.buttonName === 'Create') return this.$emit('set-metadata', clone, 'create');
 			return undefined;
 		},
 		deleteMetadata: function deleteMetadata(name) {
