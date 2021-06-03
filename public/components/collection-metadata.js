@@ -49,13 +49,13 @@ Vue.component('collection-metadata', {
 						<input id="path" v-model=selectedMetadata.path></input>
 
 						<label v-show="showBFRelevanceSection" for="incoming-transform">Output:</label>
-						<select v-show="showBFRelevanceSection" id="incoming-transform" v-model=outputType>
+						<select v-show="showBFRelevanceSection" id="incoming-transform" :selected="this.output" @change="updateOutput">
 							<option value="xml">XML</option>
 							<option value="json">JSON</option>
 						</select>
 
 						<label v-show="showBFRelevanceSection" for="incoming-transform">Relevance:</label>
-						<textarea v-show="showBFRelevanceSection" id="incoming-transform" v-model=relevance></textarea>
+						<textarea v-show="showBFRelevanceSection" id="incoming-transform" :selected="this.rel"></textarea>
 
 						<label for="incoming-transform">Incoming Transform:</label>
 						<select id="incoming-transform" v-model=selectedMetadata.incomingTransforms>
@@ -81,10 +81,7 @@ Vue.component('collection-metadata', {
     </div>
   `,
 	data: function () {
-		return {
-			relevance1: '',
-			outputType1: ''
-		};
+		return {};
 	},
 
 	props: [
@@ -104,32 +101,35 @@ Vue.component('collection-metadata', {
 		},
 		showBFRelevanceSection: function showBFRelevanceSection() {
 			return this.selectedMetadata.sourceType === 'bigfix_root_api';
-		},
-		outputType: {
-			get() {
-				if (typeof this.selectedMetadata.body === 'object') {
-					if (typeof this.selectedMetadata.body.output === 'string') return this.selectedMetadata.body.output;
-				}
-				return undefined;
-			},
-			set(val) {
-				this.$emit('set-output', val);
-			}
-		},
-		relevance: {
-			get() {
-				if (typeof this.selectedMetadata.body === 'object') {
-					if (typeof this.selectedMetadata.body.relevance === 'string') return this.selectedMetadata.body.relevance;
-				}
-				return undefined;
-			},
-			set(val) {
-				this.$emit('set-rel', val);
-			}
 		}
+		// outputType: {
+		// 	get() {
+		// 		if (typeof this.selectedMetadata.body === 'object') {
+		// 			if (typeof this.selectedMetadata.body.output === 'string') return this.selectedMetadata.body.output;
+		// 		}
+		// 		return undefined;
+		// 	},
+		// 	set(val) {
+		// 		this.$emit('set-output', val);
+		// 	}
+		// },
+		// relevance: {
+		// 	get() {
+		// 		if (typeof this.selectedMetadata.body === 'object') {
+		// 			if (typeof this.selectedMetadata.body.relevance === 'string') return this.selectedMetadata.body.relevance;
+		// 		}
+		// 		return undefined;
+		// 	},
+		// 	set(val) {
+		// 		this.$emit('set-rel', val);
+		// 	}
+		// }
 	},
 
 	methods: {
+		updateOutput: function updateOutput(val) {
+			this.$emit('set-output', val);
+		},
 		clearSelectedMetadata: function clearSelectedMetadata() {
 			this.$emit('clear-selected-metadata');
 		},

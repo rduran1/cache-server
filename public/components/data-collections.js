@@ -94,7 +94,7 @@ Vue.component('data-collections', {
 		setRelevance: function setRelevance(val) {
 			this.relevance = val;
 		},
-		setOutput: function setOutput() {
+		setOutput: function setOutput(val) {
 			this.output = val;
 		},
 		refreshLocalStore: async function refreshLocalStore(storeUri, dataProp) {
@@ -173,6 +173,10 @@ Vue.component('data-collections', {
 			this.selectedMetadata = await apiFetch({ apipath, type: 'json' });
 			this.selectedMetadata.name = name;
 			this.metadataUpdateMode = true;
+			if (typeof this.selectedMetadata.body === 'object') {
+				if (this.selectedMetadata.body.output) this.output = this.selectedMetadata.body.output;
+				if (this.selectedMetadata.body.relevance) this.relevance = this.selectedMetadata.body.relevance;
+			}
 		},
 		clearSelectedMetadata: function clearSelectedMetadata() {
 			const keyNames = Object.keys(this.selectedMetadata);
