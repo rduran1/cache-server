@@ -24,13 +24,13 @@ Vue.component('collection-metadata', {
 						<input id="ttl" v-model=selectedMetadata.ttl></input>
 						<label for="process-as-stream">Process as stream:</label>
 						<select id="process-as-stream" v-model=selectedMetadata.processAsStream>
-							<option>True</option>
-							<option>False</option>
+							<option value=true>True</option>
+							<option value=false>False</option>
 						</select>
 						<label for="auto-start">Auto Start:</label>
 						<select id="auto-start" v-model=selectedMetadata.autoStart>
-							<option>True</option>
-							<option>False</option>
+							<option value=true>True</option>
+							<option value=false>False</option>
 						</select>
 						<label for="source-type">Source Type:</label>
 						<select id="source-type" v-model=selectedMetadata.sourceType>
@@ -41,7 +41,7 @@ Vue.component('collection-metadata', {
 
 						<label for="service-account">Service Account:</label>
 						<select id="auto-start" v-model=selectedMetadata.serviceAccountName>
-							<option v-for="serviceAccount in Object.keys(serviceAccounts)">{{ serviceAccount }}</option>
+							<option v-for="serviceAccount in serviceAccounts">{{ serviceAccount.name }}</option>
 						</select>
 
 						<label for="path">Path:</label>
@@ -57,17 +57,13 @@ Vue.component('collection-metadata', {
 						<textarea v-show="showBFRelevanceSection" id="incoming-transform" v-model=selectedMetadata.relevance></textarea>
 
 						<label for="incoming-transform">Incoming Transform:</label>
-						<select id="incoming-transform" v-model=selectedMetadata.incomingTransform>
-							<option>Transform1</option>
-							<option>Transform2</option>
-							<option>Transform3</option>
+						<select id="incoming-transform" v-model=selectedMetadata.incomingTransforms>
+							<option v-for="tranform in transforms.incoming">{{ transform }}</option>
 						</select>
 
 						<label for="outgoing-transform">Outgoing Transform:</label>
 						<select id="outgoing-transform" v-model=selectedMetadata.outgoingTransform>
-							<option>Transform1</option>
-							<option>Transform2</option>
-							<option>Transform3</option>
+							<option v-for="tranform in transforms.outgoing">{{ transform }}</option>
 						</select>
 						
 						<label for="string-prefix">String Prefix:</label>
@@ -91,7 +87,8 @@ Vue.component('collection-metadata', {
 		'metadata',
 		'selectedMetadata',
 		'metadataUpdateMode',
-		'serviceAccounts'
+		'serviceAccounts',
+		'transforms'
 	],
 
 	computed: {
