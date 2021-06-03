@@ -82,6 +82,8 @@ Vue.component('collection-metadata', {
   `,
 	data: function () {
 		return {
+			relevance1: '',
+			outputType1: ''
 		};
 	},
 
@@ -109,7 +111,7 @@ Vue.component('collection-metadata', {
 				return undefined;
 			},
 			set(val) {
-				return val;
+				this.outputType1 = val;
 			}
 		},
 		relevance: {
@@ -120,7 +122,7 @@ Vue.component('collection-metadata', {
 				return undefined;
 			},
 			set(val) {
-				return val;
+				this.relevance1 = val;
 			}
 		}
 	},
@@ -136,8 +138,8 @@ Vue.component('collection-metadata', {
 			const clone = JSON.parse(JSON.stringify(this.selectedMetadata));
 			delete clone.status;
 			delete clone.streamingCount;
-			if (typeof this.outputType === 'string') clone.body.output = this.outputType;
-			if (typeof this.relevance === 'string') clone.body.relevance = this.relevance;
+			if (typeof this.outputType1 === 'string') clone.body.output = this.outputType1;
+			if (typeof this.relevance1 === 'string') clone.body.relevance = this.relevance1;
 			if (this.buttonName === 'Update') return this.$emit('set-metadata', clone, 'update');
 			if (this.buttonName === 'Create') return this.$emit('set-metadata', clone, 'create');
 			return undefined;
