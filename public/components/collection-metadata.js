@@ -18,7 +18,7 @@ Vue.component('collection-metadata', {
 						<input class="first-row" id="name" v-model=selectedMetadata.name :readonly="metadataUpdateMode"/>
 						<label for="description">Description:</label>
 						<input id="description" v-model=selectedMetadata.description></input>
-						<label for="port">Minimum valid size in bytes:</label>
+						<label for="port">Minimum size in bytes:</label>
 						<input id="port" v-model=selectedMetadata.minValidCacheSizeInBytes></input>
 						<label for="ttl">TTL:</label>
 						<input id="ttl" v-model=selectedMetadata.ttl></input>
@@ -32,22 +32,46 @@ Vue.component('collection-metadata', {
 							<option>True</option>
 							<option>False</option>
 						</select>
+						<label for="source-type">Source Type:</label>
+						<select id="source-type" v-model=selectedMetadata.sourceType>
+							<option>BigFix Root REST API</option>
+							<option>BigFix Inventory/Compliance REST API</option>
+							<option>Basic HTTP Authentication</option>
+						</select>
+
 						<label for="service-account">Service Account:</label>
-						<select id="auto-start" v-model=selectedMetadata.autoStart>
+						<select id="auto-start" v-model=selectedMetadata.serviceAccountName>
 							<option>True</option>
 							<option>False</option>
 						</select>
 
-						<label for="password">Password:</label>
-						<input id="password" type="password" v-model=selectedMetadata.password></input>
-						
-						<label for="timeout">HTTP Timeout:</label>
-						<input id="timeout" v-model=selectedMetadata.timeout></input>
-						<label for="method">HTTP Method:</label>
-						<select id="method" v-model=selectedMetadata.method>
-							<option>GET</option>
-							<option>POST</option>
+						<label for="path">Path:</label>
+						<input id="path" v-model=selectedMetadata.path></input>
+
+						<div v-show="showBFRelevanceSection">
+							<label for="incoming-transform">Output:</label>
+							<select id="incoming-transform" v-model=selectedMetadata.incomingTransform>
+								<option>XML</option>
+								<option>JSON</option>
+							</select>
+						</div>
+
+						<label for="incoming-transform">Incoming Transform:</label>
+						<select id="incoming-transform" v-model=selectedMetadata.incomingTransform>
+							<option>Transform1</option>
+							<option>Transform2</option>
+							<option>Transform3</option>
 						</select>
+
+						<label for="outgoing-transform">Outgoing Transform:</label>
+						<select id="outgoing-transform" v-model=selectedMetadata.outgoingTransform>
+							<option>Transform1</option>
+							<option>Transform2</option>
+							<option>Transform3</option>
+						</select>
+						
+						<label for="string-prefix">String Prefix:</label>
+						<input id="string-prefix" v-model=selectedMetadata.stringPrefix></input>
 						<div/>
 						<div>
 							<button @click="createOrUpdateMetadata">{{ buttonName }}</button>
@@ -73,6 +97,9 @@ Vue.component('collection-metadata', {
 		buttonName: function buttonName() {
 			if (this.metadataUpdateMode) return 'Update';
 			return 'Create';
+		},
+		showBFRelevanceSection: function showBFRelevanceSection() {
+			return selectedMetadata.sourceType === 'BigFix Root REST API';
 		}
 	},
 
