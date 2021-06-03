@@ -15,24 +15,24 @@ Vue.component('collection-metadata', {
 				<div id="title">Metadata Details</div>
 					<div class="service-account-details-grid">
 						<label class="first-row" for="name">Name:</label>
-						<input class="first-row" id="name" v-model=md.name :readonly="metadataUpdateMode"/>
+						<input class="first-row" id="name" v-model=selectedMetadata.name :readonly="metadataUpdateMode"/>
 						<label for="host">Host Name:</label>
-						<input id="host" v-model=md.host></input>
+						<input id="host" v-model=selectedMetadata.host></input>
 						<label for="port">Port Number:</label>
-						<input id="port" v-model=md.port></input>
+						<input id="port" v-model=selectedMetadata.port></input>
 						<label for="username">User Name:</label>
-						<input id="username" v-model=md.username></input>
+						<input id="username" v-model=selectedMetadata.username></input>
 						<label for="password">Password:</label>
-						<input id="password" type="password" v-model=md.password></input>
+						<input id="password" type="password" v-model=selectedMetadata.password></input>
 						<label for="reject-unauthorized">Reject Unauthorized:</label>
-						<select id="reject-unauthorized" v-model=md.rejectUnauthorized>
+						<select id="reject-unauthorized" v-model=selectedMetadata.rejectUnauthorized>
 							<option>True</option>
 							<option>False</option>
 						</select>
 						<label for="timeout">HTTP Timeout:</label>
-						<input id="timeout" v-model=md.timeout></input>
+						<input id="timeout" v-model=selectedMetadata.timeout></input>
 						<label for="method">HTTP Method:</label>
-						<select id="method" v-model=selectedServicmdeAccount.method>
+						<select id="method" v-model=selectedMetadata.method>
 							<option>GET</option>
 							<option>POST</option>
 						</select>
@@ -40,7 +40,7 @@ Vue.component('collection-metadata', {
 						<div>
 							<button @click="createOrUpdateMetadata">{{ buttonName }}</button>
 							<button @click="clearSelectedMetadata">Clear</button>
-							<button v-if="buttonName === 'Update'" @click="deleteMetadata(md.name)">Delete</button>
+							<button v-if="buttonName === 'Update'" @click="deleteMetadata(selectedMetadata.name)">Delete</button>
 						</div>
 					</div>
 				</div>
