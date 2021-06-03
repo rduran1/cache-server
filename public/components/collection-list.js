@@ -13,13 +13,13 @@ Vue.component('collection-list', {
 					<th>TTL</th>
 					<th>Status</th>
 				</tr>
-				<tr @click="selectIncident" v-for="col in collections">
+				<tr v-for="col in collections">
 					<td>{{ col.name }}</td>
 					<td>{{ col.description }}</td>
 					<td>{{ col.lastUpdated }}</td>
 					<td>{{ col.ttl }}</td>
-					<td>
-						<button
+					<td class="collection-button-tds">
+						<button class="collection-list-buttons"
 							@click="setCollectionStatus(col)"
 							:disabled="isPendingServerResponse"
 						>{{ col.status }}</button>

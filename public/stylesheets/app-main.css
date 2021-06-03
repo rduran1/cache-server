@@ -156,6 +156,19 @@ td {
   padding-left: 10px;
 }
 
+.collection-filter {
+  width: 326px;
+}
+
+.collection-label {
+  float: left;
+  width: 300px;
+}
+
+.collection-checkbox {
+  height: 15px;
+}
+
 .data-collections .grid-container {
   display: grid;
   grid-template-columns: 300px 600px;
@@ -185,7 +198,7 @@ td {
   width: 100px;
   float: right;
   margin-right: 0px;
-  margin-left: 15px;
+  margin-left: 12px;
 }
 
 .data-collections button {

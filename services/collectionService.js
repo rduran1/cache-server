@@ -189,7 +189,7 @@ const clientRequestHandler = (clientRequest, collectionName, processAsStream, bo
 collectionService.createToken = async (config) => {
 	const v = validationLogWrapper(config, 'collectionService_createToken');
 	const token = await tokensModel.getToken(v.tokenName);
-	if (typeof token === 'object') throw new Error(`Token name "${v.tokenName}" already exists`);
+	if (typeof token === 'object' && token.status !== 'deleted') throw new Error(`Token name "${v.tokenName}" already exists`);
 	await tokensModel.createToken(v);
 };
 

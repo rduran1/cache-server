@@ -1,6 +1,8 @@
 /* eslint-disable object-shorthand */
 /* eslint-disable no-undef */
 // eslint-disable-next-line no-unused-vars
+const socket = io();
+
 const app = new Vue({
 	el: '#app',
 	data: {
@@ -18,7 +20,6 @@ const app = new Vue({
 	}
 });
 
-const socket = io();
 socket.on('error', (msg) => {
 	toast.error(msg);
 });
