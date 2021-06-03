@@ -35,9 +35,11 @@ Vue.component('data-collections', {
 			@set-metadata=setMetadata
 			@get-metadata=getMetadata
 			@delete-metadata=deleteMetadata
+			:service-accounts=serviceAccounts
 			:metadata=metadata
 			:metadata-update-mode=metadataUpdateMode
 			:selected-metadata=selectedMetadata
+			:transforms=transforms
 		>metadata</collection-metadata>
 
 		<collection-tokens
@@ -63,8 +65,9 @@ Vue.component('data-collections', {
 			metadataUpdateMode: false,
 			selectedServiceAccount: {},
 			selectedToken: {},
-			selectedMetaData: {},
+			selectedMetadata: {},
 			isPendingServerResponse: false,
+			transforms: {},
 			tokens: [],
 			msa: false,
 			mcm: false,
@@ -76,6 +79,7 @@ Vue.component('data-collections', {
 		this.refreshLocalStore('all-metadata', 'metadata');
 		this.refreshLocalStore('all-service-accounts', 'serviceAccounts');
 		this.refreshLocalStore('all-tokens', 'tokens');
+		this.refreshLocalStore('transforms', 'transforms');
 		socket.on('refresh metadata', () => this.refreshLocalStore('all-metadata', 'metadata'));
 		socket.on('refresh service-accounts', () => this.refreshLocalStore('all-service-accounts', 'serviceAccounts'));
 		socket.on('refresh tokens', () => this.refreshLocalStore('all-tokens', 'tokens'));
@@ -128,7 +132,7 @@ Vue.component('data-collections', {
 				method = 'post';
 			}
 			if (setType === 'update') {
-				apipath = `${apipath}/update-metadata/${config.name}`;
+				apipath = `${this.BASE_URL}/update-metadata/${config.name}`;
 				method = 'put';
 			}
 			const cfg = {
@@ -136,7 +140,8 @@ Vue.component('data-collections', {
 				dataProp: 'metadata',
 				apipath,
 				method,
-				body: config
+				body: config,
+				headers: { 'Content-Type': 'application/json' }
 			};
 			await this.apiFetchNSyncModel(cfg);
 		},
@@ -160,7 +165,7 @@ Vue.component('data-collections', {
 			keyNames.forEach((kn) => {
 				this.selectedMetadata[kn] = '';
 			});
-			this.serviceAccountUpdateMode = false;
+			this.metadataUpdateMode = false;
 		},
 		setServiceAccount: async function setServiceAccount(config, setType) {
 			let apipath;
