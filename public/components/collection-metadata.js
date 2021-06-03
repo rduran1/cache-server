@@ -34,9 +34,10 @@ Vue.component('collection-metadata', {
 						</select>
 						<label for="source-type">Source Type:</label>
 						<select id="source-type" v-model=selectedMetadata.sourceType>
-							<option>BigFix Root REST API</option>
-							<option>BigFix Inventory/Compliance REST API</option>
-							<option>Basic HTTP Authentication</option>
+							<option value="bigfix_root_api">BigFix Root REST API</option>
+							<option value="bigfix_compliance_inventory_api">BigFix Inventory/Compliance REST API</option>
+							<option value="basic auth">Basic HTTP Authentication</option>
+							<option value="listener">Incomming Listener</option>
 						</select>
 
 						<label for="service-account">Service Account:</label>
@@ -58,12 +59,12 @@ Vue.component('collection-metadata', {
 
 						<label for="incoming-transform">Incoming Transform:</label>
 						<select id="incoming-transform" v-model=selectedMetadata.incomingTransforms>
-							<option v-for="tranform in transforms.incoming">{{ transform }}</option>
+							<option v-for="transform in transforms.incoming" :value=transform>{{ transform }}</option>
 						</select>
 
 						<label for="outgoing-transform">Outgoing Transform:</label>
 						<select id="outgoing-transform" v-model=selectedMetadata.outgoingTransform>
-							<option v-for="tranform in transforms.outgoing">{{ transform }}</option>
+							<option v-for="transform in transforms.outgoing" :value=transform>{{ transform }}</option>
 						</select>
 						
 						<label for="string-prefix">String Prefix:</label>
@@ -109,6 +110,8 @@ Vue.component('collection-metadata', {
 			this.$emit('get-metadata', name);
 		},
 		createOrUpdateMetadata: function createOrUpdateMetadata() {
+			delete this.selectedMetadata.status;
+			delete this.selectedMetadata.streamingCount;
 			if (this.buttonName === 'Update') return this.$emit('set-metadata', this.selectedMetadata, 'update');
 			if (this.buttonName === 'Create') return this.$emit('set-metadata', this.selectedMetadata, 'create');
 			return undefined;
