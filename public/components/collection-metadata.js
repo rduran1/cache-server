@@ -92,7 +92,9 @@ Vue.component('collection-metadata', {
 		'selectedMetadata',
 		'metadataUpdateMode',
 		'serviceAccounts',
-		'transforms'
+		'transforms',
+		'rel',
+		'output'
 	],
 
 	computed: {
@@ -111,7 +113,7 @@ Vue.component('collection-metadata', {
 				return undefined;
 			},
 			set(val) {
-				this.outputType1 = val;
+				this.$emit('set-output', val);
 			}
 		},
 		relevance: {
@@ -122,7 +124,7 @@ Vue.component('collection-metadata', {
 				return undefined;
 			},
 			set(val) {
-				this.relevance1 = val;
+				this.$emit('set-rel', val);
 			}
 		}
 	},
@@ -138,8 +140,11 @@ Vue.component('collection-metadata', {
 			const clone = JSON.parse(JSON.stringify(this.selectedMetadata));
 			delete clone.status;
 			delete clone.streamingCount;
-			if (typeof this.outputType1 === 'string') clone.body.output = this.outputType1;
-			if (typeof this.relevance1 === 'string') clone.body.relevance = this.relevance1;
+			if (this.output) {
+				clone.body = {};
+				clone.body.output = this.output;
+			}
+			if (this.rel) clone.body.relevance = this.rel;
 			if (this.buttonName === 'Update') return this.$emit('set-metadata', clone, 'update');
 			if (this.buttonName === 'Create') return this.$emit('set-metadata', clone, 'create');
 			return undefined;
