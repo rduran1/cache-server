@@ -24,17 +24,19 @@ Vue.component('collection-service-accounts', {
 						<input id="username" v-model=selectedServiceAccount.username></input>
 						<label for="password">Password:</label>
 						<input id="password" type="password" v-model=selectedServiceAccount.password></input>
+						<label for="token">Token:</label>
+						<input id="token" v-model=selectedServiceAccount.token></input>
 						<label for="reject-unauthorized">Reject Unauthorized:</label>
 						<select id="reject-unauthorized" v-model=selectedServiceAccount.rejectUnauthorized>
-							<option>True</option>
-							<option>False</option>
+							<option value=true>True</option>
+							<option value=false>False</option>
 						</select>
 						<label for="timeout">HTTP Timeout:</label>
 						<input id="timeout" v-model=selectedServiceAccount.timeout></input>
 						<label for="method">HTTP Method:</label>
 						<select id="method" v-model=selectedServiceAccount.method>
-							<option>GET</option>
-							<option>POST</option>
+							<option value="get">GET</option>
+							<option value="post">POST</option>
 						</select>
 						<div/>
 						<div>
