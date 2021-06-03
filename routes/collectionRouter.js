@@ -9,7 +9,7 @@ router.get('/all-tokens', accessController.isAllowed, collectionController.getAl
 router.get('/metadata/:name', accessController.isAllowed, collectionController.getMetaDataByName);
 router.get('/service-account/:name', accessController.isAllowed, collectionController.getServiceAccountByName);
 router.get('/token/:name', accessController.isAllowed, collectionController.getToken);
-
+router.get('/tranforms', accessController.isAllowed, collectionController.getTransforms);
 router.get('/dataset/:name', accessController.isAllowed, collectionController.getDataSetByName);
 
 router.post('/create-metadata/:name', accessController.isAllowed, collectionController.createMetaData);

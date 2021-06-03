@@ -44,12 +44,17 @@ transformService.get = (keyName, prefixString) => {
 };
 
 transformService.list = () => {
-	const transforms = [
-		'bigfix_inventory_api_incoming',
-		'bigfix_restapi_incoming',
-		'array_of_array_to_csv_outgoing',
-		'compress'
-	];
+	const transforms = {
+		incoming: [
+			'bigfix_inventory_api_incoming',
+			'bigfix_restapi_incoming',
+			'compress'
+		],
+		outgoing: [
+			'array_of_array_to_csv_outgoing',
+			'compress'
+		]
+	};
 	return transforms;
 };
 module.exports = transformService;

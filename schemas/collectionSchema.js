@@ -19,8 +19,9 @@ const minValidCacheSizeInBytes = Joi.number();
 const path = Joi.string();
 const body = Joi.alternatives().try(Joi.string().max(5000), Joi.object());
 const bodyFile = Joi.string();
-const headerString = Joi.string();
+const stringPrefix = Joi.string();
 const processAsStream = Joi.boolean();
+const sourceType = Joi.string().valid('bigfix_compliance_inventory_api', 'bigfix_root_api', 'basic auth', 'listener');
 
 const schemas = {};
 
@@ -102,11 +103,12 @@ schemas.collectionService_createMetaData = Joi.object().keys({
 	minValidCacheSizeInBytes: minValidCacheSizeInBytes.default(0),
 	serviceAccountName: serviceAccountName.required(),
 	path: path.required(),
+	sourceType: sourceType.required(),
 	body,
 	bodyFile,
 	incomingTransforms: Joi.string(),
 	outgoingTransforms: Joi.string(),
-	headerString,
+	stringPrefix,
 	processAsStream: processAsStream.default(true),
 	autoStart: Joi.boolean().default(true)
 })
@@ -119,6 +121,7 @@ schemas.collectionService_updateMetaData = Joi.object().keys({
 	minValidCacheSizeInBytes: Joi.number(),
 	serviceAccountName,
 	path,
+	sourceType,
 	body,
 	bodyFile,
 	lastErrorMessage: Joi.string().allow(''),
@@ -126,7 +129,7 @@ schemas.collectionService_updateMetaData = Joi.object().keys({
 	incomingTransforms: Joi.string(),
 	outgoingTransforms: Joi.string(),
 	cacheFile: Joi.string(),
-	headerString,
+	stringPrefix,
 	processAsStream,
 	autoStart: Joi.boolean().default(true)
 })

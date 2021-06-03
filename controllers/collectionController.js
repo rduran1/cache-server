@@ -1,5 +1,6 @@
 const util = require('util');
 const stream = require('stream');
+const transformService = require('../services/transformService');
 const collectionService = require('../services/collectionService');
 const toolboxService = require('../services/toolboxService');
 const logger = require('../services/loggingService')(__filename);
@@ -7,6 +8,10 @@ const logger = require('../services/loggingService')(__filename);
 const pipeline = util.promisify(stream.pipeline);
 
 const collectionController = {};
+
+collectionController.getTransforms = (req, res) => {
+	res.send(transformService.list());
+};
 
 collectionController.getAllTokens = async (req, res) => {
 	try {
