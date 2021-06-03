@@ -101,11 +101,16 @@ Vue.component('collection-metadata', {
 		showBFRelevanceSection: function showBFRelevanceSection() {
 			return this.selectedMetadata.sourceType === 'bigfix_root_api';
 		},
-		outputType: function outputType() {
-			if (typeof this.selectedMetadata.body === 'object') {
-				if (typeof this.selectedMetadata.body.output === 'string') return this.selectedMetadata.body.output;
+		outputType: {
+			get() {
+				if (typeof this.selectedMetadata.body === 'object') {
+					if (typeof this.selectedMetadata.body.output === 'string') return this.selectedMetadata.body.output;
+				}
+				return undefined;
+			},
+			set(val) {
+				return val;
 			}
-			return undefined;
 		},
 		relevance: function relevance() {
 			if (typeof this.selectedMetadata.body === 'object') {
