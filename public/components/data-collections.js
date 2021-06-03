@@ -35,11 +35,15 @@ Vue.component('data-collections', {
 			@set-metadata=setMetadata
 			@get-metadata=getMetadata
 			@delete-metadata=deleteMetadata
+			@set-rel=setRelevance
+			@set-output=setOutput
 			:service-accounts=serviceAccounts
 			:metadata=metadata
 			:metadata-update-mode=metadataUpdateMode
 			:selected-metadata=selectedMetadata
 			:transforms=transforms
+			:rel=relevance
+			:output=output
 		>metadata</collection-metadata>
 
 		<collection-tokens
@@ -69,6 +73,8 @@ Vue.component('data-collections', {
 			isPendingServerResponse: false,
 			transforms: {},
 			tokens: [],
+			relevance: '',
+			output: '',
 			msa: false,
 			mcm: false,
 			mat: false,
@@ -79,12 +85,18 @@ Vue.component('data-collections', {
 		this.refreshLocalStore('all-metadata', 'metadata');
 		this.refreshLocalStore('all-service-accounts', 'serviceAccounts');
 		this.refreshLocalStore('all-tokens', 'tokens');
-		this.refreshLocalStore('transforms', 'transforms');
+		this.transforms = await apiFetch({ apipath: `${this.BASE_URL}/transforms`, type: 'json' });
 		socket.on('refresh metadata', () => this.refreshLocalStore('all-metadata', 'metadata'));
 		socket.on('refresh service-accounts', () => this.refreshLocalStore('all-service-accounts', 'serviceAccounts'));
 		socket.on('refresh tokens', () => this.refreshLocalStore('all-tokens', 'tokens'));
 	},
 	methods: {
+		setRelevance: function setRelevance(val) {
+			this.relevance = val;
+		},
+		setOutput: function setOutput() {
+			this.output = val;
+		},
 		refreshLocalStore: async function refreshLocalStore(storeUri, dataProp) {
 			try {
 				const response = await apiFetch({ apipath: `${this.BASE_URL}/${storeUri}`, type: 'json' });
@@ -144,6 +156,7 @@ Vue.component('data-collections', {
 				headers: { 'Content-Type': 'application/json' }
 			};
 			await this.apiFetchNSyncModel(cfg);
+			this.clearSelectedMetadata();
 		},
 		deleteMetadata: async function deleteMetadata(name) {
 			const config = {
@@ -153,6 +166,7 @@ Vue.component('data-collections', {
 				method: 'delete'
 			};
 			await this.apiFetchNSyncModel(config);
+			this.clearSelectedMetadata();
 		},
 		getMetadata: async function getMetadata(name) {
 			const apipath = `${this.BASE_URL}/metadata/${name}`;
