@@ -49,13 +49,13 @@ Vue.component('collection-metadata', {
 						<input id="path" v-model=selectedMetadata.path></input>
 
 						<label v-show="showBFRelevanceSection" for="incoming-transform">Output:</label>
-						<select v-show="showBFRelevanceSection" id="incoming-transform" v-model=selectedMetadata.output>
-							<option>XML</option>
-							<option>JSON</option>
+						<select v-show="showBFRelevanceSection" id="incoming-transform" v-model=outputType>
+							<option value="xml">XML</option>
+							<option value="json">JSON</option>
 						</select>
 
 						<label v-show="showBFRelevanceSection" for="incoming-transform">Relevance:</label>
-						<textarea v-show="showBFRelevanceSection" id="incoming-transform" v-model=selectedMetadata.relevance></textarea>
+						<textarea v-show="showBFRelevanceSection" id="incoming-transform" v-model=relevance></textarea>
 
 						<label for="incoming-transform">Incoming Transform:</label>
 						<select id="incoming-transform" v-model=selectedMetadata.incomingTransforms>
@@ -81,7 +81,8 @@ Vue.component('collection-metadata', {
     </div>
   `,
 	data: function () {
-		return {};
+		return {
+		};
 	},
 
 	props: [
@@ -98,7 +99,19 @@ Vue.component('collection-metadata', {
 			return 'Create';
 		},
 		showBFRelevanceSection: function showBFRelevanceSection() {
-			return this.selectedMetadata.sourceType === 'BigFix Root REST API';
+			return this.selectedMetadata.sourceType === 'bigfix_root_api';
+		},
+		outputType: function outputType() {
+			if (typeof this.selectedMetadata.body === 'object') {
+				if (typeof this.selectedMetadata.body.output === 'string') return this.selectedMetadata.body.output;
+			}
+			return undefined;
+		},
+		relevance: function relevance() {
+			if (typeof this.selectedMetadata.body === 'object') {
+				if (typeof this.selectedMetadata.body.relevance === 'string') return this.selectedMetadata.body.relevance;
+			}
+			return undefined;
 		}
 	},
 
