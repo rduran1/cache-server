@@ -16,19 +16,31 @@ Vue.component('collection-metadata', {
 					<div class="service-account-details-grid">
 						<label class="first-row" for="name">Name:</label>
 						<input class="first-row" id="name" v-model=selectedMetadata.name :readonly="metadataUpdateMode"/>
-						<label for="host">Host Name:</label>
-						<input id="host" v-model=selectedMetadata.host></input>
-						<label for="port">Port Number:</label>
-						<input id="port" v-model=selectedMetadata.port></input>
-						<label for="username">User Name:</label>
-						<input id="username" v-model=selectedMetadata.username></input>
-						<label for="password">Password:</label>
-						<input id="password" type="password" v-model=selectedMetadata.password></input>
-						<label for="reject-unauthorized">Reject Unauthorized:</label>
-						<select id="reject-unauthorized" v-model=selectedMetadata.rejectUnauthorized>
+						<label for="description">Description:</label>
+						<input id="description" v-model=selectedMetadata.description></input>
+						<label for="port">Minimum valid size in bytes:</label>
+						<input id="port" v-model=selectedMetadata.minValidCacheSizeInBytes></input>
+						<label for="ttl">TTL:</label>
+						<input id="ttl" v-model=selectedMetadata.ttl></input>
+						<label for="process-as-stream">Process as stream:</label>
+						<select id="process-as-stream" v-model=selectedMetadata.processAsStream>
 							<option>True</option>
 							<option>False</option>
 						</select>
+						<label for="auto-start">Auto Start:</label>
+						<select id="auto-start" v-model=selectedMetadata.autoStart>
+							<option>True</option>
+							<option>False</option>
+						</select>
+						<label for="service-account">Service Account:</label>
+						<select id="auto-start" v-model=selectedMetadata.autoStart>
+							<option>True</option>
+							<option>False</option>
+						</select>
+
+						<label for="password">Password:</label>
+						<input id="password" type="password" v-model=selectedMetadata.password></input>
+						
 						<label for="timeout">HTTP Timeout:</label>
 						<input id="timeout" v-model=selectedMetadata.timeout></input>
 						<label for="method">HTTP Method:</label>
