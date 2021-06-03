@@ -48,13 +48,14 @@ Vue.component('collection-metadata', {
 						<label for="path">Path:</label>
 						<input id="path" v-model=selectedMetadata.path></input>
 
-						<div v-show="showBFRelevanceSection">
-							<label for="incoming-transform">Output:</label>
-							<select id="incoming-transform" v-model=selectedMetadata.incomingTransform>
-								<option>XML</option>
-								<option>JSON</option>
-							</select>
-						</div>
+						<label v-show="showBFRelevanceSection" for="incoming-transform">Output:</label>
+						<select v-show="showBFRelevanceSection" id="incoming-transform" v-model=selectedMetadata.body.output>
+							<option>XML</option>
+							<option>JSON</option>
+						</select>
+
+						<label v-show="showBFRelevanceSection" for="incoming-transform">Relevance:</label>
+						<textarea v-show="showBFRelevanceSection" id="incoming-transform" v-model=selectedMetadata.body.relevance></textarea>
 
 						<label for="incoming-transform">Incoming Transform:</label>
 						<select id="incoming-transform" v-model=selectedMetadata.incomingTransform>
@@ -99,7 +100,7 @@ Vue.component('collection-metadata', {
 			return 'Create';
 		},
 		showBFRelevanceSection: function showBFRelevanceSection() {
-			return selectedMetadata.sourceType === 'BigFix Root REST API';
+			return this.selectedMetadata.sourceType === 'BigFix Root REST API';
 		}
 	},
 
