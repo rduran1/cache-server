@@ -71,7 +71,7 @@ schemas.collectionService_createServiceAccount = Joi.object().keys({
 	timeout: timeout.default(0),
 	rejectUnauthorized: rejectUnauthorized.default(false),
 	method,
-	token: Joi.string()
+	apiToken: Joi.string()
 })
 	.with('password', 'username')
 	.with('username', 'password');
@@ -85,7 +85,7 @@ schemas.collectionService_updateServiceAccount = Joi.object().keys({
 	timeout,
 	rejectUnauthorized,
 	method,
-	token: Joi.string()
+	apiToken: Joi.string()
 })
 	.with('password', 'username')
 	.with('username', 'password');

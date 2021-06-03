@@ -24,8 +24,8 @@ Vue.component('collection-service-accounts', {
 						<input id="username" v-model=selectedServiceAccount.username></input>
 						<label for="password">Password:</label>
 						<input id="password" type="password" v-model=selectedServiceAccount.password></input>
-						<label for="token">Token:</label>
-						<input id="token" v-model=selectedServiceAccount.token></input>
+						<label for="apiToken">API Token:</label>
+						<input id="apiToken" v-model=selectedServiceAccount.apiToken></input>
 						<label for="reject-unauthorized">Reject Unauthorized:</label>
 						<select id="reject-unauthorized" v-model=selectedServiceAccount.rejectUnauthorized>
 							<option value=true>True</option>
