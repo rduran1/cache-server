@@ -41,21 +41,20 @@ Vue.component('collection-metadata', {
 
 						<label for="service-account">Service Account:</label>
 						<select id="auto-start" v-model=selectedMetadata.serviceAccountName>
-							<option>True</option>
-							<option>False</option>
+							<option v-for="serviceAccount in Object.keys(serviceAccounts)">{{ serviceAccount }}</option>
 						</select>
 
 						<label for="path">Path:</label>
 						<input id="path" v-model=selectedMetadata.path></input>
 
 						<label v-show="showBFRelevanceSection" for="incoming-transform">Output:</label>
-						<select v-show="showBFRelevanceSection" id="incoming-transform" v-model=selectedMetadata.body.output>
+						<select v-show="showBFRelevanceSection" id="incoming-transform" v-model=selectedMetadata.output>
 							<option>XML</option>
 							<option>JSON</option>
 						</select>
 
 						<label v-show="showBFRelevanceSection" for="incoming-transform">Relevance:</label>
-						<textarea v-show="showBFRelevanceSection" id="incoming-transform" v-model=selectedMetadata.body.relevance></textarea>
+						<textarea v-show="showBFRelevanceSection" id="incoming-transform" v-model=selectedMetadata.relevance></textarea>
 
 						<label for="incoming-transform">Incoming Transform:</label>
 						<select id="incoming-transform" v-model=selectedMetadata.incomingTransform>
@@ -91,7 +90,8 @@ Vue.component('collection-metadata', {
 	props: [
 		'metadata',
 		'selectedMetadata',
-		'metadataUpdateMode'
+		'metadataUpdateMode',
+		'serviceAccounts'
 	],
 
 	computed: {
