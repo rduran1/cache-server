@@ -31,8 +31,13 @@ Vue.component('data-collections', {
 
 		<collection-metadata
 			v-if="mcm"
-			@set=setServiceAccount
-			@delete=deleteServiceAccount
+			@clear-selected-metadata=clearSelectedMetadata
+			@set-metadata=setMetadata
+			@get-metadata=getMetadata
+			@delete-metadata=deleteMetadata
+			:metadata=metadata
+			:metadata-update-mode=metadataUpdateMode
+			:selected-metadata=selectedMetadata
 		>metadata</collection-metadata>
 
 		<collection-tokens
@@ -55,8 +60,10 @@ Vue.component('data-collections', {
 			serviceAccounts: [],
 			serviceAccountUpdateMode: false,
 			tokenUpdateMode: false,
+			metadataUpdateMode: false,
 			selectedServiceAccount: {},
 			selectedToken: {},
+			selectedMetaData: {},
 			isPendingServerResponse: false,
 			tokens: [],
 			msa: false,
@@ -113,7 +120,7 @@ Vue.component('data-collections', {
 			};
 			await this.apiFetchNSyncModel(config);
 		},
-		setMetaData: async function setMetaData(config, setType) {
+		setMetadata: async function setMetadata(config, setType) {
 			let apipath;
 			let method;
 			if (setType === 'create') {
@@ -133,7 +140,7 @@ Vue.component('data-collections', {
 			};
 			await this.apiFetchNSyncModel(cfg);
 		},
-		deleteMetaData: async function deleteMetaData(name) {
+		deleteMetadata: async function deleteMetadata(name) {
 			const config = {
 				uri: 'all-metadata',
 				dataProp: 'metadata',
@@ -141,6 +148,19 @@ Vue.component('data-collections', {
 				method: 'delete'
 			};
 			await this.apiFetchNSyncModel(config);
+		},
+		getMetadata: async function getMetadata(name) {
+			const apipath = `${this.BASE_URL}/metadata/${name}`;
+			this.selectedMetadata = await apiFetch({ apipath, type: 'json' });
+			this.selectedMetadata.name = name;
+			this.metadataUpdateMode = true;
+		},
+		clearSelectedMetadata: function clearSelectedMetadata() {
+			const keyNames = Object.keys(this.selectedMetadata);
+			keyNames.forEach((kn) => {
+				this.selectedMetadata[kn] = '';
+			});
+			this.serviceAccountUpdateMode = false;
 		},
 		setServiceAccount: async function setServiceAccount(config, setType) {
 			let apipath;
