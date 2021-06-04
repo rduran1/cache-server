@@ -33,8 +33,17 @@ model.isTokenAuthorizedToAccessCollection = async (tokenValue, collectionName) =
 	return false;
 };
 
-model.getToken = async (tokenValue) => {
+model.getTokenByValue = async (tokenValue) => {
 	const token = store.find((e) => e.value === tokenValue && e.status !== 'deleted');
+	if (typeof token === 'object') {
+		const clone = toolboxService.clone(token);
+		return clone;
+	}
+	return undefined;
+};
+
+model.getTokenByName = async (tokenName) => {
+	const token = store.find((e) => e.tokenName === tokenName && e.status !== 'deleted');
 	if (typeof token === 'object') {
 		const clone = toolboxService.clone(token);
 		return clone;

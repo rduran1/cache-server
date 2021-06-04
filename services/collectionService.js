@@ -197,9 +197,9 @@ collectionService.createToken = async (config) => {
 	await tokensModel.createToken(v);
 };
 
-collectionService.getToken = async (tokenName) => {
+collectionService.getTokenByName = async (tokenName) => {
 	const v = validationLogWrapper({ tokenName }, 'collectionService_getToken');
-	const token = await tokensModel.getToken(v.tokenName);
+	const token = await tokensModel.getTokenByName(v.tokenName);
 	if (typeof token !== 'object') throw new Error(`Token name "${v.tokenName}" does not exist`);
 	return token;
 };
@@ -211,14 +211,14 @@ collectionService.getAllTokens = async () => {
 
 collectionService.updateToken = async (config) => {
 	const v = validationLogWrapper(config, 'collectionService_updateToken');
-	const token = await tokensModel.getToken(v.tokenName);
+	const token = await tokensModel.getTokenByName(v.tokenName);
 	if (typeof token !== 'object') throw new Error(`Token name "${v.tokenName}" does not exist`);
 	await tokensModel.updateToken(v);
 };
 
 collectionService.deleteToken = async (tokenName) => {
 	const v = validationLogWrapper({ tokenName }, 'collectionService_deleteToken');
-	const token = await tokensModel.getToken(v.tokenName);
+	const token = await tokensModel.getTokenByName(v.tokenName);
 	if (typeof token !== 'object') throw new Error(`Token name "${v.tokenName}" does not exist`);
 	await tokensModel.deleteToken(v.tokenName);
 };

@@ -26,7 +26,7 @@ collectionController.getAllTokens = async (req, res) => {
 collectionController.getToken = async (req, res) => {
 	const { name } = req.params;
 	try {
-		const token = await collectionService.getToken(name);
+		const token = await collectionService.getTokenByName(name);
 		res.send(token);
 	} catch (e) {
 		res.statusMessage = e.message;
