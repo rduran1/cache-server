@@ -48,14 +48,23 @@ Vue.component('collection-metadata', {
 						<label for="path">Path:</label>
 						<input id="path" v-model=selectedMetadata.path></input>
 
-						<label v-show="showBFRelevanceSection" for="incoming-transform">Output:</label>
-						<select v-show="showBFRelevanceSection" id="incoming-transform" :selected="this.output" @change="updateOutput">
+
+
+						<label v-show="showBFRelevanceSection" for="relevance-output">Output:</label>
+						<select v-show="showBFRelevanceSection" id="relevance-output" :selected="selectedMetadata.output" @change="updateOutput">
 							<option value="xml">XML</option>
 							<option value="json">JSON</option>
 						</select>
 
-						<label v-show="showBFRelevanceSection" for="incoming-transform">Relevance:</label>
-						<textarea v-show="showBFRelevanceSection" id="incoming-transform" :selected="this.rel"></textarea>
+						<label v-show="showBFRelevanceSection" for="relevance">Relevance:</label>
+						<textarea 
+							v-show="showBFRelevanceSection" 
+							id="relevance" 
+							:selected="selectedMetadata.relevance" 
+							@change="updateRelevance"
+						></textarea>
+
+
 
 						<label for="incoming-transform">Incoming Transform:</label>
 						<select id="incoming-transform" v-model=selectedMetadata.incomingTransforms>
@@ -89,9 +98,7 @@ Vue.component('collection-metadata', {
 		'selectedMetadata',
 		'metadataUpdateMode',
 		'serviceAccounts',
-		'transforms',
-		'rel',
-		'output'
+		'transforms'
 	],
 
 	computed: {
@@ -129,6 +136,9 @@ Vue.component('collection-metadata', {
 	methods: {
 		updateOutput: function updateOutput(val) {
 			this.$emit('set-output', val);
+		},
+		updateRelevance: function updateRelevance(val) {
+			this.$emit('set-relevance', val);
 		},
 		clearSelectedMetadata: function clearSelectedMetadata() {
 			this.$emit('clear-selected-metadata');

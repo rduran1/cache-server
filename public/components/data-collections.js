@@ -42,8 +42,6 @@ Vue.component('data-collections', {
 			:metadata-update-mode=metadataUpdateMode
 			:selected-metadata=selectedMetadata
 			:transforms=transforms
-			:rel=relevance
-			:output=output
 		>metadata</collection-metadata>
 
 		<collection-tokens
@@ -73,8 +71,6 @@ Vue.component('data-collections', {
 			isPendingServerResponse: false,
 			transforms: {},
 			tokens: [],
-			relevance: '',
-			output: '',
 			msa: false,
 			mcm: false,
 			mat: false,
@@ -92,10 +88,10 @@ Vue.component('data-collections', {
 	},
 	methods: {
 		setRelevance: function setRelevance(val) {
-			this.relevance = val;
+			this.selectedMetadata.relevance = val;
 		},
 		setOutput: function setOutput(val) {
-			this.output = val;
+			this.selectedMetadata.output = val;
 		},
 		refreshLocalStore: async function refreshLocalStore(storeUri, dataProp) {
 			try {
@@ -174,8 +170,8 @@ Vue.component('data-collections', {
 			this.selectedMetadata.name = name;
 			this.metadataUpdateMode = true;
 			if (typeof this.selectedMetadata.body === 'object') {
-				if (this.selectedMetadata.body.output) this.output = this.selectedMetadata.body.output;
-				if (this.selectedMetadata.body.relevance) this.relevance = this.selectedMetadata.body.relevance;
+				this.selectedMetadata.output = this.selectedMetadata.body.output;
+				this.selectedMetadata.relevance = this.selectedMetadata.body.relevance;
 			}
 		},
 		clearSelectedMetadata: function clearSelectedMetadata() {
