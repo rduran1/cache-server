@@ -32,7 +32,12 @@ model.setMetaData = async (name, config) => {
 	const clone = toolboxService.clone(store);
 	const cfg = toolboxService.clone(config);
 	clone[name] = cfg;
-	delete clone[name].streamingCount; // streamingCount property is only maintained in memory for performance and to avoid confusion
+	const collectionNames = Object.keys(clone);
+	for (let i = 0; i < collectionNames.length; i++) {
+		// The following properties are only maintained in memory so delete before saving to file
+		delete clone[collectionNames[i]].streamingCount;
+		delete clone[collectionNames[i]].status;
+	}
 	await toolboxService.saveStoreToFile(storeFile, clone);
 	if (typeof store[name] !== 'object') { // Check if object doesnt exist in store before creating
 		try {
