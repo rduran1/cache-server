@@ -86,7 +86,7 @@ function setMetaDataStatus(collectionName, status, errorMsg) {
 }
 
 function checkIfTransformsExist(v, ancillaryTransform) {
-	if (typeof v.incomingTransforms === 'string') {
+	if (typeof v.incomingTransforms === 'string' && v.incomingTransforms.length > 0) {
 		const t = transformService.get(v.incomingTransforms);
 		if (typeof t === 'undefined') {
 			const e = new Error(`Incoming transform label "${v.incomingTransforms}" does not exist`);
@@ -94,7 +94,7 @@ function checkIfTransformsExist(v, ancillaryTransform) {
 			throw e;
 		}
 	}
-	if (typeof v.outgoingTransforms === 'string') {
+	if (typeof v.outgoingTransforms === 'string' && v.outgoingTransforms.length > 0) {
 		const t = transformService.get(v.outgoingTransforms);
 		if (typeof t === 'undefined') {
 			const e = new Error(`Outgoing transform label "${v.outgoingTransforms}" does not exist`);
