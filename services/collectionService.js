@@ -424,6 +424,10 @@ collectionService.saveDataStream = async (collectionName, dataStream) => {
 	if (!metaData) throw new Error(`Collection meta data for "${v.collectionName}" does not exist`);
 	checkIfTransformsExist(metaData);
 	const transforms = transformService.get(metaData.incomingTransforms);
+	if (typeof metaData.stringPrefix === 'string' && metaData.stringPrefix.length > 0) {
+		const sp = transformService.addPrefix(metaData.stringPrefix);
+		transforms.push(sp);
+	}
 	await collectionsModel.saveDataStream(v.collectionName, dataStream, transforms);
 };
 

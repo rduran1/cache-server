@@ -4,6 +4,11 @@ const ReplaceStreamService = require('./replaceStreamService');
 
 const transformService = {};
 
+transformService.addPrefix = (prefixString) => {
+	const rs1 =	new ReplaceStreamService('', '', prefixString);
+	return rs1;
+};
+
 transformService.get = (keyName, prefixString) => {
 	let result;
 	switch (keyName) {
