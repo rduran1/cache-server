@@ -135,6 +135,17 @@ Vue.component('data-collections', {
 		setMetadata: async function setMetadata(config, setType) {
 			let apipath;
 			let method;
+			let body = {};
+			if (typeof config.relevance === 'string') {
+				body = {
+					output: config.output,
+					relevance: config.relevance
+				};
+				delete config.relevance;
+				delete config.output;
+				config.body = body;
+			}
+
 			if (setType === 'create') {
 				apipath = `${this.BASE_URL}/create-metadata/${config.name}`;
 				method = 'post';
