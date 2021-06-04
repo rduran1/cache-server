@@ -108,7 +108,15 @@ collectionController.getServiceAccountByName = async (req, res) => {
 };
 
 collectionController.getDataSetByName = async (req, res) => {
-	const { name } = req.params;
+	const { name, token } = req.params;
+	const isAllowed = await collectionService.isTokenAuthorizedToAccessCollection(token, name);
+	if (!isAllowed) {
+		const emsg = `Token provided does not have permission to access "${name}"`;
+		logger.warn(emsg);
+		res.statusMessage = emsg;
+		res.status(403).end();
+		return logger.info(`responded with HTTP 404: ${res.statusMessage}`);
+	}
 	try {
 		const { dataStream, transforms } = await collectionService.getDataStream(name);
 		collectionService.increaseStreamCount(name);

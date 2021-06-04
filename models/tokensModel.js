@@ -27,14 +27,14 @@ const model = {};
 const mName = (basename(__filename).replace(/\.js$/i, ''));
 model.name = mName;
 
-model.isTokenAuthorizedToAccessCollection = async (tokenName, collectionName) => {
-	const token = await model.getToken(tokenName);
+model.isTokenAuthorizedToAccessCollection = async (tokenValue, collectionName) => {
+	const token = await model.getToken(tokenValue);
 	if (token) return token.collections.include(collectionName);
 	return false;
 };
 
-model.getToken = async (tokenName) => {
-	const token = store.find((e) => e.tokenName === tokenName && e.status !== 'deleted');
+model.getToken = async (tokenValue) => {
+	const token = store.find((e) => e.value === tokenValue && e.status !== 'deleted');
 	if (typeof token === 'object') {
 		const clone = toolboxService.clone(token);
 		return clone;
