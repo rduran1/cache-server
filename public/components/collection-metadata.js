@@ -48,10 +48,8 @@ Vue.component('collection-metadata', {
 						<label for="path">Path:</label>
 						<input id="path" v-model=selectedMetadata.path></input>
 
-
-
 						<label v-show="showBFRelevanceSection" for="relevance-output">Output:</label>
-						<select v-show="showBFRelevanceSection" id="relevance-output" :selected="selectedMetadata.output" @change="updateOutput">
+						<select v-show="showBFRelevanceSection" id="relevance-output" v-model="selectedMetadata.body.output">
 							<option value="xml">XML</option>
 							<option value="json">JSON</option>
 						</select>
@@ -60,11 +58,8 @@ Vue.component('collection-metadata', {
 						<textarea 
 							v-show="showBFRelevanceSection" 
 							id="relevance" 
-							:selected="selectedMetadata.relevance" 
-							@change="updateRelevance"
+							v-model="selectedMetadata.body.relevance" 
 						></textarea>
-
-
 
 						<label for="incoming-transform">Incoming Transform:</label>
 						<select id="incoming-transform" v-model=selectedMetadata.incomingTransforms>
@@ -90,7 +85,9 @@ Vue.component('collection-metadata', {
     </div>
   `,
 	data: function () {
-		return {};
+		return {
+			output: ''
+		};
 	},
 
 	props: [
@@ -109,37 +106,9 @@ Vue.component('collection-metadata', {
 		showBFRelevanceSection: function showBFRelevanceSection() {
 			return this.selectedMetadata.sourceType === 'bigfix_root_api';
 		}
-		// outputType: {
-		// 	get() {
-		// 		if (typeof this.selectedMetadata.body === 'object') {
-		// 			if (typeof this.selectedMetadata.body.output === 'string') return this.selectedMetadata.body.output;
-		// 		}
-		// 		return undefined;
-		// 	},
-		// 	set(val) {
-		// 		this.$emit('set-output', val);
-		// 	}
-		// },
-		// relevance: {
-		// 	get() {
-		// 		if (typeof this.selectedMetadata.body === 'object') {
-		// 			if (typeof this.selectedMetadata.body.relevance === 'string') return this.selectedMetadata.body.relevance;
-		// 		}
-		// 		return undefined;
-		// 	},
-		// 	set(val) {
-		// 		this.$emit('set-rel', val);
-		// 	}
-		// }
 	},
 
 	methods: {
-		updateOutput: function updateOutput(val) {
-			this.$emit('set-output', val);
-		},
-		updateRelevance: function updateRelevance(val) {
-			this.$emit('set-relevance', val);
-		},
 		clearSelectedMetadata: function clearSelectedMetadata() {
 			this.$emit('clear-selected-metadata');
 		},
@@ -150,11 +119,6 @@ Vue.component('collection-metadata', {
 			const clone = JSON.parse(JSON.stringify(this.selectedMetadata));
 			delete clone.status;
 			delete clone.streamingCount;
-			if (this.output) {
-				clone.body = {};
-				clone.body.output = this.output;
-			}
-			if (this.rel) clone.body.relevance = this.rel;
 			if (this.buttonName === 'Update') return this.$emit('set-metadata', clone, 'update');
 			if (this.buttonName === 'Create') return this.$emit('set-metadata', clone, 'create');
 			return undefined;

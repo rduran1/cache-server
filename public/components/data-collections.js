@@ -35,8 +35,6 @@ Vue.component('data-collections', {
 			@set-metadata=setMetadata
 			@get-metadata=getMetadata
 			@delete-metadata=deleteMetadata
-			@set-rel=setRelevance
-			@set-output=setOutput
 			:service-accounts=serviceAccounts
 			:metadata=metadata
 			:metadata-update-mode=metadataUpdateMode
@@ -87,12 +85,6 @@ Vue.component('data-collections', {
 		socket.on('refresh tokens', () => this.refreshLocalStore('all-tokens', 'tokens'));
 	},
 	methods: {
-		setRelevance: function setRelevance(val) {
-			this.selectedMetadata.relevance = val;
-		},
-		setOutput: function setOutput(val) {
-			this.selectedMetadata.output = val;
-		},
 		refreshLocalStore: async function refreshLocalStore(storeUri, dataProp) {
 			try {
 				const response = await apiFetch({ apipath: `${this.BASE_URL}/${storeUri}`, type: 'json' });
@@ -135,17 +127,6 @@ Vue.component('data-collections', {
 		setMetadata: async function setMetadata(config, setType) {
 			let apipath;
 			let method;
-			let body = {};
-			if (typeof config.relevance === 'string') {
-				body = {
-					output: config.output,
-					relevance: config.relevance
-				};
-				delete config.relevance;
-				delete config.output;
-				config.body = body;
-			}
-
 			if (setType === 'create') {
 				apipath = `${this.BASE_URL}/create-metadata/${config.name}`;
 				method = 'post';
@@ -180,10 +161,7 @@ Vue.component('data-collections', {
 			this.selectedMetadata = await apiFetch({ apipath, type: 'json' });
 			this.selectedMetadata.name = name;
 			this.metadataUpdateMode = true;
-			if (typeof this.selectedMetadata.body === 'object') {
-				this.selectedMetadata.output = this.selectedMetadata.body.output;
-				this.selectedMetadata.relevance = this.selectedMetadata.body.relevance;
-			}
+			if (typeof this.selectedMetadata.body !== 'object') this.selectedMetadata.body = {};
 		},
 		clearSelectedMetadata: function clearSelectedMetadata() {
 			const keyNames = Object.keys(this.selectedMetadata);
