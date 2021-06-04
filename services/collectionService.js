@@ -33,6 +33,10 @@ function buildHttpRequestConfig(serviceAccount, collectionMetaData) {
 	if (typeof config.username === 'string') config.auth = `${config.username}:${config.password}`;
 	const { path, body } = collectionMetaData;
 	config.path = path;
+	if (collectionMetaData.sourceType === 'bigfix_compliance_inventory_api') {
+		if (typeof config.apiToken === 'string') config.path = `${config.path}&token=${config.apiToken}`;
+		delete config.apiToken;
+	}
 	if (typeof body === 'object') config.body = qs.stringify(body);
 	if (typeof body === 'string') config.body = body;
 	config.returnClientRequest = true;
@@ -374,11 +378,18 @@ collectionService.getMetaData = async (collectionName) => {
 		logger.error(e.stack);
 		throw e;
 	}
+	delete metaData.cacheFile;
+	delete metaData.bodyFile;
 	return metaData;
 };
 
 collectionService.getAllMetaData = async () => {
 	const metaData = await collectionsModel.getAllMetaData();
+	const mdKeys = Object.keys(metaData);
+	for (let i = 0; i < mdKeys.length; i++) {
+		delete metaData[mdKeys[i]].cacheFile;
+		delete metaData[mdKeys[i]].bodyFile;
+	}
 	return metaData;
 };
 
