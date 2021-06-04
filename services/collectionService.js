@@ -399,11 +399,6 @@ collectionService.getAllServiceAccounts = async () => {
 	return sa;
 };
 
-collectionService.isTokenAuthorizedToAccessCollection = async (tokenValue, collectionName) => {
-	const result = await tokensModel.isTokenAuthorizedToAccessCollection(tokenValue, collectionName);
-	return result;
-};
-
 collectionService.getDataStream = async (collectionName, ancillaryTransform) => {
 	const v = validationLogWrapper({ collectionName, ancillaryTransform }, 'collectionService_getDataStream');
 	const metaData = await collectionsModel.getMetaData(v.collectionName);

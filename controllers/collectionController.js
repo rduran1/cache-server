@@ -108,14 +108,21 @@ collectionController.getServiceAccountByName = async (req, res) => {
 };
 
 collectionController.getDataSetByName = async (req, res) => {
-	const { name, token } = req.params;
-	const isAllowed = await collectionService.isTokenAuthorizedToAccessCollection(token, name);
+	const { name } = req.params;
+	if (typeof req.query !== 'object' || typeof req.query.token !== 'string') {
+		const emsg = 'Token is required';
+		logger.warn(emsg);
+		res.statusMessage = emsg;
+		res.status(403).end();
+		return logger.info(`responded with HTTP 403: ${res.statusMessage}`);
+	}
+	const isAllowed = await collectionService.isTokenAuthorizedToAccessCollection(req.query.token, name);
 	if (!isAllowed) {
 		const emsg = `Token provided does not have permission to access "${name}"`;
 		logger.warn(emsg);
 		res.statusMessage = emsg;
 		res.status(403).end();
-		return logger.info(`responded with HTTP 404: ${res.statusMessage}`);
+		return logger.info(`responded with HTTP 403: ${res.statusMessage}`);
 	}
 	try {
 		const { dataStream, transforms } = await collectionService.getDataStream(name);
