@@ -19,7 +19,7 @@ Vue.component('collection-service-accounts', {
 						<label for="host">Host Name:</label>
 						<input id="host" v-model=selectedServiceAccount.host></input>
 						<label for="port">Port Number:</label>
-						<input id="port" v-model=selectedServiceAccount.port></input>
+						<input id="port" type=number v-model=selectedServiceAccount.port></input>
 						<label for="username">User Name:</label>
 						<input id="username" v-model=selectedServiceAccount.username></input>
 						<label for="password">Password:</label>
@@ -32,7 +32,7 @@ Vue.component('collection-service-accounts', {
 							<option value=false>False</option>
 						</select>
 						<label for="timeout">HTTP Timeout:</label>
-						<input id="timeout" v-model=selectedServiceAccount.timeout></input>
+						<input id="timeout" type=number v-model=selectedServiceAccount.timeout></input>
 						<label for="method">HTTP Method:</label>
 						<select id="method" v-model=selectedServiceAccount.method>
 							<option value="get">GET</option>

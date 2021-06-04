@@ -65,7 +65,12 @@ Vue.component('data-collections', {
 			metadataUpdateMode: false,
 			selectedServiceAccount: {},
 			selectedToken: {},
-			selectedMetadata: {},
+			selectedMetadata: {
+				body: {
+					output: '',
+					relevance: ''
+				}
+			},
 			isPendingServerResponse: false,
 			transforms: {},
 			tokens: [],
@@ -165,9 +170,11 @@ Vue.component('data-collections', {
 		},
 		clearSelectedMetadata: function clearSelectedMetadata() {
 			const keyNames = Object.keys(this.selectedMetadata);
-			keyNames.forEach((kn) => {
-				this.selectedMetadata[kn] = '';
-			});
+			for (let i = 0; i < keyNames.length; i++) {
+				if (keyNames[i] !== 'body') this.selectedMetadata[keyNames[i]] = '';
+			}
+			this.selectedMetadata.body.output = '';
+			this.selectedMetadata.body.relevance = '';
 			this.metadataUpdateMode = false;
 		},
 		setServiceAccount: async function setServiceAccount(config, setType) {

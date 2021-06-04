@@ -18,10 +18,10 @@ Vue.component('collection-metadata', {
 						<input class="first-row" id="name" v-model=selectedMetadata.name :readonly="metadataUpdateMode"/>
 						<label for="description">Description:</label>
 						<input id="description" v-model=selectedMetadata.description></input>
-						<label for="port">Minimum size in bytes:</label>
-						<input id="port" v-model=selectedMetadata.minValidCacheSizeInBytes></input>
+						<label for="min-size">Minimum size in bytes:</label>
+						<input id="min-size" type=number v-model=selectedMetadata.minValidCacheSizeInBytes></input>
 						<label for="ttl">TTL:</label>
-						<input id="ttl" v-model=selectedMetadata.ttl></input>
+						<input id="ttl" type=number v-model=selectedMetadata.ttl></input>
 						<label for="process-as-stream">Process as stream:</label>
 						<select id="process-as-stream" v-model=selectedMetadata.processAsStream>
 							<option value=true>True</option>
@@ -119,6 +119,8 @@ Vue.component('collection-metadata', {
 			const clone = JSON.parse(JSON.stringify(this.selectedMetadata));
 			delete clone.status;
 			delete clone.streamingCount;
+			delete clone.lastErrorMessage;
+			delete clone.lastErrorTimestamp;
 			if (this.buttonName === 'Update') return this.$emit('set-metadata', clone, 'update');
 			if (this.buttonName === 'Create') return this.$emit('set-metadata', clone, 'create');
 			return undefined;
