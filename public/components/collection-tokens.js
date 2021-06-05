@@ -38,8 +38,8 @@ Vue.component('collection-tokens', {
 									type="checkbox"
 									:id="item"
 									:value="item"
+									@click="updateSelectedCollectionsArray(item)"
 									:checked="isChecked(item)"
-									ref="collectionCheckboxesRef"
 								/>
 							</div>
 						</div>
@@ -62,10 +62,6 @@ Vue.component('collection-tokens', {
 		};
 	},
 
-	created: function created() {
-		this.filteredCollectionList = this.collectionNames;
-	},
-
 	props: [
 		'tokens',
 		'selectedToken',
@@ -85,9 +81,20 @@ Vue.component('collection-tokens', {
 	},
 
 	methods: {
+		updateSelectedCollectionsArray: function updateSelectedCollectionsArray(collectionName) {
+			if (this.selectedCollections.includes(collectionName)) { // remove from array
+				const len = this.selectedCollections.length;
+				for (let i = 0; i < len; i++) {
+					if (this.selectedCollections[i] === collectionName) this.selectedCollections.splice(i, 1);
+				}
+			} else { // add to array
+				this.selectedCollections.push(collectionName);
+				this.selectedCollections = [...new Set(this.selectedCollections)];
+			}
+		},
 		isChecked: function isChecked(collectionName) {
 			if (typeof this.selectedToken !== 'object' || typeof this.selectedToken.collections !== 'object') return false;
-			return this.selectedToken.collections.includes(collectionName);
+			return this.selectedCollections.includes(collectionName);
 		},
 		filterCollectionsList: function filterCollectionsList() {
 			this.filteredCollectionList = this.collectionNames.filter((name) => name.includes(this.filterString));
@@ -101,9 +108,6 @@ Vue.component('collection-tokens', {
 			this.$emit('get-token', name);
 		},
 		createOrUpdateToken: function createOrUpdateToken() {
-			this.selectedCollections.length = 0;
-			const s = this.$refs.collectionCheckboxesRef.filter((e) => e.checked);
-			s.map((e) => this.selectedCollections.push(e.value));
 			const clone = JSON.parse(JSON.stringify(this.selectedToken));
 			clone.collections = this.selectedCollections;
 			delete clone.value;
