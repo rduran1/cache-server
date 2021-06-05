@@ -85,6 +85,8 @@ Vue.component('data-collections', {
 		this.refreshLocalStore('all-service-accounts', 'serviceAccounts');
 		this.refreshLocalStore('all-tokens', 'tokens');
 		this.transforms = await apiFetch({ apipath: `${this.BASE_URL}/transforms`, type: 'json' });
+		this.transforms.incoming.push('');
+		this.transforms.outgoing.push('');
 		socket.on('refresh metadata', () => this.refreshLocalStore('all-metadata', 'metadata'));
 		socket.on('refresh service-accounts', () => this.refreshLocalStore('all-service-accounts', 'serviceAccounts'));
 		socket.on('refresh tokens', () => this.refreshLocalStore('all-tokens', 'tokens'));
@@ -232,11 +234,12 @@ Vue.component('data-collections', {
 			});
 			this.tokenUpdateMode = false;
 		},
-		getToken: async function getToken(name) {
+		getToken: async function getToken(name, done) {
 			const apipath = `${this.BASE_URL}/token/${name}`;
 			this.selectedToken = await apiFetch({ apipath, type: 'json' });
 			this.selectedToken.tokenName = name;
 			this.tokenUpdateMode = true;
+			done();
 		},
 		setToken: async function setToken(config, setType) {
 			let apipath;

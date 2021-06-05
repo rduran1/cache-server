@@ -69,6 +69,10 @@ Vue.component('collection-tokens', {
 		'metadata'
 	],
 
+	created: function created() {
+		this.filteredCollectionList = this.collectionNames;
+	},
+
 	computed: {
 		buttonName: function buttonName() {
 			if (this.tokenUpdateMode) return 'Update';
@@ -105,7 +109,10 @@ Vue.component('collection-tokens', {
 		},
 		getToken: function getToken(name) {
 			this.selectedCollections.length = 0;
-			this.$emit('get-token', name);
+			this.$emit('get-token', name, this.onGetTokenCompleted);
+		},
+		onGetTokenCompleted: function onGetTokenCompleted() {
+			this.selectedToken.collections.forEach((c) => this.selectedCollections.push(c));
 		},
 		createOrUpdateToken: function createOrUpdateToken() {
 			const clone = JSON.parse(JSON.stringify(this.selectedToken));
