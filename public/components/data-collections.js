@@ -234,12 +234,11 @@ Vue.component('data-collections', {
 			});
 			this.tokenUpdateMode = false;
 		},
-		getToken: async function getToken(name, done) {
+		getToken: async function getToken(name) {
 			const apipath = `${this.BASE_URL}/token/${name}`;
 			this.selectedToken = await apiFetch({ apipath, type: 'json' });
 			this.selectedToken.tokenName = name;
 			this.tokenUpdateMode = true;
-			done();
 		},
 		setToken: async function setToken(config, setType) {
 			let apipath;

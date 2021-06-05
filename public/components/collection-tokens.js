@@ -84,6 +84,12 @@ Vue.component('collection-tokens', {
 		}
 	},
 
+	watch: {
+		selectedToken: function selectedToken() {
+			this.selectedToken.collections.forEach((c) => this.selectedCollections.push(c));
+		}
+	},
+
 	methods: {
 		updateSelectedCollectionsArray: function updateSelectedCollectionsArray(collectionName) {
 			if (this.selectedCollections.includes(collectionName)) { // remove from array
@@ -109,10 +115,7 @@ Vue.component('collection-tokens', {
 		},
 		getToken: function getToken(name) {
 			this.selectedCollections.length = 0;
-			this.$emit('get-token', name, this.onGetTokenCompleted);
-		},
-		onGetTokenCompleted: function onGetTokenCompleted() {
-			this.selectedToken.collections.forEach((c) => this.selectedCollections.push(c));
+			this.$emit('get-token', name);
 		},
 		createOrUpdateToken: function createOrUpdateToken() {
 			const clone = JSON.parse(JSON.stringify(this.selectedToken));
