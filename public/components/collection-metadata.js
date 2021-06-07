@@ -54,7 +54,10 @@ Vue.component('collection-metadata', {
 							<option value="json">JSON</option>
 						</select>
 
-						<label v-show="showBFRelevanceSection" for="relevance">Relevance:</label>
+						<label 
+							v-show="showBFRelevanceSection" 
+							for="relevance">Relevance: <i @click="transpile" class="bi bi-gear relevance-transpiler-icon" />
+						</label>
 						<textarea 
 							v-show="showBFRelevanceSection" 
 							id="relevance" 
@@ -67,7 +70,7 @@ Vue.component('collection-metadata', {
 						</select>
 
 						<label for="outgoing-transform">Outgoing Transform:</label>
-						<select id="outgoing-transform" v-model=selectedMetadata.outgoingTransform>
+						<select id="outgoing-transform" v-model=selectedMetadata.outgoingTransforms>
 							<option v-for="transform in transforms.outgoing" :value=transform>{{ transform }}</option>
 						</select>
 						
@@ -109,6 +112,50 @@ Vue.component('collection-metadata', {
 	},
 
 	methods: {
+		transpile: function transpile() {
+			let whoseit = '';
+			const data = this.selectedMetadata.body.relevance.toLowerCase().split('\n');
+			if (data[0].includes('whoseit=')) {
+				const filter = data[0].split('whoseit=')[1];
+				whoseit = `whose (${filter})`;
+			}
+			let query = `
+				name of item 0 of it | "Missing Computer Name",
+			`;
+			query += data.map((item, i) => `
+				(
+					if (size of item ${i + 1} of it = 1) then
+						(
+							(if it = "" then "No Data" else it)
+							of concatenation ";" of values of results (item 0 of it, elements of item ${i + 1} of it)
+						)
+					else
+					(
+						if (size of item ${i + 1} of it > 1) then
+						(
+							(
+								"Duplicates: " & concatenation "|" of ((name of it) & "=" & (id of it as string))
+								of elements of item ${i + 1} of it
+							) as string
+						)
+						else ("No Data")
+					)
+				)
+			`);
+			query += `
+				)
+				of
+					(
+						elements of item 0 of it,
+			`;
+			query += data.map((item, i) => ` item ${i + 1} of it `);
+			query += ` ) of (set of bes computers ${whoseit},`;
+			query += data.map((item) => {
+				const field = item.split(',', 4);
+				return ` set of bes properties whose ((id of it = (${field[0]}, ${field[1]}, ${field[2]}))) /* ${field[3]} */ `;
+			});
+			this.selectedMetadata.body.relevance = query;
+		},
 		clearSelectedMetadata: function clearSelectedMetadata() {
 			this.$emit('clear-selected-metadata');
 		},
