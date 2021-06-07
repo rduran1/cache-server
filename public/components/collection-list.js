@@ -16,7 +16,7 @@ Vue.component('collection-list', {
 				<tr v-for="col in collections">
 					<td>{{ col.name }}</td>
 					<td>{{ col.description }}</td>
-					<td>{{ col.lastUpdated }}</td>
+					<td>{{ col.lastCacheUpdate }}</td>
 					<td>{{ col.ttl }}</td>
 					<td class="collection-button-tds">
 						<button class="collection-list-buttons"

@@ -16,10 +16,11 @@ const collectionName = Joi.string().max(75);
 const description = Joi.string().max(150);
 const ttl = Joi.number();
 const minValidCacheSizeInBytes = Joi.number();
+const lastCacheUpdate = Joi.date().iso();
 const path = Joi.string();
 const body = Joi.alternatives().try(Joi.string().max(5000), Joi.object());
 const bodyFile = Joi.string();
-const stringPrefix = Joi.string();
+const stringPrefix = Joi.string().allow('');
 const processAsStream = Joi.boolean();
 const sourceType = Joi.string().valid('bigfix_compliance_inventory_api', 'bigfix_root_api', 'basic auth', 'listener');
 
@@ -108,19 +109,19 @@ schemas.collectionService_createMetaData = Joi.object().keys({
 	sourceType: sourceType.required(),
 	body,
 	bodyFile,
-	incomingTransforms: Joi.string(),
-	outgoingTransforms: Joi.string(),
+	incomingTransforms: Joi.string().allow(''),
+	outgoingTransforms: Joi.string().allow(''),
 	stringPrefix,
 	processAsStream: processAsStream.default(true),
 	autoStart: Joi.boolean().default(true)
-})
-	.xor('body', 'bodyFile');
+});
 
 schemas.collectionService_updateMetaData = Joi.object().keys({
 	name: collectionName.required(),
 	description,
 	ttl,
 	minValidCacheSizeInBytes: Joi.number(),
+	lastCacheUpdate,
 	serviceAccountName,
 	path,
 	sourceType,
@@ -128,14 +129,13 @@ schemas.collectionService_updateMetaData = Joi.object().keys({
 	bodyFile,
 	lastErrorMessage: Joi.string().allow(''),
 	lastErrorTimestamp: Joi.date().iso(),
-	incomingTransforms: Joi.string(),
-	outgoingTransforms: Joi.string(),
+	incomingTransforms: Joi.string().allow(''),
+	outgoingTransforms: Joi.string().allow(''),
 	cacheFile: Joi.string(),
 	stringPrefix,
 	processAsStream,
 	autoStart: Joi.boolean().default(true)
-})
-	.xor('body', 'bodyFile');
+});
 
 schemas.collectionService_deleteMetaData = Joi.object().keys({
 	collectionName

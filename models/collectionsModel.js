@@ -31,6 +31,7 @@ function checkIfCacheFileExistsInMetaData(collectionName, metaData) {
 model.setMetaData = async (name, config) => {
 	const clone = toolboxService.clone(store);
 	const cfg = toolboxService.clone(config);
+	if (typeof store[name] === 'object') cfg.cacheFile = store[name].cacheFile;
 	clone[name] = cfg;
 	const collectionNames = Object.keys(clone);
 	for (let i = 0; i < collectionNames.length; i++) {
@@ -123,11 +124,12 @@ model.saveDataStream = async (collectionName, dataStream, transforms) => {
 		if (fs.existsSync(`${metaData.cacheFile}.tmp`)) fs.unlinkSync(`${metaData.cacheFile}.tmp`);
 		throw new Error(`Pipeline error: ${e.message}`);
 	}
-	const tmpFileSize = fs.statSync(`${metaData.cacheFile}.tmp`).size;
-	if (tmpFileSize < metaData.minValidCacheSizeInBytes) {
+	const { size, mtime } = fs.statSync(`${metaData.cacheFile}.tmp`);
+	if (size < metaData.minValidCacheSizeInBytes) {
 		fs.unlinkSync(`${metaData.cacheFile}.tmp`);
-		throw new Error(`Data received for "${collectionName}" is undersized: Received ${tmpFileSize} bytes`);
+		throw new Error(`Data received for "${collectionName}" is undersized: Received ${size} bytes`);
 	}
+	store[collectionName].lastCacheUpdate = mtime;
 	// Only rename if collection is not being streamed
 	while (store[collectionName].streamingCount !== 0) {
 		// eslint-disable-next-line no-await-in-loop
