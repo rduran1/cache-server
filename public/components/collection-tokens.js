@@ -20,6 +20,14 @@ Vue.component('collection-tokens', {
 						<input id="description" v-model=selectedToken.description></input>
 						<label for="issued-to">Issued To:</label>
 						<input id="issued-to" v-model=selectedToken.issuedTo></input>
+
+						<label for="access-type">Access Type:</label>
+						<select id="access-type" v-model="selectedToken.accessType">
+							<option value="readonly">Read Only</option>
+							<option value="writeonly">Write Only</option>
+							<option value="readwrite">Read and Write</option>
+						</select>
+
 						<label v-if="tokenUpdateMode" for="date-issued">Date Issued:</label>
 						<input v-if="tokenUpdateMode" id="date-issued" :value=selectedToken.dateIssued readonly></input>
 						<label v-if="tokenUpdateMode" for="value">Value:</label>
@@ -122,6 +130,8 @@ Vue.component('collection-tokens', {
 			clone.collections = this.selectedCollections;
 			delete clone.value;
 			delete clone.dateIssued;
+			this.filterString = '';
+			this.filteredCollectionList = this.collectionNames;
 			if (this.buttonName === 'Update') return this.$emit('set-token', clone, 'update');
 			if (this.buttonName === 'Create') return this.$emit('set-token', clone, 'create');
 			return undefined;

@@ -4,6 +4,7 @@ const tokenName = Joi.string().max(50);
 const issuedTo = Joi.string();
 const authorizedIps = Joi.array();
 const collections = Joi.array();
+const accessType = Joi.string().valid('readonly', 'writeonly', 'readwrite').default('readonly');
 const serviceAccountName = Joi.string().max(50);
 const host = Joi.string().max(75);
 const port = Joi.number().min(80).max(65534);
@@ -36,7 +37,8 @@ schemas.collectionService_decreaseStreamCount = Joi.object().keys({
 
 schemas.collectionService_isTokenAuthorizedToAccessCollection = Joi.object().keys({
 	tokenName: tokenName.required(),
-	collectionName: collectionName.required()
+	collectionName: collectionName.required(),
+	method: Joi.string()
 });
 
 schemas.collectionService_createToken = Joi.object().keys({
@@ -44,7 +46,8 @@ schemas.collectionService_createToken = Joi.object().keys({
 	description: description.required(),
 	issuedTo: issuedTo.required(),
 	authorizedIps,
-	collections
+	collections,
+	accessType
 });
 
 schemas.collectionService_getToken = Joi.object().keys({
@@ -56,7 +59,8 @@ schemas.collectionService_updateToken = Joi.object().keys({
 	description,
 	issuedTo,
 	authorizedIps,
-	collections
+	collections,
+	accessType
 });
 
 schemas.collectionService_deleteToken = Joi.object().keys({

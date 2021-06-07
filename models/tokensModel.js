@@ -27,9 +27,11 @@ const model = {};
 const mName = (basename(__filename).replace(/\.js$/i, ''));
 model.name = mName;
 
-model.isTokenAuthorizedToAccessCollection = async (tokenValue, collectionName) => {
-	const token = await model.getToken(tokenValue);
-	if (token) return token.collections.include(collectionName);
+model.isTokenAuthorizedToAccessCollection = async (tokenValue, collectionName, method) => {
+	const token = await model.getTokenByValue(tokenValue);
+	if (method.toLowerCase() === 'post' && (token.accessType !== 'write' || token.accessType !== 'readwrite')) return false;
+	if (method.toLowerCase() === 'get' && (token.accessType !== 'read' || token.accessType !== 'readwrite')) return false;
+	if (token) return token.collections.includes(collectionName);
 	return false;
 };
 

@@ -9,8 +9,8 @@ router.get('/all-tokens', accessController.isAllowed, collectionController.getAl
 router.get('/metadata/:name', accessController.isAllowed, collectionController.getMetaDataByName);
 router.get('/service-account/:name', accessController.isAllowed, collectionController.getServiceAccountByName);
 router.get('/token/:name', accessController.isAllowed, collectionController.getToken);
-router.get('/tranforms', accessController.isAllowed, collectionController.getTransforms);
-router.get('/dataset/:name', accessController.isAllowed, collectionController.getDataSetByName);
+router.get('/transforms', accessController.isAllowed, collectionController.getTransforms);
+router.get('/dataset/:name', collectionController.getDataSetByName);
 
 router.post('/create-metadata/:name', accessController.isAllowed, collectionController.createMetaData);
 router.post('/create-service-account/:name', accessController.isAllowed, collectionController.createServiceAccount);
@@ -27,6 +27,6 @@ router.delete('/delete-metadata/:name', accessController.isAllowed, collectionCo
 router.delete('/delete-service-account/:name', accessController.isAllowed, collectionController.deleteServiceAccount);
 router.delete('/delete-token/:name', accessController.isAllowed, collectionController.deleteToken);
 
-router.post('/dataset/:name', accessController.isAllowed, collectionController.saveDataStream);
+router.post('/dataset/:name', collectionController.saveDataStream);
 
 module.exports = router;

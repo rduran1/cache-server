@@ -116,7 +116,7 @@ collectionController.getDataSetByName = async (req, res) => {
 		res.status(403).end();
 		return logger.info(`responded with HTTP 403: ${res.statusMessage}`);
 	}
-	const isAllowed = await collectionService.isTokenAuthorizedToAccessCollection(req.query.token, name);
+	const isAllowed = await collectionService.isTokenAuthorizedToAccessCollection(req.query.token, name, req.method);
 	if (!isAllowed) {
 		const emsg = `Token provided does not have permission to access "${name}"`;
 		logger.warn(emsg);
@@ -233,6 +233,14 @@ collectionController.deleteServiceAccount = async (req, res) => {
 
 collectionController.saveDataStream = async (req, res) => {
 	const { name } = req.params;
+	const isAllowed = await collectionService.isTokenAuthorizedToAccessCollection(req.query.token, name, req.method);
+	if (!isAllowed) {
+		const emsg = `Token provided does not have permission to access "${name}"`;
+		logger.warn(emsg);
+		res.statusMessage = emsg;
+		res.status(403).end();
+		return logger.info(`responded with HTTP 403: ${res.statusMessage}`);
+	}
 	try {
 		await collectionService.saveDataStream(name, req);
 		res.status(200).send();

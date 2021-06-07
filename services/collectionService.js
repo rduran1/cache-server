@@ -223,9 +223,9 @@ collectionService.deleteToken = async (tokenName) => {
 	await tokensModel.deleteToken(v.tokenName);
 };
 
-collectionService.isTokenAuthorizedToAccessCollection = async (tokenName, collectionName) => {
-	const v = validationLogWrapper({ tokenName, collectionName }, 'collectionService_isTokenAuthorizedToAccessCollection');
-	const result = await tokensModel.isTokenAuthorizedToAccessCollection(v.tokenName, v.collectionName);
+collectionService.isTokenAuthorizedToAccessCollection = async (tokenName, collectionName, method) => {
+	const v = validationLogWrapper({ tokenName, collectionName, method }, 'collectionService_isTokenAuthorizedToAccessCollection');
+	const result = await tokensModel.isTokenAuthorizedToAccessCollection(v.tokenName, v.collectionName, v.method);
 	return result;
 };
 
@@ -423,10 +423,11 @@ collectionService.saveDataStream = async (collectionName, dataStream) => {
 	const metaData = await collectionsModel.getMetaData(v.collectionName);
 	if (!metaData) throw new Error(`Collection meta data for "${v.collectionName}" does not exist`);
 	checkIfTransformsExist(metaData);
-	const transforms = transformService.get(metaData.incomingTransforms);
-	if (typeof metaData.stringPrefix === 'string' && metaData.stringPrefix.length > 0) {
-		const sp = transformService.addPrefix(metaData.stringPrefix);
-		transforms.push(sp);
+	let transforms;
+	let prefix;
+	if (typeof metaData.stringPrefix === 'string' && metaData.stringPrefix.length > 0) prefix = metaData.stringPrefix;
+	if (typeof metaData.incomingTransforms === 'string' && metaData.incomingTransforms.length > 0) {
+		transforms = transformService.get(metaData.incomingTransforms, prefix);
 	}
 	await collectionsModel.saveDataStream(v.collectionName, dataStream, transforms);
 };
@@ -449,6 +450,7 @@ collectionService.refreshData = async (collectionName) => {
 		// Check if collector was stopped
 		metaData = await collectionService.getMetaData(v.collectionName);
 		if (metaData.status === 'stopped') return;
+		notifier.emit('refresh-metadata');
 		logger.info(`Collection "${v.collectionName}" cache refresh completed successfully`);
 		setMetaDataStatus(v.collectionName, 'waiting');
 	} catch (e) {
