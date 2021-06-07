@@ -56,7 +56,7 @@ Vue.component('collection-metadata', {
 
 						<label 
 							v-show="showBFRelevanceSection" 
-							for="relevance">Relevance: <i @click="transpile" class="bi bi-gear relevance-transpiler-icon" :disabled=transpilerDisabled/>
+							for="relevance">Relevance: <i @click="transpile" class="bi bi-gear relevance-transpiler-icon" :disabled=transpilerDisabled />
 						</label>
 						<textarea 
 							v-show="showBFRelevanceSection" 
@@ -118,14 +118,23 @@ Vue.component('collection-metadata', {
 			this.transpilerDisabled = false;
 		},
 		transpile: function transpile() {
+			if (this.transpilerDisabled) return;
 			this.transpilerDisabled = true;
 			let whoseit = '';
 			const data = this.selectedMetadata.body.relevance.toLowerCase().split('\n');
+			if (data[0].includes('/* transpiled relevance content */')) return;
 			if (data[0].includes('whoseit=')) {
 				const filter = data[0].split('whoseit=')[1];
 				whoseit = `whose (${filter})`;
+				data.shift();
 			}
-			let query = `
+			for (let i = 0; i < data.length; i++) {
+				if (data[i].split(',').length !== 4) {
+					toast.error('Cannot transpile, each row must have exactly 4 elements separated by a comma');
+					return;
+				}
+			}
+			let query = `/* transpiled relevance content */
 				name of item 0 of it | "Missing Computer Name",
 			`;
 			query += data.map((item, i) => `
