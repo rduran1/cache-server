@@ -56,12 +56,13 @@ Vue.component('collection-metadata', {
 
 						<label 
 							v-show="showBFRelevanceSection" 
-							for="relevance">Relevance: <i @click="transpile" class="bi bi-gear relevance-transpiler-icon" />
+							for="relevance">Relevance: <i @click="transpile" class="bi bi-gear relevance-transpiler-icon" :disabled=transpilerDisabled/>
 						</label>
 						<textarea 
 							v-show="showBFRelevanceSection" 
 							id="relevance" 
-							v-model="selectedMetadata.body.relevance" 
+							v-model="selectedMetadata.body.relevance"
+							@change="enableTranspiler"
 						></textarea>
 
 						<label for="incoming-transform">Incoming Transform:</label>
@@ -89,7 +90,8 @@ Vue.component('collection-metadata', {
   `,
 	data: function () {
 		return {
-			output: ''
+			output: '',
+			transpilerDisabled: true
 		};
 	},
 
@@ -112,7 +114,11 @@ Vue.component('collection-metadata', {
 	},
 
 	methods: {
+		enableTranspiler: function enableTranspiler() {
+			this.transpilerDisabled = false;
+		},
 		transpile: function transpile() {
+			this.transpilerDisabled = true;
 			let whoseit = '';
 			const data = this.selectedMetadata.body.relevance.toLowerCase().split('\n');
 			if (data[0].includes('whoseit=')) {
@@ -154,7 +160,7 @@ Vue.component('collection-metadata', {
 				const field = item.split(',', 4);
 				return ` set of bes properties whose ((id of it = (${field[0]}, ${field[1]}, ${field[2]}))) /* ${field[3]} */ `;
 			});
-			this.selectedMetadata.body.relevance = query;
+			this.selectedMetadata.body.relevance = `(${query})`;
 		},
 		clearSelectedMetadata: function clearSelectedMetadata() {
 			this.$emit('clear-selected-metadata');
