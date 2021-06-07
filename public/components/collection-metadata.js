@@ -52,8 +52,8 @@ Vue.component('collection-metadata', {
 							<option v-for="serviceAccount in serviceAccounts">{{ serviceAccount.name }}</option>
 						</select>
 
-						<label v-show="showBFRelevanceSection" for="path">Path:</label>
-						<input v-show="showBFRelevanceSection" id="path" v-model=selectedMetadata.path></input>
+						<label v-show="showPathSection" for="path">Path:</label>
+						<input v-show="showPathSection" id="path" v-model=selectedMetadata.path></input> 
 
 						<label v-show="showBFRelevanceSection" for="relevance-output">Output:</label>
 						<select v-show="showBFRelevanceSection" id="relevance-output" v-model="selectedMetadata.body.output">
@@ -121,6 +121,11 @@ Vue.component('collection-metadata', {
 		showNonListenerSection: function showNonListenerSection() {
 			if (this.selectedMetadata.sourceType === 'bigfix_compliance_inventory_api') return true;
 			if (this.selectedMetadata.sourceType === 'bigfix_root_api') return true;
+			if (this.selectedMetadata.sourceType === 'basic auth') return true;
+			return false;
+		},
+		showPathSection: function showPathSection() {
+			if (this.selectedMetadata.sourceType === 'bigfix_compliance_inventory_api') return true;
 			if (this.selectedMetadata.sourceType === 'basic auth') return true;
 			return false;
 		}
