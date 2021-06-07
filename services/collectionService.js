@@ -154,7 +154,7 @@ const clientRequestHandler = (clientRequest, collectionName, processAsStream, bo
 			});
 			httpIncomingMessage.on('end', async () => {
 				try {
-					collectionService.saveData(collectionName, data);
+					collectionService.saveDataCollection(collectionName, data);
 					resolve();
 				} catch (e) {
 					return reject(e);
@@ -173,7 +173,7 @@ const clientRequestHandler = (clientRequest, collectionName, processAsStream, bo
 		em.addListener('stopCollectionProcess', destroySocket);
 		if (processAsStream) {
 			try {
-				await collectionService.saveDataStream(collectionName, httpIncomingMessage);
+				await collectionService.saveCollectionData(collectionName, httpIncomingMessage);
 				resolve();
 			} catch (e) {
 				return reject(e);
@@ -420,8 +420,8 @@ collectionService.getDataStream = async (collectionName, ancillaryTransform) => 
 	return result;
 };
 
-collectionService.saveDataStream = async (collectionName, dataStream) => {
-	const v = toolboxService.validate({ collectionName, dataStream }, 'collectionService_saveDataStream');
+collectionService.saveCollectionData = async (collectionName, dataStream) => {
+	const v = toolboxService.validate({ collectionName, dataStream }, 'collectionService_saveCollectionData');
 	const metaData = await collectionsModel.getMetaData(v.collectionName);
 	if (!metaData) throw new Error(`Collection meta data for "${v.collectionName}" does not exist`);
 	checkIfTransformsExist(metaData);
@@ -431,7 +431,11 @@ collectionService.saveDataStream = async (collectionName, dataStream) => {
 	if (typeof metaData.incomingTransforms === 'string' && metaData.incomingTransforms.length > 0) {
 		transforms = transformService.get(metaData.incomingTransforms, prefix);
 	}
-	await collectionsModel.saveDataStream(v.collectionName, dataStream, transforms);
+	if (metaData.processAsStream) {
+		await collectionsModel.saveDataStream(v.collectionName, dataStream, transforms);
+	} else {
+		await collectionsModel.saveData(v.collectionName, dataStream, transforms);
+	}
 };
 
 collectionService.refreshData = async (collectionName) => {

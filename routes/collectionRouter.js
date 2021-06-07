@@ -27,6 +27,6 @@ router.delete('/delete-metadata/:name', accessController.isAllowed, collectionCo
 router.delete('/delete-service-account/:name', accessController.isAllowed, collectionController.deleteServiceAccount);
 router.delete('/delete-token/:name', accessController.isAllowed, collectionController.deleteToken);
 
-router.post('/dataset/:name', collectionController.saveDataStream);
+router.post('/dataset/:name', collectionController.saveCollectionData);
 
 module.exports = router;

@@ -231,7 +231,7 @@ collectionController.deleteServiceAccount = async (req, res) => {
 	}
 };
 
-collectionController.saveDataStream = async (req, res) => {
+collectionController.saveCollectionData = async (req, res) => {
 	const { name } = req.params;
 	const isAllowed = await collectionService.isTokenAuthorizedToAccessCollection(req.query.token, name, req.method);
 	if (!isAllowed) {
@@ -242,7 +242,7 @@ collectionController.saveDataStream = async (req, res) => {
 		return logger.info(`responded with HTTP 403: ${res.statusMessage}`);
 	}
 	try {
-		await collectionService.saveDataStream(name, req);
+		await collectionService.saveCollectionData(name, req);
 		res.status(200).send();
 		return logger.info('responded with HTTP 200');
 	} catch (e) {
