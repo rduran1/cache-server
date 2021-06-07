@@ -108,7 +108,7 @@ schemas.collectionService_createMetaData = Joi.object().keys({
 	description: description.required(),
 	ttl: ttl.default(1440),
 	minValidCacheSizeInBytes: minValidCacheSizeInBytes.default(0),
-	serviceAccountName: serviceAccountName.required(),
+	serviceAccountName,
 	path: path.required(),
 	sourceType: sourceType.required(),
 	body,
@@ -154,7 +154,7 @@ schemas.collectionService_getDataStream = Joi.object().keys({
 	ancillaryTransform: Joi.string()
 });
 
-schemas.collectionService_saveDataStream = Joi.object().keys({
+schemas.collectionService_saveCollectionData = Joi.object().keys({
 	collectionName,
 	dataStream: Joi.object().required()
 });
