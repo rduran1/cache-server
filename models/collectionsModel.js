@@ -103,6 +103,39 @@ model.deleteMetaData = async (collectionName) => {
 	return undefined;
 };
 
+model.saveData = async (collectionName, data, transforms) => {
+	const metaData = await model.getMetaData(collectionName);
+	if (typeof metaData === 'undefined') throw new Error(`Collection ${collectionName} does not exist`);
+	checkIfCacheFileExistsInMetaData(collectionName, metaData);
+	checkForDeletionInProgress(collectionName);
+	try {
+		fs.writeFileSync(`${metaData.cacheFile}.tmp`, data, { encoding: 'utf-8' });
+		if (typeof transforms !== 'undefined') {
+			// perform transform
+		}
+		checkForDeletionInProgress(collectionName);
+		if (store[collectionName].status === 'stopped') {
+			if (fs.existsSync(`${metaData.cacheFile}.tmp`)) fs.unlinkSync(`${metaData.cacheFile}.tmp`);
+			return;
+		}
+	} catch (e) {
+		if (fs.existsSync(`${metaData.cacheFile}.tmp`)) fs.unlinkSync(`${metaData.cacheFile}.tmp`);
+		throw new Error(`Pipeline error: ${e.message}`);
+	}
+	const { size, mtime } = fs.statSync(`${metaData.cacheFile}.tmp`);
+	if (size < metaData.minValidCacheSizeInBytes) {
+		fs.unlinkSync(`${metaData.cacheFile}.tmp`);
+		throw new Error(`Data received for "${collectionName}" is undersized: Received ${size} bytes`);
+	}
+	store[collectionName].lastCacheUpdate = mtime;
+	// Only rename if collection is not being streamed
+	while (store[collectionName].streamingCount !== 0) {
+		// eslint-disable-next-line no-await-in-loop
+		await toolboxService.sleep(100);
+	}
+	fs.renameSync(`${metaData.cacheFile}.tmp`, metaData.cacheFile);
+};
+
 model.saveDataStream = async (collectionName, dataStream, transforms) => {
 	const metaData = await model.getMetaData(collectionName);
 	if (typeof metaData === 'undefined') throw new Error(`Collection ${collectionName} does not exist`);
