@@ -154,7 +154,7 @@ const clientRequestHandler = (clientRequest, collectionName, processAsStream, bo
 			});
 			httpIncomingMessage.on('end', async () => {
 				try {
-					collectionService.saveDataCollection(collectionName, data);
+					collectionService.saveCollectionData(collectionName, data);
 					resolve();
 				} catch (e) {
 					return reject(e);
@@ -435,6 +435,7 @@ collectionService.saveCollectionData = async (collectionName, dataStream) => {
 		await collectionsModel.saveDataStream(v.collectionName, dataStream, transforms);
 	} else {
 		await collectionsModel.saveData(v.collectionName, dataStream, transforms);
+		notifier.emit('refresh-metadata');
 	}
 };
 
