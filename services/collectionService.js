@@ -309,7 +309,9 @@ collectionService.createMetaData = async (config) => {
 		logger.error(e.stack);
 		throw e;
 	}
-	await collectionService.getServiceAccount(v.serviceAccountName); // throws error if account does not exist
+	if (v.serviceAccountName) {
+		await collectionService.getServiceAccount(v.serviceAccountName); // throws error if account does not exist
+	}
 	checkIfTransformsExist(v); // throws error if transforms requested do not exist
 	const collectionMetaDataName = v.name;
 	v.cacheFile = join(cacheDirectory, v.name);
@@ -465,16 +467,26 @@ collectionService.refreshData = async (collectionName) => {
 
 collectionService.stopInterval = async (collectionName) => {
 	const v = validationLogWrapper({ collectionName }, 'collectionService_stopInterval');
+	const o = await collectionService.getMetaData(v.collectionName);
+	if (o.sourceType === 'listener') {
+		setMetaDataStatus(v.collectionName, 'stopped');
+		return notifier.emit('refresh-metadata');
+	}
 	// if (typeof collectionService.timers[v.collectionName] === 'undefined') return;
 	logger.info(`Stopping collection interval for "${collectionName}"`);
 	clearIntervalTimer(v.collectionName);
 	setMetaDataStatus(v.collectionName, 'stopped');
 	em.emit('stopCollectionProcess', v.collectionName);
-	logger.info(`Collection interval for "${collectionName}" successfully stopped`);
+	return logger.info(`Collection interval for "${collectionName}" successfully stopped`);
 };
 
 collectionService.startInterval = async (collectionName) => {
 	const v = validationLogWrapper({ collectionName }, 'collectionService_startInterval');
+	const o = await collectionService.getMetaData(v.collectionName);
+	if (o.sourceType === 'listener') {
+		setMetaDataStatus(v.collectionName, 'listening');
+		return notifier.emit('refresh-metadata');
+	}
 	// Return if timer is already set, if not then set timer property to temporary empty object so that
 	// additional calls to startInterval for this collection are ignored while this collection is starting
 	// collectionService.timers[v.collectionName] = {};
@@ -483,10 +495,10 @@ collectionService.startInterval = async (collectionName) => {
 	await collectionService.refreshData(v.collectionName);
 	// Check if collector was stopped while refreshing
 	const metaData = await collectionService.getMetaData(v.collectionName);
-	if (metaData.status === 'stopped') return;
+	if (metaData.status === 'stopped') return undefined;
 	await setIntervalTimer(v.collectionName);
 	notifier.emit('refresh-metadata');
-	logger.info(`Collection interval for "${collectionName}" successfully started`);
+	return logger.info(`Collection interval for "${collectionName}" successfully started`);
 };
 
 collectionService.autoStartOnStartup = async () => {
