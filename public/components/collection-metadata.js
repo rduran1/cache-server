@@ -14,39 +14,46 @@ Vue.component('collection-metadata', {
 			<div>
 				<div id="title">Metadata Details</div>
 					<div class="service-account-details-grid">
+
 						<label class="first-row" for="name">Name:</label>
 						<input class="first-row" id="name" v-model=selectedMetadata.name :readonly="metadataUpdateMode"/>
+
 						<label for="description">Description:</label>
 						<input id="description" v-model=selectedMetadata.description></input>
+
 						<label for="min-size">Minimum size in bytes:</label>
 						<input id="min-size" type=number v-model=selectedMetadata.minValidCacheSizeInBytes></input>
-						<label for="ttl">TTL:</label>
-						<input id="ttl" type=number v-model=selectedMetadata.ttl></input>
-						<label for="process-as-stream">Process as stream:</label>
-						<select id="process-as-stream" v-model=selectedMetadata.processAsStream>
-							<option value=true>True</option>
-							<option value=false>False</option>
-						</select>
-						<label for="auto-start">Auto Start:</label>
-						<select id="auto-start" v-model=selectedMetadata.autoStart>
-							<option value=true>True</option>
-							<option value=false>False</option>
-						</select>
+
 						<label for="source-type">Source Type:</label>
 						<select id="source-type" v-model=selectedMetadata.sourceType>
 							<option value="bigfix_root_api">BigFix Root REST API</option>
 							<option value="bigfix_compliance_inventory_api">BigFix Inventory/Compliance REST API</option>
 							<option value="basic auth">Basic HTTP Authentication</option>
-							<option value="listener">Incomming Listener</option>
+							<option value="listener">Incoming Listener</option>
 						</select>
 
-						<label for="service-account">Service Account:</label>
-						<select id="auto-start" v-model=selectedMetadata.serviceAccountName>
+						<label v-show="showNonListenerSection" for="ttl">TTL:</label>
+						<input v-show="showNonListenerSection" id="ttl" type=number v-model=selectedMetadata.ttl></input>
+
+						<label for="process-as-stream">Process as stream:</label>
+						<select id="process-as-stream" v-model=selectedMetadata.processAsStream>
+							<option value=true>True</option>
+							<option value=false>False</option>
+						</select>
+
+						<label v-show="showNonListenerSection" for="auto-start">Auto Start:</label>
+						<select v-show="showNonListenerSection" id="auto-start" v-model=selectedMetadata.autoStart>
+							<option value=true>True</option>
+							<option value=false>False</option>
+						</select>
+
+						<label v-show="showNonListenerSection" for="service-account">Service Account:</label>
+						<select v-show="showNonListenerSection" id="auto-start" v-model=selectedMetadata.serviceAccountName>
 							<option v-for="serviceAccount in serviceAccounts">{{ serviceAccount.name }}</option>
 						</select>
 
-						<label for="path">Path:</label>
-						<input id="path" v-model=selectedMetadata.path></input>
+						<label v-show="showBFRelevanceSection" for="path">Path:</label>
+						<input v-show="showBFRelevanceSection" id="path" v-model=selectedMetadata.path></input>
 
 						<label v-show="showBFRelevanceSection" for="relevance-output">Output:</label>
 						<select v-show="showBFRelevanceSection" id="relevance-output" v-model="selectedMetadata.body.output">
@@ -110,6 +117,12 @@ Vue.component('collection-metadata', {
 		},
 		showBFRelevanceSection: function showBFRelevanceSection() {
 			return this.selectedMetadata.sourceType === 'bigfix_root_api';
+		},
+		showNonListenerSection: function showNonListenerSection() {
+			if (this.selectedMetadata.sourceType === 'bigfix_compliance_inventory_api') return true;
+			if (this.selectedMetadata.sourceType === 'bigfix_root_api') return true;
+			if (this.selectedMetadata.sourceType === 'basic auth') return true;
+			return false;
 		}
 	},
 
@@ -169,6 +182,7 @@ Vue.component('collection-metadata', {
 				const field = item.split(',', 4);
 				return ` set of bes properties whose ((id of it = (${field[0]}, ${field[1]}, ${field[2]}))) /* ${field[3]} */ `;
 			});
+			// eslint-disable-next-line vue/no-mutating-props
 			this.selectedMetadata.body.relevance = `(${query})`;
 		},
 		clearSelectedMetadata: function clearSelectedMetadata() {
@@ -183,6 +197,7 @@ Vue.component('collection-metadata', {
 			delete clone.streamingCount;
 			delete clone.lastErrorMessage;
 			delete clone.lastErrorTimestamp;
+			if (this.showBFRelevanceSection) clone.path = '/api/query';
 			if (this.buttonName === 'Update') return this.$emit('set-metadata', clone, 'update');
 			if (this.buttonName === 'Create') return this.$emit('set-metadata', clone, 'create');
 			return undefined;
