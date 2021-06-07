@@ -109,7 +109,9 @@ model.saveData = async (collectionName, data, transforms) => {
 	checkIfCacheFileExistsInMetaData(collectionName, metaData);
 	checkForDeletionInProgress(collectionName);
 	try {
-		fs.writeFileSync(`${metaData.cacheFile}.tmp`, data, { encoding: 'utf-8' });
+		let dataToWrite;
+		if (typeof data === 'object') dataToWrite = JSON.stringify(data);
+		fs.writeFileSync(`${metaData.cacheFile}.tmp`, dataToWrite, { encoding: 'utf-8' });
 		if (typeof transforms !== 'undefined') {
 			// perform transform
 		}
