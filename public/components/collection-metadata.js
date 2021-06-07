@@ -203,6 +203,11 @@ Vue.component('collection-metadata', {
 			delete clone.lastErrorMessage;
 			delete clone.lastErrorTimestamp;
 			if (this.showBFRelevanceSection) clone.path = '/api/query';
+			if (this.selectedMetadata.sourceType === 'listener') {
+				clone.path = '/';
+				clone.ttl = 0;
+				clone.autoStart = false;
+			}
 			if (this.buttonName === 'Update') return this.$emit('set-metadata', clone, 'update');
 			if (this.buttonName === 'Create') return this.$emit('set-metadata', clone, 'create');
 			return undefined;
