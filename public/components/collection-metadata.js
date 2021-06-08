@@ -128,16 +128,18 @@ Vue.component('collection-metadata', {
 			if (this.selectedMetadata.sourceType === 'bigfix_compliance_inventory_api') return true;
 			if (this.selectedMetadata.sourceType === 'basic auth') return true;
 			return false;
-		},
-		validTransformsForStreamType: function validTransformsForStreamType(direction) {
-			if (typeof this.selectedMetadata.processAsStream === 'undefined') return [];
-			if (this.selectedMetadata.processAsStream) return this.transforms[direction].stream;
-			if (!this.selectedMetadata.processAsStream) return this.transforms[direction].nonstream;
-			return [];
 		}
 	},
 
 	methods: {
+		validTransformsForStreamType: function validTransformsForStreamType(direction) {
+			if (typeof this.selectedMetadata.processAsStream === 'undefined') return [];
+			if (this.selectedMetadata.processAsStream === 'true'
+				|| this.selectedMetadata.processAsStream === true) return this.transforms[direction].stream;
+			if (!this.selectedMetadata.processAsStream === 'false'
+				|| this.selectedMetadata.processAsStream === false) return this.transforms[direction].nonstream;
+			return [];
+		},
 		enableTranspiler: function enableTranspiler() {
 			this.transpilerDisabled = false;
 		},
