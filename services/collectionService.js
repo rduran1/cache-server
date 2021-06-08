@@ -85,27 +85,27 @@ function setMetaDataStatus(collectionName, status, errorMsg) {
 	collectionsModel.setMetaDataStatus(collectionName, statusInfo);
 }
 
-function checkIfTransformsExist(v, ancillaryTransform) {
+function checkIfTransformsExistsAndIsValidForSourceType(v, ancillaryTransform) {
+	const tList = transformService.list();
+	let dataType = 'nonstream';
+	if (v.processAsStream) dataType = 'stream';
 	if (typeof v.incomingTransforms === 'string' && v.incomingTransforms.length > 0) {
-		const t = transformService.get(v.incomingTransforms);
-		if (typeof t === 'undefined') {
-			const e = new Error(`Incoming transform label "${v.incomingTransforms}" does not exist`);
+		if (!tList.incoming[dataType].includes(v.incomingTransforms)) {
+			const e = new Error(`Incoming transform label "${v.incomingTransforms}" does not exist for ${dataType}`);
 			logger.error(e.stack);
 			throw e;
 		}
 	}
 	if (typeof v.outgoingTransforms === 'string' && v.outgoingTransforms.length > 0) {
-		const t = transformService.get(v.outgoingTransforms);
-		if (typeof t === 'undefined') {
-			const e = new Error(`Outgoing transform label "${v.outgoingTransforms}" does not exist`);
+		if (!tList.outgoing[dataType].includes(v.outgoingTransforms)) {
+			const e = new Error(`Outgoing transform label "${v.outgoingTransforms}" does not exist for ${dataType}`);
 			logger.error(e.stack);
 			throw e;
 		}
 	}
-	if (typeof ancillaryTransform === 'string') {
-		const t = transformService.get(ancillaryTransform);
-		if (typeof t === 'undefined') {
-			const e = new Error(`Ancillary tansform label "${ancillaryTransform}" does not exist`);
+	if (typeof ancillaryTransform === 'string' && ancillaryTransform.length > 0) {
+		if (!tList.incoming[dataType].includes(ancillaryTransform) && !tList.outgoing[dataType].includes(ancillaryTransform)) {
+			const e = new Error(`Ancillary transform label "${ancillaryTransform}" does not exist for ${dataType}`);
 			logger.error(e.stack);
 			throw e;
 		}
@@ -312,7 +312,7 @@ collectionService.createMetaData = async (config) => {
 	if (v.serviceAccountName) {
 		await collectionService.getServiceAccount(v.serviceAccountName); // throws error if account does not exist
 	}
-	checkIfTransformsExist(v); // throws error if transforms requested do not exist
+	checkIfTransformsExistsAndIsValidForSourceType(v); // throws error if transforms requested do not exist
 	const collectionMetaDataName = v.name;
 	v.cacheFile = join(cacheDirectory, v.name);
 	/// ///////////////////////////////////////////////////////////
@@ -342,7 +342,7 @@ collectionService.updateMetaData = async (config) => {
 		throw e;
 	}
 	if (typeof v.serviceAccountName !== 'undefined') await collectionService.getServiceAccount(v.serviceAccountName);
-	checkIfTransformsExist(v);
+	checkIfTransformsExistsAndIsValidForSourceType(v);
 	Object.assign(metaData, v);
 	const collectionMetaDataName = v.name;
 	/// ///////////////////////////////////////////////////////////
@@ -405,7 +405,7 @@ collectionService.getDataStream = async (collectionName, ancillaryTransform) => 
 	const v = validationLogWrapper({ collectionName, ancillaryTransform }, 'collectionService_getDataStream');
 	const metaData = await collectionsModel.getMetaData(v.collectionName);
 	if (!metaData) throw new Error(`Collection meta data for "${v.collectionName}" does not exist`);
-	checkIfTransformsExist(metaData, ancillaryTransform);
+	checkIfTransformsExistsAndIsValidForSourceType(metaData, ancillaryTransform);
 	// Get outgoing transforms and add any transforms requested in the params
 	const transforms = transformService.get(metaData.outgoingTransforms);
 	const transformsParam = transformService.get(ancillaryTransform);
@@ -424,7 +424,7 @@ collectionService.saveCollectionData = async (collectionName, dataStream) => {
 	const v = toolboxService.validate({ collectionName, dataStream }, 'collectionService_saveCollectionData');
 	const metaData = await collectionsModel.getMetaData(v.collectionName);
 	if (!metaData) throw new Error(`Collection meta data for "${v.collectionName}" does not exist`);
-	checkIfTransformsExist(metaData);
+	checkIfTransformsExistsAndIsValidForSourceType(metaData);
 	let transforms;
 	let prefix;
 	if (typeof metaData.stringPrefix === 'string' && metaData.stringPrefix.length > 0) prefix = metaData.stringPrefix;
@@ -434,24 +434,14 @@ collectionService.saveCollectionData = async (collectionName, dataStream) => {
 	if (metaData.processAsStream) {
 		await collectionsModel.saveDataStream(v.collectionName, dataStream, transforms);
 	} else {
-		let data;
-		dataStream.on('data', (chunk) => {
-			data += chunk.toString();
-		});
-		dataStream.on('end', async () => {
-			try {
-				await collectionsModel.saveData(v.collectionName, data, transforms);
-			} catch (e) {
-				logger.error(e.message);
-			} finally {
-				notifier.emit('refresh-metadata');
-			}
-		});
-		dataStream.on('aborted', logger.info('httpIncomingMessage aborted'));
-
-		dataStream.on('error', (e) => {
-			logger.error(`httpIncomingMessage error: ${e.message}`);
-		});
+		if (typeof dataStream.body !== 'string') throw new Error('MIME type is no recognized, if transmitting text use content type "text/plain"');
+		try {
+			await collectionsModel.saveData(v.collectionName, dataStream.body, transforms);
+		} catch (e) {
+			logger.error(e.message);
+		} finally {
+			notifier.emit('refresh-metadata');
+		}
 	}
 };
 
