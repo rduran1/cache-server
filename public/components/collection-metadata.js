@@ -74,12 +74,12 @@ Vue.component('collection-metadata', {
 
 						<label for="incoming-transform">Incoming Transform:</label>
 						<select id="incoming-transform" v-model=selectedMetadata.incomingTransforms>
-							<option v-for="transform in transforms.incoming[this.streamOrNoStream]" :value=transform>{{ transform }}</option>
+							<option v-for="transform in validTransformsForStreamType('incoming')" :value=transform>{{ transform }}</option>
 						</select>
 
 						<label for="outgoing-transform">Outgoing Transform:</label>
 						<select id="outgoing-transform" v-model=selectedMetadata.outgoingTransforms>
-							<option v-for="transform in transforms.outgoing[this.streamOrNoStream]" :value=transform>{{ transform }}</option>
+							<option v-for="transform in validTransformsForStreamType('outgoing')" :value=transform>{{ transform }}</option>
 						</select>
 						
 						<label for="string-prefix">String Prefix:</label>
@@ -129,9 +129,11 @@ Vue.component('collection-metadata', {
 			if (this.selectedMetadata.sourceType === 'basic auth') return true;
 			return false;
 		},
-		streamOrNoStream: function streamOrNoStream() {
-			if (this.selectedMetadata.processAsStream) return 'stream';
-			return 'nonstream';
+		validTransformsForStreamType: function validTransformsForStreamType(direction) {
+			if (typeof this.selectedMetadata.processAsStream === 'undefined') return [];
+			if (this.selectedMetadata.processAsStream) return this.transforms[direction].stream;
+			if (!this.selectedMetadata.processAsStream) return this.transforms[direction].nonstream;
+			return [];
 		}
 	},
 
