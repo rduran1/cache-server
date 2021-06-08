@@ -434,8 +434,24 @@ collectionService.saveCollectionData = async (collectionName, dataStream) => {
 	if (metaData.processAsStream) {
 		await collectionsModel.saveDataStream(v.collectionName, dataStream, transforms);
 	} else {
-		await collectionsModel.saveData(v.collectionName, dataStream, transforms);
-		notifier.emit('refresh-metadata');
+		let data;
+		dataStream.on('data', (chunk) => {
+			data += chunk.toString();
+		});
+		dataStream.on('end', async () => {
+			try {
+				await collectionsModel.saveData(v.collectionName, data, transforms);
+			} catch (e) {
+				logger.error(e.message);
+			} finally {
+				notifier.emit('refresh-metadata');
+			}
+		});
+		dataStream.on('aborted', logger.info('httpIncomingMessage aborted'));
+
+		dataStream.on('error', (e) => {
+			logger.error(`httpIncomingMessage error: ${e.message}`);
+		});
 	}
 };
 
