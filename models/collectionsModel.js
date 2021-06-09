@@ -108,11 +108,14 @@ model.saveData = async (collectionName, data, transforms) => {
 	if (typeof metaData === 'undefined') throw new Error(`Collection ${collectionName} does not exist`);
 	checkIfCacheFileExistsInMetaData(collectionName, metaData);
 	checkForDeletionInProgress(collectionName);
+	let dataToSave = data;
 	try {
-		fs.writeFileSync(`${metaData.cacheFile}.tmp`, data, { encoding: 'utf-8' });
-		if (typeof transforms !== 'undefined') {
-			// perform transform
-		}
+		if (typeof transforms === 'function') dataToSave = transforms(data);
+	} catch (e) {
+		throw new Error(`Transform service function error: ${e.message}`);
+	}
+	try {
+		fs.writeFileSync(`${metaData.cacheFile}.tmp`, dataToSave, { encoding: 'utf-8' });
 		checkForDeletionInProgress(collectionName);
 		if (store[collectionName].status === 'stopped') {
 			if (fs.existsSync(`${metaData.cacheFile}.tmp`)) fs.unlinkSync(`${metaData.cacheFile}.tmp`);
@@ -141,6 +144,12 @@ model.saveDataStream = async (collectionName, dataStream, transforms) => {
 	if (typeof metaData === 'undefined') throw new Error(`Collection ${collectionName} does not exist`);
 	checkIfCacheFileExistsInMetaData(collectionName, metaData);
 	checkForDeletionInProgress(collectionName);
+	if (typeof dataStream.headers['x-dataset-size'] !== 'undefined') {
+		const sizeExtractedFromHeader = dataStream.headers['x-dataset-size'];
+		if (sizeExtractedFromHeader < metaData.minValidCacheSizeInBytes) {
+			throw new Error(`Data for "${collectionName}" is undersized: x-dataset-size reported size to be ${sizeExtractedFromHeader} bytes`);
+		}
+	}
 	try {
 		const writeStream = fs.createWriteStream(`${metaData.cacheFile}.tmp`, 'utf-8');
 		if (typeof transforms !== 'undefined') {
