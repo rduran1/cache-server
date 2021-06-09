@@ -434,9 +434,21 @@ collectionService.saveCollectionData = async (collectionName, dataStream) => {
 	if (metaData.processAsStream) {
 		await collectionsModel.saveDataStream(v.collectionName, dataStream, transforms);
 	} else {
-		if (typeof dataStream.body !== 'string') throw new Error('MIME type is no recognized, if transmitting text use content type "text/plain"');
+		if (typeof dataStream.headers['content-type'] !== 'string') {
+			throw new Error('Content type header missing in request');
+		}
+		if (dataStream.headers['content-type'] !== 'text/plain' || dataStream.headers['content-type'] !== 'application/json') {
+			const ct = dataStream.headers['content-type'];
+			throw new Error(`MIME type provided in request "${ct}", only "text/plain" or "application/json" are acceptable`);
+		}
+		if (typeof dataStream !== 'string' && dataStream.body !== 'string') {
+			throw new Error('MIME type is not recognized, if transmitting text use content type "text/plain"');
+		}
+		let dataToSave;
+		if (dataStream.headers['content-type'] !== 'text/plain') dataToSave = dataStream.body;
+		if (dataStream.headers['content-type'] !== 'application/json') dataToSave = JSON.stringify(dataStream.body);
 		try {
-			await collectionsModel.saveData(v.collectionName, dataStream.body, transforms);
+			await collectionsModel.saveData(v.collectionName, dataToSave, transforms);
 		} catch (e) {
 			logger.error(e.message);
 		} finally {
