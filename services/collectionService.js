@@ -192,7 +192,7 @@ const clientRequestHandler = (clientRequest, collectionName, processAsStream, bo
 
 collectionService.createToken = async (config) => {
 	const v = validationLogWrapper(config, 'collectionService_createToken');
-	const token = await tokensModel.getToken(v.tokenName);
+	const token = await tokensModel.getTokenByName(v.tokenName);
 	if (typeof token === 'object' && token.status !== 'deleted') throw new Error(`Token name "${v.tokenName}" already exists`);
 	await tokensModel.createToken(v);
 };
@@ -434,16 +434,20 @@ collectionService.saveCollectionData = async (collectionName, dataStream) => {
 	if (metaData.processAsStream) {
 		await collectionsModel.saveDataStream(v.collectionName, dataStream, transforms);
 	} else {
-		if (typeof dataStream.headers['content-type'] !== 'string') {
-			throw new Error('Content type header missing in request');
-		}
-		if (dataStream.headers['content-type'] !== 'text/plain' && dataStream.headers['content-type'] !== 'application/json') {
-			const ct = dataStream.headers['content-type'];
-			throw new Error(`MIME type provided in request "${ct}", only "text/plain" or "application/json" are acceptable`);
-		}
 		let dataToSave;
-		if (dataStream.headers['content-type'] !== 'text/plain') dataToSave = dataStream.body;
-		if (dataStream.headers['content-type'] !== 'application/json') dataToSave = JSON.stringify(dataStream.body);
+		if (typeof dataStream !== 'string') {
+			if (typeof dataStream.headers !== 'undefined' && typeof dataStream.headers['content-type'] !== 'string') {
+				throw new Error('Content type header missing in request');
+			}
+			if (dataStream.headers['content-type'] !== 'text/plain' && dataStream.headers['content-type'] !== 'application/json') {
+				const ct = dataStream.headers['content-type'];
+				throw new Error(`MIME type provided in request "${ct}", only "text/plain" or "application/json" are acceptable`);
+			}
+			if (dataStream.headers['content-type'] === 'text/plain') dataToSave = dataStream.body;
+			if (dataStream.headers['content-type'] === 'application/json') dataToSave = JSON.stringify(dataStream.body);
+		} else {
+			dataToSave = dataStream;
+		}
 		try {
 			await collectionsModel.saveData(v.collectionName, dataToSave, transforms);
 		} catch (e) {
