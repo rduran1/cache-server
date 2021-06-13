@@ -8,13 +8,13 @@ let exitOnWriteToLogFailure = false;
 function logit(fileName, level, msg) {
 	if (!loggingLevel.includes(level.toLowerCase())) return;
 	const padding = ' '.repeat(5 - level.length);
-	let emsg;
+	let emsg = msg || '';
 	try {
-		emsg = `${Date()}: [${level}${padding}] ${msg.replace(/\n/, EOL)}${EOL}`;
+		emsg = `${Date()}: [${level}${padding}] ${emsg.replace(/\n/, EOL)}${EOL}`;
 		appendFileSync(fileName, `${emsg}`);
 	} catch (e) {
 		// eslint-disable-next-line no-console
-		console.error(`A critical error occurred, failed to append msg to ${fileName} -> ${emsg}: ${e.message}`);
+		console.error(`A critical error occurred, failed to append msg to ${fileName} -> ${emsg}: ${e.stack}`);
 		if (exitOnWriteToLogFailure) process.exit(1000);
 	}
 }
