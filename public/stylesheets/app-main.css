@@ -7,11 +7,13 @@
   --c4: grey;
   --c5: #af5616;
   --c6: #272c30;
+  --c7: #1d1f20;
 }
 
 body {
-  background-color: #1d1f20;
+  background-color: var(--c7);
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  overscroll-behavior: none;
 }
 
 button {
@@ -34,8 +36,8 @@ button:active {
 }
 
 button:disabled {
-  opacity: 0.6;
-  background-color: #5c6773;
+  background-color: #3f444a;
+  color: #a7a5a5;
   cursor: default;
 }
 
@@ -165,10 +167,6 @@ td {
   width: 300px;
 }
 
-.collection-checkbox {
-  height: 15px;
-}
-
 .data-collections .grid-container {
   display: grid;
   grid-template-columns: 300px 600px;
@@ -201,11 +199,15 @@ td {
   margin-left: 12px;
 }
 
+.collection-button-tds {
+  width: 200px;
+  padding: 0px;
+}
+
 .data-collections button {
   width: 200px;
   height: 25px;
-  margin-right: 15px;
-  margin-bottom: 15px;
+  margin: 8px;
 }
 
 .data-collections ul {
@@ -247,12 +249,17 @@ td {
   font-size: 1.5em;
   font-weight: bold;
   width: 100%;
+  position: fixed;
+  top: 0px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: var(--c7);
 }
 
 #workspace {
   transition: 0.6s;
   color: var(--c1);
-  padding: 0px 50px;
+  padding: 0px 20px 0px 50px;
 }
 
 /* sidebar styling */
