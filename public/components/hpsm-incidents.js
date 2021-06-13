@@ -64,6 +64,7 @@ Vue.component('hpsm-incidents', {
 			} catch (e) {
 				toast.error(e.message);
 			}
+			await this.refreshList();
 			document.body.style.cursor = 'default';
 		},
 		refreshList: async function refreshList() {
