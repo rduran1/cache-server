@@ -92,7 +92,7 @@ app.use((e, req, res, next) => {
 		logger.error(`${emsg}: Responding with HTTP 400: ${e.message}`);
 		return res.status(400).send(e.message);
 	}
-	if (/^Unexpected end of JSON input /.test(e.message)) {
+	if (/^Unexpected end of JSON input/.test(e.message)) {
 		logger.error(`${emsg}: Responding with HTTP 400: ${e.message}`);
 		return res.status(400).send(e.message);
 	}
