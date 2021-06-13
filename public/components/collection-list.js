@@ -50,6 +50,7 @@ Vue.component('collection-list', {
 			if (col.status === 'waiting') config.status = 'stop';
 			if (col.status === 'starting') config.status = 'stop';
 			if (col.status === 'error') config.status = 'stop';
+			if (col.status === 'listening') config.status = 'stop';
 			return this.$emit('set-collection-status', config);
 		}
 	}
