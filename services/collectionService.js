@@ -42,6 +42,8 @@ function buildHttpRequestConfig(serviceAccount, collectionMetaData) {
 	config.returnClientRequest = true;
 	delete config.username;
 	delete config.password;
+	if (config.method.toLowerCase() === 'get') delete config.body;
+	delete config.body;
 	return config;
 }
 
