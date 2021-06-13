@@ -74,11 +74,13 @@ Vue.component('collection-metadata', {
 
 						<label for="incoming-transform">Incoming Transform:</label>
 						<select id="incoming-transform" v-model=selectedMetadata.incomingTransforms>
+							<option></option>
 							<option v-for="transform in validTransformsForStreamType('incoming')" :value=transform>{{ transform }}</option>
 						</select>
 
 						<label for="outgoing-transform">Outgoing Transform:</label>
 						<select id="outgoing-transform" v-model=selectedMetadata.outgoingTransforms>
+							<option></option>
 							<option v-for="transform in validTransformsForStreamType('outgoing')" :value=transform>{{ transform }}</option>
 						</select>
 						
@@ -136,7 +138,7 @@ Vue.component('collection-metadata', {
 			if (typeof this.selectedMetadata.processAsStream === 'undefined') return [];
 			if (this.selectedMetadata.processAsStream === 'true'
 				|| this.selectedMetadata.processAsStream === true) return this.transforms[direction].stream;
-			if (!this.selectedMetadata.processAsStream === 'false'
+			if (this.selectedMetadata.processAsStream === 'false'
 				|| this.selectedMetadata.processAsStream === false) return this.transforms[direction].nonstream;
 			return [];
 		},
@@ -210,6 +212,7 @@ Vue.component('collection-metadata', {
 			delete clone.streamingCount;
 			delete clone.lastErrorMessage;
 			delete clone.lastErrorTimestamp;
+			delete clone.lastCacheUpdate;
 			if (this.showBFRelevanceSection) clone.path = '/api/query';
 			if (this.selectedMetadata.sourceType === 'listener') {
 				clone.path = '/';
