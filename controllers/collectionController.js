@@ -248,6 +248,7 @@ collectionController.saveCollectionData = async (req, res) => {
 	} catch (e) {
 		res.statusMessage = e.message;
 		res.status(400).end();
+		logger.error(e.stack);
 		return logger.info(`responded with HTTP 400: ${res.statusMessage}`);
 	}
 };
