@@ -29,11 +29,12 @@ model.name = mName;
 
 model.isTokenAuthorizedToAccessCollection = async (tokenValue, collectionName, method) => {
 	const token = await model.getTokenByValue(tokenValue);
+	if (typeof token === 'undefined') return false;
 	if (method.toLowerCase() === 'post') {
-		if (token.accessType !== 'writeonly' || token.accessType !== 'readwrite') return false;
+		if (token.accessType !== 'writeonly' && token.accessType !== 'readwrite') return false;
 	}
 	if (method.toLowerCase() === 'get') {
-		if (token.accessType !== 'readonly' || token.accessType !== 'readwrite') return false;
+		if (token.accessType !== 'readonly' && token.accessType !== 'readwrite') return false;
 	}
 	if (token) return token.collections.includes(collectionName);
 	return false;
