@@ -233,6 +233,7 @@ collectionController.deleteServiceAccount = async (req, res) => {
 
 collectionController.saveCollectionData = async (req, res) => {
 	const { name } = req.params;
+	logger.debug(`Checking token has permission to update ${name}`);
 	const isAllowed = await collectionService.isTokenAuthorizedToAccessCollection(req.query.token, name, req.method);
 	if (!isAllowed) {
 		const emsg = `Token provided does not have permission to access "${name}"`;
@@ -241,8 +242,11 @@ collectionController.saveCollectionData = async (req, res) => {
 		res.status(403).end();
 		return logger.info(`responded with HTTP 403: ${res.statusMessage}`);
 	}
+	logger.debug(`Token is authorized to access ${name}`);
 	try {
+		logger.debug(`Saving ${name} to storage`);
 		await collectionService.saveCollectionData(name, req);
+		logger.debug(`${name} successfully saved to storage`);
 		res.status(200).send();
 		return logger.info('responded with HTTP 200');
 	} catch (e) {
