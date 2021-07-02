@@ -22,7 +22,7 @@ Vue.component('collection-list', {
 						<button class="collection-list-buttons"
 							@click="setCollectionStatus(col)"
 							:disabled="isPendingServerResponse"
-						>{{ col.status }}</button>
+						><abbr v-if="col.status === "error" :title="errorMessage(col)">{{ col.status }}</abbr><div v-else>{{ col.status }}</button>
 					</td>
 				</tr>
 			</table>
@@ -52,6 +52,9 @@ Vue.component('collection-list', {
 			if (col.status === 'error') config.status = 'stop';
 			if (col.status === 'listening') config.status = 'stop';
 			return this.$emit('set-collection-status', config);
+		},
+		errorMessage: function errorMessage(col) {
+			return col.status === 'error' ? col.lastErrorMessage : '';
 		}
 	}
 });
