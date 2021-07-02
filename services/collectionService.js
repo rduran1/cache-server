@@ -36,6 +36,8 @@ function buildHttpRequestConfig(serviceAccount, collectionMetaData) {
 	if (collectionMetaData.sourceType === 'bigfix_compliance_inventory_api') {
 		if (typeof config.apiToken === 'string') config.path = `${config.path}&token=${config.apiToken}`;
 		delete config.apiToken;
+	} else {
+		delete config.apiToken;
 	}
 	if (typeof body === 'object') config.body = qs.stringify(body);
 	if (typeof body === 'string') config.body = body;
@@ -85,6 +87,7 @@ function setMetaDataStatus(collectionName, status, errorMsg) {
 		logger.error(`Error in collection "${collectionName}": ${errorMsg}`);
 	}
 	collectionsModel.setMetaDataStatus(collectionName, statusInfo);
+	notifier.emit('refresh-metadata');
 }
 
 function checkIfTransformsExistsAndIsValidForSourceType(v, ancillaryTransform) {
