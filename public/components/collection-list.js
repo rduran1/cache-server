@@ -22,7 +22,10 @@ Vue.component('collection-list', {
 						<button class="collection-list-buttons"
 							@click="setCollectionStatus(col)"
 							:disabled="isPendingServerResponse"
-						><abbr v-if="col.status === "error" :title="errorMessage(col)">{{ col.status }}</abbr><div v-else>{{ col.status }}</button>
+						>
+							<abbr v-if="col.status === 'error'" :title="errorMessage(col)">{{ col.status }}</abbr>
+							<abbr v-else>{{ col.status }}</abbr>
+						</button>
 					</td>
 				</tr>
 			</table>
